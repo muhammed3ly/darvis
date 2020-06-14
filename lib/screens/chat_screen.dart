@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:darvis/widgets/chat_screen_widgets/char_screen_header.dart';
 import 'package:darvis/widgets/chat_screen_widgets/message_bubble.dart';
@@ -7,6 +6,7 @@ import 'package:darvis/widgets/chat_screen_widgets/typing_bar.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
+  static const String routeName = '/chat';
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }

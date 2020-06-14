@@ -1,3 +1,5 @@
+import 'package:darvis/screens/settings_screen.dart';
+
 import './screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +15,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ChatScreen(),
+      home: SettingsScreen(),
+      routes: {
+        ChatScreen.routeName: (context) => ChatScreen(),
+      },
     );
   }
 }
