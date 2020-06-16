@@ -5,7 +5,6 @@ class User with ChangeNotifier {
   String email, userName, imageUrl, userId;
 
   void setData(String email, String userName, String imageUrl, String userId) {
-    print('got');
     this.email = email;
     this.userName = userName;
     this.imageUrl = imageUrl;

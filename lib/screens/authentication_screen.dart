@@ -1,10 +1,6 @@
-import '../providers/categories.dart';
-import '../providers/users.dart';
 import 'package:chat_bot/screens/sign_up_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 
 class AuthScreen extends StatefulWidget {
   static const routeName = '/auth-screen';
@@ -17,7 +13,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueAccent,
+      backgroundColor: Colors.white,
       body: AuthForm(),
     );
   }
@@ -29,7 +25,7 @@ class AuthForm extends StatefulWidget {
 }
 
 class _AuthFormState extends State<AuthForm> {
-  String email, password;
+  String email = '', password = '';
 
   final formKey = GlobalKey<FormState>();
   final auth = FirebaseAuth.instance;
@@ -38,6 +34,8 @@ class _AuthFormState extends State<AuthForm> {
 
   @override
   void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -77,7 +75,6 @@ class _AuthFormState extends State<AuthForm> {
 //        };
 //      }).toList());
     } catch (error) {
-
       var message = 'An error occurred';
       Scaffold.of(context).showSnackBar(
         SnackBar(
@@ -94,121 +91,190 @@ class _AuthFormState extends State<AuthForm> {
     final height = MediaQuery.of(context).size.height;
     return Center(
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                    margin: EdgeInsets.all(20),
-                    height: height / 5,
-                    width: width - 40,
-                    child: Image.asset(
-                      'assets/images/logo.jpg',
-                      fit: BoxFit.fill,
-                    )),
+        child: Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromRGBO(3, 155, 229, 1),
+                Colors.black87,
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [0, 1],
             ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.white,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                height: 50,
               ),
-              width: width - 20,
-              padding:
-                  EdgeInsets.only(top: 25, bottom: 20, left: 25, right: 25),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          TextFormField(
-                            onSaved: (value) => email = value,
-                            keyboardType: TextInputType.emailAddress,
-                            key: ValueKey('email'),
+//              FittedBox(
+//                child: Container(
+//                  padding:
+//                      const EdgeInsets.symmetric(vertical: 60, horizontal: 10),
+//                  child: Image.asset(
+//                    'assets/images/logo.png',
+//                    fit: BoxFit.cover,
+//                  ),
+//                ),
+//              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: Column(
+                    children: <Widget>[
+                      FittedBox(
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                              top: 60, bottom: 40, left: 10, right: 10),
+                          child: Text(
+                            'Darvis',
                             style: TextStyle(
-                              color: Colors.black,
+                                fontFamily: 'Signatra',
+                                fontSize: 120,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            TextFormField(
+                              onSaved: (value) => email = value,
+                              onChanged: (value) {
+                                setState(() {
+                                  email = value;
+                                });
+                              },
+                              keyboardType: TextInputType.emailAddress,
+                              key: ValueKey('email'),
+                              style:
+                                  TextStyle(fontSize: 17, color: Colors.white),
+                              decoration: InputDecoration(
+                                filled: true,
+                                errorStyle: TextStyle(color: Colors.white),
+                                fillColor: Colors.white10,
+                                labelText: 'Email Address',
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 10),
+                                labelStyle: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                                border: InputBorder.none,
+                              ),
+                              validator: (email) {
+                                if (email.isEmpty)
+                                  return 'enter your email address';
+                                if (!email.contains('@'))
+                                  return 'enter a valid email address';
+                                return null;
+                              },
                             ),
-                            decoration: InputDecoration(
-                              focusColor: Colors.black,
-                              fillColor: Colors.black,
-                              labelText: 'Email Address',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(25.0),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              onSaved: (value) => password = value,
+                              onChanged: (value) {
+                                setState(() {
+                                  password = value;
+                                });
+                              },
+                              key: ValueKey('password'),
+                              validator: (value) {
+                                if (value.isEmpty) return 'enter your password';
+                                return null;
+                              },
+                              style:
+                                  TextStyle(fontSize: 17, color: Colors.white),
+                              decoration: InputDecoration(
+                                errorStyle: TextStyle(color: Colors.white),
+                                filled: true,
+                                fillColor: Colors.white10,
+                                labelText: 'Password',
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 10),
+                                labelStyle: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              obscureText: true,
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Opacity(
+                              opacity: (email.isEmpty || password.isEmpty)
+                                  ? 0.5
+                                  : 1.0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white24,
+                                  border: Border.all(color: Colors.white),
+                                ),
+                                width: double.infinity,
+                                child: FlatButton(
+                                  padding: EdgeInsets.symmetric(horizontal: 60),
+                                  child: Text(
+                                    'Login',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                  onPressed: (email.isEmpty || password.isEmpty)
+                                      ? null
+                                      : () => login(),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.elliptical(0, 0),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              icon: Icon(Icons.email),
                             ),
-                            validator: (email) {
-                              if (email.isEmpty)
-                                return 'enter your email address';
-                              if (!email.contains('@'))
-                                return 'enter a valid email address';
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 10),
-                          TextFormField(
-                            onSaved: (value) => password = value,
-                            key: ValueKey('password'),
-                            validator: (value) {
-                              if (value.isEmpty) return 'enter your password';
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              icon: Icon(Icons.security),
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(25.0))),
-                            ),
-                            obscureText: true,
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          FlatButton(
-                            padding: EdgeInsets.symmetric(horizontal: 60),
-                            child: Text(
-                              'Login',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            onPressed: () => login(),
-                            color: Colors.black26,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          FlatButton(
-                            child: Text(
-                              'Create an account',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            color: Colors.black26,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            onPressed: () => Navigator.of(context)
-                                .pushNamed(SignUpScreen.routeName),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+              InkWell(
+                onTap: () =>
+                    Navigator.of(context).pushNamed(SignUpScreen.routeName),
+                child: Container(
+                  color: Colors.white10,
+                  width: width,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Don\'t have an account?',
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w300),
+                      ),
+                      Text(
+                        ' Sign up.',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

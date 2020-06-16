@@ -26,19 +26,28 @@ class _MyAppState extends State<MyApp> {
         title: 'Darvis',
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          primaryColor: Color.fromRGBO(3, 155, 229, 1),
         ),
         home: StreamBuilder(
           stream: FirebaseAuth.instance.onAuthStateChanged,
           builder: (ctx, userSnapShort) {
-            print('here for stream'); 
+            print('here for stream');
             print(userSnapShort.hasData);
+//            if (userSnapShort.connectionState == ConnectionState.waiting) {
+//              return Scaffold(
+//                body: Center(
+//                  child: CircularProgressIndicator(),
+//                ),
+//              );
+//            }
             if (userSnapShort.hasData) {
-              return HomeScreen(signUp: true);
+              return HomeScreen();
             }
             return AuthScreen();
           },
         ),
-//        home: AuthScreen(),
+//        home: HomeScreen(),
+
         routes: {
           AuthScreen.routeName: (_) => AuthScreen(),
           HomeScreen.routeName: (_) => HomeScreen(),
