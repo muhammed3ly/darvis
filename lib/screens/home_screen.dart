@@ -1,3 +1,5 @@
+import 'package:chat_bot/screens/my_favorites.dart';
+
 import '../screens/chat_screen.dart';
 import '../screens/settings_screen.dart';
 import '../widgets/drawer_content.dart';
@@ -22,11 +24,15 @@ class HomeScreen extends StatelessWidget {
 
         switch (position) {
           case 0:
-            screenCurrent = ChatScreen(toggle);
+            screenCurrent = MyFavoritesScreen(
+              toggle: toggle,
+            );
             break;
           case 1:
-            screenCurrent = SettingsScreen(toggle);
+            screenCurrent = ChatScreen(toggle);
             break;
+          case 2:
+            screenCurrent = SettingsScreen(toggle);
         }
 
         return SwipeDetector(

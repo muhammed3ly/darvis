@@ -8,7 +8,6 @@ import '../providers/categories.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 
-
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';
 
@@ -454,6 +453,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       password = password.trim();
       AuthResult authResult = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      Navigator.of(context).pop();
 //      final ref = FirebaseStorage.instance
 //          .ref()
 //          .child('user_image')
@@ -495,7 +495,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: Container(
         height: height,
         width: width,
-
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -536,7 +535,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         )
                       : GridView.builder(
                           itemCount: categories.categories.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             childAspectRatio: 1,
                             crossAxisSpacing: 20,
@@ -560,7 +560,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () => categories.toggleFavorite(idx),
+                                      onTap: () =>
+                                          categories.toggleFavorite(idx),
                                       child: Icon(categories.categories[idx]
                                                   ['isFav'] ==
                                               'true'

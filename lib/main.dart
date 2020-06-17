@@ -34,21 +34,14 @@ class _MyAppState extends State<MyApp> {
           builder: (ctx, userSnapShort) {
             print('here for stream');
             print(userSnapShort.hasData);
-//            if (userSnapShort.connectionState == ConnectionState.waiting) {
-//              return Scaffold(
-//                body: Center(
-//                  child: CircularProgressIndicator(),
-//                ),
-//              );
-//            }
             if (userSnapShort.hasData) {
+              print('hello home');
               return HomeScreen();
+            } else {
+              return AuthScreen();
             }
-            return AuthScreen();
           },
         ),
-//        home: HomeScreen(),
-
         routes: {
           AuthScreen.routeName: (_) => AuthScreen(),
           HomeScreen.routeName: (_) => HomeScreen(),

@@ -40,13 +40,21 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
                 SimpleHiddenDrawerProvider.of(context)
                     .setSelectedMenuPosition(0);
               },
-              child: Text("Chat Screen"),
+              child: Text("My Favorites"),
             ),
             FlatButton(
               textColor: Colors.white,
               onPressed: () {
                 SimpleHiddenDrawerProvider.of(context)
                     .setSelectedMenuPosition(1);
+              },
+              child: Text("Chat Screen"),
+            ),
+            FlatButton(
+              textColor: Colors.white,
+              onPressed: () {
+                SimpleHiddenDrawerProvider.of(context)
+                    .setSelectedMenuPosition(2);
               },
               child: Text("Settings Screen"),
             ),
