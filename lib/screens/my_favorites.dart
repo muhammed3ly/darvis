@@ -10,9 +10,9 @@ import '../widgets/Drawer.dart';
 
 class MyFavoritesScreen extends StatefulWidget {
   static const routeName = '/home-screen';
-  bool signUp;
   final Function toggle;
-  MyFavoritesScreen({this.signUp = false, @required this.toggle});
+
+  MyFavoritesScreen({@required this.toggle});
 
   @override
   _MyFavoritesScreenState createState() => _MyFavoritesScreenState();
@@ -22,37 +22,37 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
   bool first = true;
 
   Future<void> init() async {
-    print('init here');
     if (first) {
+      Provider.of<User>(context, listen: false).loadMessage();
       first = false;
       final user = await FirebaseAuth.instance.currentUser();
       final userData =
           await Firestore.instance.collection('users').document(user.uid).get();
-      userData.documentID;
 
       Provider.of<User>(context, listen: false).setData(
           user.email, userData['userName'], userData['imageUrl'], user.uid);
-      final allDocuments = await Firestore.instance
-          .collection('users')
-          .document(user.uid)
-          .collection('categories')
-          .getDocuments();
 
-      Provider.of<Categories>(context, listen: false)
-          .set(allDocuments.documents.map((document) {
-        return {
-          'name': document.documentID as String,
-          'imageUrl': document.data['imageUrl'] as String,
-          'isFav': document.data['isFav'] as String,
-        };
-      }).toList());
+      if (Provider.of<Categories>(context, listen: false).categories == null) {
+        final allDocuments = await Firestore.instance
+            .collection('users')
+            .document(user.uid)
+            .collection('categories')
+            .getDocuments();
+        Provider.of<Categories>(context, listen: false)
+            .set(allDocuments.documents.map((document) {
+          return {
+            'name': document.documentID as String,
+            'imageUrl': document.data['imageUrl'] as String,
+            'isFav': document.data['isFav'] as String,
+          };
+        }).toList());
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.signUp) init();
-    print('hahahahah');
+    init();
     String userId = Provider.of<User>(context, listen: false).userId;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;

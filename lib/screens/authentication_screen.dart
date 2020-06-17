@@ -45,35 +45,10 @@ class _AuthFormState extends State<AuthForm> {
     if (!valid) return;
     formKey.currentState.save();
     try {
+      email = email.trim();
+      password = password.trim();
       AuthResult res = await auth.signInWithEmailAndPassword(
           email: email, password: password);
-//
-//      final userData = await Firestore.instance
-//          .collection('users')
-//          .document(res.user.uid)
-//          .get();
-//      userData.documentID;
-//      print(email);
-//      print(userData['userName']);
-//      print(userData['imageUrl']);
-//      print(res.user.uid);
-//      Provider.of<User>(context, listen: false).setData(
-//          email, userData['userName'], userData['imageUrl'], res.user.uid);
-//      final allDocuments = await Firestore.instance
-//          .collection('users')
-//          .document(res.user.uid)
-//          .collection('categories')
-//          .getDocuments();
-//      print(res.user.uid);
-//      print(allDocuments.documents);
-//      Provider.of<Categories>(context, listen: false)
-//          .set(allDocuments.documents.map((document) {
-//        return {
-//          'name': document.documentID as String,
-//          'imageUrl': document.data['imageUrl'] as String,
-//          'isFav': document.data['isFav'] as String,
-//        };
-//      }).toList());
     } catch (error) {
       var message = 'An error occurred';
       Scaffold.of(context).showSnackBar(
@@ -90,27 +65,26 @@ class _AuthFormState extends State<AuthForm> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return Center(
-      child: SingleChildScrollView(
-        child: Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(3, 155, 229, 1),
-                Colors.black87,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [0, 1],
-            ),
+      child: Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromRGBO(3, 155, 229, 1),
+              Colors.black87,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: [0, 1],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                height: 50,
-              ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              height: 50,
+            ),
 //              FittedBox(
 //                child: Container(
 //                  padding:
@@ -121,9 +95,10 @@ class _AuthFormState extends State<AuthForm> {
 //                  ),
 //                ),
 //              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
                       FittedBox(
@@ -243,37 +218,37 @@ class _AuthFormState extends State<AuthForm> {
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () =>
-                    Navigator.of(context).pushNamed(SignUpScreen.routeName),
-                child: Container(
-                  color: Colors.white10,
-                  width: width,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        'Don\'t have an account?',
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w300),
-                      ),
-                      Text(
-                        ' Sign up.',
-                        style: TextStyle(
-                          fontSize: 20,
+            ),
+            InkWell(
+              onTap: () =>
+                  Navigator.of(context).pushNamed(SignUpScreen.routeName),
+              child: Container(
+                color: Colors.white10,
+                width: width,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      'Don\'t have an account?',
+                      style: TextStyle(
+                          fontSize: 18,
                           color: Colors.white,
-                        ),
+                          fontWeight: FontWeight.w300),
+                    ),
+                    Text(
+                      ' Sign up.',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

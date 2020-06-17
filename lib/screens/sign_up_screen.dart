@@ -7,7 +7,9 @@ import 'package:provider/provider.dart';
 import '../providers/categories.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import '../providers/users.dart';
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';
 
@@ -100,17 +102,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-//              Container(
-//                padding: EdgeInsets.all(20),
-//                child: LinearPercentIndicator(
-//                  width: width - 40,
-//                  lineHeight: 14.0,
-//                  percent: 0,
-//                  backgroundColor: Colors.white,
-//                  progressColor: Colors.black87,
-//                ),
-//              ),
-
               Expanded(
                 child: Container(
                   padding:
@@ -345,7 +336,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
         child: Column(
-//          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SizedBox(
               height: 70,
@@ -451,38 +441,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       email = email.trim();
       password = password.trim();
+      var categories =
+          Provider.of<Categories>(context, listen: false).categories;
       AuthResult authResult = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
+
+
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_image')
+          .child(authResult.user.uid + '.jpg');
+
+      await ref.putFile(pickedImage).onComplete;
+      final url = await ref.getDownloadURL();
+      await Firestore.instance
+          .collection('users')
+          .document(authResult.user.uid)
+          .setData({
+        'userName': userName,
+        'email': email,
+        'imageUrl': url,
+      });
+      categories.forEach((type) {
+        Firestore.instance
+            .collection('users')
+            .document(authResult.user.uid)
+            .collection('categories')
+            .document(type['name'])
+            .setData({
+          'imageUrl': type['imageUrl'],
+          'isFav': type['isFav'],
+        });
+      });
       Navigator.of(context).pop();
-//      final ref = FirebaseStorage.instance
-//          .ref()
-//          .child('user_image')
-//          .child(authResult.user.uid + '.jpg');
-//      await ref.putFile(pickedImage).onComplete;
-//      final url = await ref.getDownloadURL();
-//      await Firestore.instance
-//          .collection('users')
-//          .document(authResult.user.uid)
-//          .setData({
-//        'userName': userName,
-//        'email': email,
-//        'imageUrl': url,
-//      });
-//      Provider.of<Categories>(context, listen: false)
-//          .categories
-//          .forEach((type) {
-//        Firestore.instance
-//            .collection('users')
-//            .document(authResult.user.uid)
-//            .collection('categories')
-//            .document(type['name'])
-//            .setData({
-//          'imageUrl': type['imageUrl'],
-//          'isFav': type['isFav'],
-//        });
-//      });
-//      Provider.of<User>(context, listen: false)
-//          .setData(email, userName, url, authResult.user.uid);
     } catch (error) {
       print(error);
     }
