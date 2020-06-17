@@ -1,4 +1,5 @@
 import 'package:chat_bot/screens/authentication_screen.dart';
+import 'package:chat_bot/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../providers/users.dart';
+
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';
 
@@ -446,7 +448,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       AuthResult authResult = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
 
-
       final ref = FirebaseStorage.instance
           .ref()
           .child('user_image')
@@ -473,7 +474,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'isFav': type['isFav'],
         });
       });
-      Navigator.of(context).pop();
+
+      print('done firestore');
+      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
     } catch (error) {
       print(error);
     }

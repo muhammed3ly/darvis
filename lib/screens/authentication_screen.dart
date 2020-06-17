@@ -220,8 +220,8 @@ class _AuthFormState extends State<AuthForm> {
               ),
             ),
             InkWell(
-              onTap: () =>
-                  Navigator.of(context).pushNamed(SignUpScreen.routeName),
+              onTap: () => Navigator.of(context)
+                  .pushReplacementNamed(SignUpScreen.routeName),
               child: Container(
                 color: Colors.white10,
                 width: width,

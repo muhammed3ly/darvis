@@ -1,3 +1,4 @@
+import 'package:chat_bot/screens/authentication_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -63,6 +64,8 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
               onPressed: () async {
                 Provider.of<Categories>(context, listen: false).clear();
                 await FirebaseAuth.instance.signOut();
+                Navigator.of(context)
+                    .pushReplacementNamed(AuthScreen.routeName);
               },
               child: Text("Sign Out"),
             ),

@@ -118,7 +118,13 @@ class _TypingBarState extends State<TypingBar> {
                             color: Colors.white,
                           ),
                         )
-                      : CircularProgressIndicator(),
+                      : Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                new AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
                 ),
               ),
             ),

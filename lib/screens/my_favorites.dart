@@ -66,7 +66,6 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
       body: Container(
         height: height,
         width: width,
-        padding: const EdgeInsets.only(top: 80),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
