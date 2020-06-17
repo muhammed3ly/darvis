@@ -1,12 +1,10 @@
-import 'dart:io';
-
-import 'package:darvis/widgets/gradient_appbar.dart';
-import 'package:darvis/widgets/settings_screen_widgets/bottom_sheets/name_bottom_sheet.dart';
-import 'package:darvis/widgets/settings_screen_widgets/bottom_sheets/password.dart';
-import 'package:darvis/widgets/settings_screen_widgets/bottom_sheets/profile_picture_bottom_sheet.dart';
-import 'package:darvis/widgets/settings_screen_widgets/settings_item.dart';
-import 'package:darvis/widgets/settings_screen_widgets/settings_photo_item.dart';
-import 'package:darvis/widgets/settings_screen_widgets/settings_section.dart';
+import '../widgets/gradient_appbar.dart';
+import '../widgets/settings_screen_widgets/bottom_sheets/name_bottom_sheet.dart';
+import '../widgets/settings_screen_widgets/bottom_sheets/password.dart';
+import '../widgets/settings_screen_widgets/bottom_sheets/profile_picture_bottom_sheet.dart';
+import '../widgets/settings_screen_widgets/settings_item.dart';
+import '../widgets/settings_screen_widgets/settings_photo_item.dart';
+import '../widgets/settings_screen_widgets/settings_section.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 

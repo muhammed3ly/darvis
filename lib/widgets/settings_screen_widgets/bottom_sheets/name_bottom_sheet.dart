@@ -14,7 +14,7 @@ class NameBottomSheet extends StatelessWidget {
       color: Colors.white,
     ),
   );
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

@@ -4,9 +4,9 @@ class ChatBubble extends StatelessWidget {
   final String _sender, _message, _turn;
   ChatBubble(Key key, this._sender, this._message, this._turn)
       : super(key: key);
-  double _space = 2.0;
   @override
   Widget build(BuildContext context) {
+    double _space = 2.0;
     if (_turn == 'start') {
       _space = 7;
     }

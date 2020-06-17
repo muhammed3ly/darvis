@@ -1,4 +1,4 @@
-import 'package:chat_bot/screens/sign_up_screen.dart';
+import '../screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -139,7 +139,6 @@ class _AuthFormState extends State<AuthForm> {
                           ),
                         ),
                       ),
-
                       Form(
                         key: formKey,
                         child: Column(

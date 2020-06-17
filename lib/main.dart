@@ -1,10 +1,7 @@
-import 'package:darvis/screens/chat_screen.dart';
-import 'package:darvis/screens/home_screen.dart';
-import 'package:darvis/screens/settings_screen.dart';
-import 'package:chat_bot/providers/categories.dart';
-import 'package:chat_bot/screens/authentication_screen.dart';
-import 'package:chat_bot/screens/home_screen.dart';
-import 'package:chat_bot/screens/sign_up_screen.dart';
+import './screens/home_screen.dart';
+import './providers/categories.dart';
+import './screens/authentication_screen.dart';
+import './screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './providers/users.dart';
@@ -26,6 +23,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => User())
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Darvis',
         theme: ThemeData(
           primarySwatch: Colors.blue,

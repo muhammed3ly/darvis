@@ -1,10 +1,6 @@
-import '../providers/categories.dart';
-import '../providers/users.dart';
 import 'package:chat_bot/screens/sign_up_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 
 class AuthScreen2 extends StatefulWidget {
   static const routeName = '/auth-screen2';
@@ -221,7 +217,7 @@ class _AuthFormState extends State<AuthForm> {
                 child: Container(
 //                  color: Colors.white10,
                   decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color : Colors.grey)),
+                    border: Border(top: BorderSide(color: Colors.grey)),
                   ),
                   width: width,
                   padding: EdgeInsets.symmetric(vertical: 16),
@@ -241,7 +237,7 @@ class _AuthFormState extends State<AuthForm> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color:Colors.indigo,
+                          color: Colors.indigo,
                         ),
                       ),
                     ],

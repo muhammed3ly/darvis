@@ -1,3 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/categories.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
 
@@ -39,12 +43,21 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
               child: Text("Chat Screen"),
             ),
             FlatButton(
-                textColor: Colors.white,
-                onPressed: () {
-                  SimpleHiddenDrawerProvider.of(context)
-                      .setSelectedMenuPosition(1);
-                },
-                child: Text("Settings Screen"))
+              textColor: Colors.white,
+              onPressed: () {
+                SimpleHiddenDrawerProvider.of(context)
+                    .setSelectedMenuPosition(1);
+              },
+              child: Text("Settings Screen"),
+            ),
+            FlatButton(
+              textColor: Colors.white,
+              onPressed: () async {
+                Provider.of<Categories>(context, listen: false).clear();
+                await FirebaseAuth.instance.signOut();
+              },
+              child: Text("Sign Out"),
+            ),
           ],
         ),
       ),

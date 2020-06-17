@@ -1,11 +1,12 @@
-import 'package:darvis/screens/chat_screen.dart';
-import 'package:darvis/screens/settings_screen.dart';
-import 'package:darvis/widgets/drawer_content.dart';
+import '../screens/chat_screen.dart';
+import '../screens/settings_screen.dart';
+import '../widgets/drawer_content.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
 import 'package:swipedetector/swipedetector.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const String routeName = '/home';
   var tog;
   @override
   Widget build(BuildContext context) {
