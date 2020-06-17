@@ -1,4 +1,4 @@
-package com.example.darvis
+package com.example.chat_bot
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

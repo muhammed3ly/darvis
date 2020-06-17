@@ -1,25 +1,62 @@
 import 'package:darvis/screens/chat_screen.dart';
 import 'package:darvis/screens/home_screen.dart';
 import 'package:darvis/screens/settings_screen.dart';
+import 'package:chat_bot/providers/categories.dart';
+import 'package:chat_bot/screens/authentication_screen.dart';
+import 'package:chat_bot/screens/home_screen.dart';
+import 'package:chat_bot/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import './providers/users.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'DARVIS',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => Categories()),
+        ChangeNotifierProvider(create: (_) => User())
+      ],
+      child: MaterialApp(
+        title: 'Darvis',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          primaryColor: Color.fromRGBO(3, 155, 229, 1),
+        ),
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.onAuthStateChanged,
+          builder: (ctx, userSnapShort) {
+            print('here for stream');
+            print(userSnapShort.hasData);
+//            if (userSnapShort.connectionState == ConnectionState.waiting) {
+//              return Scaffold(
+//                body: Center(
+//                  child: CircularProgressIndicator(),
+//                ),
+//              );
+//            }
+            if (userSnapShort.hasData) {
+              return HomeScreen();
+            }
+            return AuthScreen();
+          },
+        ),
+//        home: HomeScreen(),
+
+        routes: {
+          AuthScreen.routeName: (_) => AuthScreen(),
+          HomeScreen.routeName: (_) => HomeScreen(),
+          SignUpScreen.routeName: (_) => SignUpScreen(),
+        },
       ),
-      home: HomeScreen(),
-      /* routes: {
-        ChatScreen.routeName: (context) => ChatScreen(),
-        SettingsScreen.routeName: (context) => SettingsScreen(),
-      },*/
     );
   }
 }

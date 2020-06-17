@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "955929942269",
+    "firebase_url": "https://darvis-a040d.firebaseio.com",
+    "project_id": "darvis-a040d",
+    "storage_bucket": "darvis-a040d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955929942269:android:1cb14e25794c707974c694",
+        "android_client_info": {
+          "package_name": "com.example.chat_bot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "955929942269-dra2ir3i33lkg5fv9gf2slr9hhr41igt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABCPy9qziAqTApslXuirmMcnRWqmUbpps"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "955929942269-dra2ir3i33lkg5fv9gf2slr9hhr41igt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

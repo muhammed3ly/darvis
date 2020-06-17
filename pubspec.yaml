@@ -1,4 +1,4 @@
-name: darvis
+name: chat_bot
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -27,6 +27,14 @@ dependencies:
   hidden_drawer_menu: ^1.1.2
   swipedetector: ^1.2.0
   
+  provider: ^3.0.0
+  cloud_firestore: ^0.13.6
+  firebase_auth: ^0.16.1
+  image_picker: ^0.6.7
+  firebase_storage: ^3.1.6
+  percent_indicator: ^2.1.4
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -47,6 +55,7 @@ flutter:
   assets:
    - assets/images/default-user-placeholder.png
    - assets/images/chatbot.png
+    - assets/images/logo.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -60,12 +69,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+    - family: Signatra
+      fonts:
+        - asset: assets/fonts/Signatra.ttf
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
