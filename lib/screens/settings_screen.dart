@@ -1,22 +1,29 @@
 import 'dart:io';
 
+import 'package:darvis/widgets/gradient_appbar.dart';
 import 'package:darvis/widgets/settings_screen_widgets/bottom_sheets/name_bottom_sheet.dart';
 import 'package:darvis/widgets/settings_screen_widgets/bottom_sheets/password.dart';
 import 'package:darvis/widgets/settings_screen_widgets/bottom_sheets/profile_picture_bottom_sheet.dart';
 import 'package:darvis/widgets/settings_screen_widgets/settings_item.dart';
+import 'package:darvis/widgets/settings_screen_widgets/settings_photo_item.dart';
 import 'package:darvis/widgets/settings_screen_widgets/settings_section.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SettingsScreen extends StatefulWidget {
+  static const String routeName = '/settings';
+  final Function toggle;
+  SettingsScreen(this.toggle);
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
   MediaQueryData mediaQuery;
-  File _pickedImage;
   String _profileUserName = "Muhammed Aly";
+  String _profilePicture = 'assets/images/default-user-placeholder.png';
+  String _chatbotImage = 'assets/images/chatbot.png';
+  String _chatbotName = 'Akram';
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -35,9 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
     if (profile) {
-      setState(() {
-        _pickedImage = File(pickedFile.path);
-      });
+      //TODO: do some work to change profile picture
     } else {
       //TODO: do some work to change chatbot photo
       print('Change chatbot photo');
@@ -45,9 +50,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Navigator.of(context).pop();
   }
 
-  void _changeUserName(String userName) {
+  void _changeName(String name, bool user) {
     setState(() {
-      _profileUserName = userName;
+      if (user) {
+        _profileUserName = name;
+      } else {
+        _chatbotName = name;
+      }
     });
     Navigator.of(context).pop();
   }
@@ -58,6 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _modalBottomSheetMenu(Widget sheetDetails) {
     showModalBottomSheet(
         context: context,
+        backgroundColor: Colors.black.withOpacity(0),
         builder: (builder) {
           return sheetDetails;
         });
@@ -66,79 +76,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
+      extendBodyBehindAppBar: true,
+      appBar: GradientAppBar(
+        title: 'SETTINGS',
+        gradientBegin: Color.fromRGBO(3, 155, 229, 1),
+        gradientEnd: Colors.black,
+        toggle: widget.toggle,
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.only(top: 80),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromRGBO(3, 155, 229, 1),
+                Colors.black,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [0, 1],
+            ),
+          ),
           child: Column(
             children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(top: 10),
-                height:
-                    (mediaQuery.size.height - mediaQuery.padding.top) * 0.45,
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(top: 6),
-                      width: mediaQuery.size.width * 0.6 + 10,
-                      height: mediaQuery.size.width * 0.6 + 10,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            Color.fromRGBO(3, 155, 229, 1),
-                            Colors.black87,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          stops: [0, 1],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      child: CircleAvatar(
-                        radius: mediaQuery.size.width * 0.3,
-                        backgroundImage: _pickedImage == null
-                            ? NetworkImage(
-                                'https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png',
-                              )
-                            : FileImage(_pickedImage),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: -5,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 40,
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.edit,
-                              size: 30,
-                            ),
-                            onPressed: () => _modalBottomSheetMenu(
-                              ProfilePictureBottomSheet(
-                                _changeProfilePhoto,
-                                true,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               SettingsSection(
-                title: 'My Profle',
+                title: 'My Profile',
                 children: <Widget>[
+                  SettingsPhotoItem(
+                    _profilePicture,
+                    () => _modalBottomSheetMenu(
+                        ProfilePictureBottomSheet(_changeProfilePhoto, true)),
+                  ),
                   SettingsItem(
                     title: 'Username',
                     subtitle: _profileUserName,
                     fun: () => _modalBottomSheetMenu(
-                        NameBottomSheet(_changeUserName, _profileUserName)),
+                      NameBottomSheet(_changeName, _profileUserName, true),
+                    ),
                   ),
                   SettingsItem(
                     title: 'Change Password',
@@ -155,18 +129,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsSection(
                 title: 'Chatbot Profile',
                 children: <Widget>[
-                  SettingsItem(
-                    title: 'Chatbot Name',
-                    subtitle: 'Akram',
-                    fun: () {},
+                  SettingsPhotoItem(
+                    _chatbotImage,
+                    () => _modalBottomSheetMenu(
+                        ProfilePictureBottomSheet(_changeProfilePhoto, false)),
                   ),
                   SettingsItem(
-                    title: 'Chatbot Photo',
+                    title: 'Chatbot Name',
+                    subtitle: _chatbotName,
                     fun: () => _modalBottomSheetMenu(
-                      ProfilePictureBottomSheet(
-                        _changeProfilePhoto,
-                        true,
-                      ),
+                      NameBottomSheet(_changeName, _chatbotName, false),
                     ),
                   ),
                   SettingsItem(

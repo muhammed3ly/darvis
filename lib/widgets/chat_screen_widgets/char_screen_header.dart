@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ChatScreenHeader extends StatelessWidget {
+  final Function toggle;
   final _headerHeight;
-  ChatScreenHeader(this._headerHeight);
+  ChatScreenHeader(this._headerHeight, this.toggle);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -13,10 +14,10 @@ class ChatScreenHeader extends StatelessWidget {
           children: <Widget>[
             IconButton(
               icon: Icon(
-                Icons.arrow_back_ios,
+                Icons.menu,
                 color: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: toggle,
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 8),

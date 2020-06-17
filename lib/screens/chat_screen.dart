@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String routeName = '/chat';
+  final Function toggle;
+  ChatScreen(this.toggle);
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -50,13 +52,24 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             height: double.infinity,
             width: double.infinity,
-            color: Color.fromRGBO(3, 155, 229, 1),
+            //color: Color.fromRGBO(3, 155, 229, 1),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromRGBO(3, 155, 229, 1),
+                  Colors.black,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: [0, 1],
+              ),
+            ),
           ),
           SafeArea(
             child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  ChatScreenHeader(screenHeight * 0.15),
+                  ChatScreenHeader(screenHeight * 0.15, widget.toggle),
                   Container(
                     height: screenHeight * 0.85,
                     decoration: BoxDecoration(

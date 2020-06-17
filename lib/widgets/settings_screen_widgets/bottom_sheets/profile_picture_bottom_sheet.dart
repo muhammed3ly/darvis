@@ -10,10 +10,14 @@ class ProfilePictureBottomSheet extends StatelessWidget {
     return Container(
       height: 100.0,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
         gradient: LinearGradient(
           colors: [
             Color.fromRGBO(3, 155, 229, 1),
-            Colors.black87,
+            Colors.black,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

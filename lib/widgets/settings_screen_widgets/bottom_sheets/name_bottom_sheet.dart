@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class NameBottomSheet extends StatelessWidget {
   final Function _changeName;
   final String _userName;
-  NameBottomSheet(this._changeName, this._userName) {
+  final bool isUser;
+  NameBottomSheet(this._changeName, this._userName, this.isUser) {
     _controller.text = _userName;
   }
   final outlineBorder = OutlineInputBorder(
@@ -25,10 +26,14 @@ class NameBottomSheet extends StatelessWidget {
           top: 10,
         ),
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+          ),
           gradient: LinearGradient(
             colors: [
               Color.fromRGBO(3, 155, 229, 1),
-              Colors.black87,
+              Colors.black,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -59,7 +64,7 @@ class NameBottomSheet extends StatelessWidget {
               ),
               label: Text('Save'),
               textColor: Colors.white,
-              onPressed: () => _changeName(_controller.text),
+              onPressed: () => _changeName(_controller.text, isUser),
             ),
           ],
         ),
