@@ -20,6 +20,7 @@ class User with ChangeNotifier {
   String email, userName, imageUrl, userId;
   String chatBotName, chatBotImageUrl;
   List<Message> _chatMessages = [];
+
   void setData(String email, String userName, String imageUrl, String userId) {
     this.email = email;
     this.userName = userName;
@@ -116,5 +117,21 @@ class User with ChangeNotifier {
       'userId': userId,
       'feedback': text.trim(),
     });
+    Future<void> loadMessage() async {
+      _chatMessages = [];
+      var messages = await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .collection('chats')
+          .orderBy('time', descending: false)
+          .getDocuments();
+      messages.documents.forEach((message) {
+        _chatMessages.add(Message(
+            text: message['text'],
+            byMe: message['byMe'],
+            time: message['time']));
+      });
+      notifyListeners();
+    }
   }
 }
