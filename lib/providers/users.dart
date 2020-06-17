@@ -117,21 +117,20 @@ class User with ChangeNotifier {
       'userId': userId,
       'feedback': text.trim(),
     });
-    Future<void> loadMessage() async {
-      _chatMessages = [];
-      var messages = await Firestore.instance
-          .collection('users')
-          .document(userId)
-          .collection('chats')
-          .orderBy('time', descending: false)
-          .getDocuments();
-      messages.documents.forEach((message) {
-        _chatMessages.add(Message(
-            text: message['text'],
-            byMe: message['byMe'],
-            time: message['time']));
-      });
-      notifyListeners();
-    }
+  }
+
+  Future<void> loadMessage() async {
+    _chatMessages = [];
+    var messages = await Firestore.instance
+        .collection('users')
+        .document(userId)
+        .collection('chats')
+        .orderBy('time', descending: false)
+        .getDocuments();
+    messages.documents.forEach((message) {
+      _chatMessages.add(Message(
+          text: message['text'], byMe: message['byMe'], time: message['time']));
+    });
+    notifyListeners();
   }
 }
