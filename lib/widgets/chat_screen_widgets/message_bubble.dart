@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ChatBubble extends StatelessWidget {
-  final String _sender, _message, _turn;
-  ChatBubble(Key key, this._sender, this._message, this._turn)
-      : super(key: key);
+  final String _message, _turn;
+  String _sender;
+  final bool _byMe;
+  ChatBubble(Key key, this._byMe, this._message, this._turn) : super(key: key) {
+    if (_byMe) {
+      _sender = 'User';
+    } else {
+      _sender = 'Bot';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     double _space = 2.0;

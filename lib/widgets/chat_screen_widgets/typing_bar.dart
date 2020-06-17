@@ -12,6 +12,7 @@ class TypingBar extends StatefulWidget {
 
 class _TypingBarState extends State<TypingBar> {
   File _file;
+  bool _ready;
   String _message = '';
   TextEditingController _messageController = TextEditingController();
   final outlineBorder = OutlineInputBorder(
@@ -22,6 +23,12 @@ class _TypingBarState extends State<TypingBar> {
     ),
   );
   FocusNode textFieldFocusNode = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+    _ready = true;
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -39,6 +46,7 @@ class _TypingBarState extends State<TypingBar> {
             _message = value;
           });
         },
+        enabled: _ready,
         focusNode: textFieldFocusNode,
         keyboardType: TextInputType.multiline,
         maxLines: 5,
@@ -66,14 +74,18 @@ class _TypingBarState extends State<TypingBar> {
           errorBorder: outlineBorder,
           focusedErrorBorder: outlineBorder,
           suffixIcon: InkWell(
+            enableFeedback: _ready,
             onTap: _message.isNotEmpty
-                ? () {
-                    Future.delayed(Duration(milliseconds: 50), () {
+                ? () async {
+                    setState(() {
+                      _ready = false;
+                    });
+                    await Future.delayed(Duration(milliseconds: 50), () async {
                       _messageController.clear();
                       if (_file != null) {
-                        widget._sendMessage(_message, file: _file);
+                        await widget._sendMessage(_message, file: _file);
                       } else {
-                        widget._sendMessage(_message);
+                        await widget._sendMessage(_message);
                       }
                       _messageController.clear();
                       setState(() {
@@ -81,6 +93,9 @@ class _TypingBarState extends State<TypingBar> {
                         _message = '';
                       });
                       FocusScope.of(context).requestFocus(FocusNode());
+                    });
+                    setState(() {
+                      _ready = true;
                     });
                   }
                 : null,
@@ -91,17 +106,19 @@ class _TypingBarState extends State<TypingBar> {
                     ? Color.fromRGBO(3, 155, 229, 1)
                     : Color.fromRGBO(141, 209, 243, 1),
                 child: Center(
-                  child: Container(
-                    transform: _message.isNotEmpty
-                        ? (Matrix4.rotationZ(-45 * pi / 180)
-                          ..translate(-17.0, 9))
-                        : null,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.send,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _ready
+                      ? Container(
+                          transform: _message.isNotEmpty
+                              ? (Matrix4.rotationZ(-45 * pi / 180)
+                                ..translate(-17.0, 9))
+                              : null,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                        )
+                      : CircularProgressIndicator(),
                 ),
               ),
             ),

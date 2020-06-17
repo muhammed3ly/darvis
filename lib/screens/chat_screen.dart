@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:chat_bot/providers/users.dart';
+import 'package:provider/provider.dart';
+
 import '../widgets/chat_screen_widgets/char_screen_header.dart';
 import '../widgets/chat_screen_widgets/message_bubble.dart';
 import '../widgets/chat_screen_widgets/typing_bar.dart';
@@ -16,14 +19,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   double screenHeight;
   bool first = true;
-  String _message, _last;
-  File _file;
-  List<Map<String, String>> _messages = [
-    {
-      'who': 'Bot',
-      'message': 'I\'m a chatbot',
-    }
-  ];
+  bool _last;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -31,17 +28,31 @@ class _ChatScreenState extends State<ChatScreen> {
         MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
   }
 
-  void _sendMessage(String message, {File file}) {
-    _message = message;
-    if (file != null) {
-      _file = file;
+  Future<void> _sendMessage(String message, {File file}) async {
+    try {
+      await Provider.of<User>(context, listen: false).addMessage(
+        Message(
+          text: message,
+          byMe: true,
+          time: DateTime.now().toIso8601String(),
+        ),
+      );
+    } catch (error) {
+      print(error);
+      showDialog(
+          context: context,
+          child: AlertDialog(
+            title: Text('Message could not be sent.'),
+            content: Text(
+                'We couldn\'t send your message right now, try again later.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ));
     }
-    setState(() {
-      _messages.add({
-        'who': 'User',
-        'message': message,
-      });
-    });
   }
 
   @override
@@ -87,26 +98,28 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(
                                   top: 8.0, left: 8.0, right: 8.0),
-                              child: ListView.builder(
-                                itemCount: _messages.length,
-                                itemBuilder: (ctx, i) {
-                                  String turn = 'middle';
-                                  if (_last == null ||
-                                      _last != _messages[i]['who']) {
-                                    turn = 'start';
-                                  } else if (i == _messages.length - 1 ||
-                                      _messages[i]['who'] !=
-                                          _messages[i + 1]['who']) {
-                                    turn = 'last';
-                                  }
-                                  _last = _messages[i]['who'];
-                                  return ChatBubble(
-                                    ValueKey(DateTime.now()),
-                                    _messages[i]['who'],
-                                    _messages[i]['message'],
-                                    turn,
-                                  );
-                                },
+                              child: Consumer<User>(
+                                builder: (_, user, _2) => ListView.builder(
+                                  itemCount: user.messages.length,
+                                  itemBuilder: (ctx, i) {
+                                    String turn = 'middle';
+                                    if (_last == null ||
+                                        _last != user.messages[i].byMe) {
+                                      turn = 'start';
+                                    } else if (i == user.messages.length - 1 ||
+                                        user.messages[i].byMe !=
+                                            user.messages[i + 1].byMe) {
+                                      turn = 'last';
+                                    }
+                                    _last = user.messages[i].byMe;
+                                    return ChatBubble(
+                                      ValueKey(user.messages[i].time),
+                                      user.messages[i].byMe,
+                                      user.messages[i].text,
+                                      turn,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
