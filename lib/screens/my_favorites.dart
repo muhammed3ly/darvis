@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../providers/categories.dart';
 import '../providers/users.dart';
-import '../widgets/Drawer.dart';
 
 class MyFavoritesScreen extends StatefulWidget {
   static const routeName = '/home-screen';

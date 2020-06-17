@@ -1,3 +1,10 @@
+import 'dart:io';
+
+import 'package:chat_bot/providers/users.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
 import '../widgets/gradient_appbar.dart';
 import '../widgets/settings_screen_widgets/bottom_sheets/name_bottom_sheet.dart';
 import '../widgets/settings_screen_widgets/bottom_sheets/password.dart';
@@ -5,8 +12,6 @@ import '../widgets/settings_screen_widgets/bottom_sheets/profile_picture_bottom_
 import '../widgets/settings_screen_widgets/settings_item.dart';
 import '../widgets/settings_screen_widgets/settings_photo_item.dart';
 import '../widgets/settings_screen_widgets/settings_section.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const String routeName = '/settings';
@@ -18,14 +23,25 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   MediaQueryData mediaQuery;
-  String _profileUserName = "Muhammed Aly";
-  String _profilePicture = 'assets/images/default-user-placeholder.png';
-  String _chatbotImage = 'assets/images/chatbot.png';
-  String _chatbotName = 'Akram';
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     mediaQuery = MediaQuery.of(context);
+  }
+
+  Future<void> showCantUpdate(error) async {
+    await showDialog(
+        context: context,
+        child: AlertDialog(
+          title: Text('Try again later!'),
+          content: Text(error),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ));
   }
 
   void _changeProfilePhoto(int mode, bool profile) async {
@@ -39,29 +55,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (pickedFile == null) {
       return;
     }
-    if (profile) {
-      //TODO: do some work to change profile picture
-    } else {
-      //TODO: do some work to change chatbot photo
-      print('Change chatbot photo');
+    final File file = File(pickedFile.path);
+    try {
+      if (profile) {
+        await Provider.of<User>(context, listen: false).updateUserImage(file);
+      } else {
+        Provider.of<User>(context, listen: false).updateChatBotImage(file);
+      }
+    } catch (error) {
+      await showCantUpdate(error);
     }
     Navigator.of(context).pop();
   }
 
-  void _changeName(String name, bool user) {
-    setState(() {
+  void _changeName(String name, bool user) async {
+    try {
       if (user) {
-        _profileUserName = name;
+        await Provider.of<User>(context, listen: false).updateUserName(name);
       } else {
-        _chatbotName = name;
+        await Provider.of<User>(context, listen: false).updateChatBotName(name);
       }
-    });
+    } catch (error) {
+      await showCantUpdate(error);
+    }
     Navigator.of(context).pop();
   }
 
-  void _changePassword(String password) {
-    //TODO: do some work to change the password
+  void _changePassword(String password) async {
+    try {
+      await Provider.of<User>(context, listen: false).updatePassword(password);
+    } catch (error) {
+      await showCantUpdate(error);
+    }
+    Navigator.of(context).pop();
   }
+
+  void _resetChat() async {
+    try {
+      await Provider.of<User>(context, listen: false).resetChat();
+    } catch (error) {
+      await showCantUpdate(error);
+    }
+    Navigator.of(context).pop();
+  }
+
+  void _sendFeedback(String feedback) async {
+    try {
+      await Provider.of<User>(context, listen: false).sendFeedback(feedback);
+    } catch (error) {
+      await showCantUpdate(error);
+    }
+    Navigator.of(context).pop();
+  }
+
   void _modalBottomSheetMenu(Widget sheetDetails) {
     showModalBottomSheet(
         context: context,
@@ -81,87 +127,84 @@ class _SettingsScreenState extends State<SettingsScreen> {
         gradientEnd: Colors.black,
         toggle: widget.toggle,
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.only(top: 80),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(3, 155, 229, 1),
-                Colors.black,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [0, 1],
+      body: Consumer<User>(
+        builder: (_, user, _2) => SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.only(top: 80),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromRGBO(3, 155, 229, 1),
+                  Colors.black,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: [0, 1],
+              ),
             ),
-          ),
-          child: Column(
-            children: <Widget>[
-              SettingsSection(
-                title: 'My Profile',
-                children: <Widget>[
-                  SettingsPhotoItem(
-                    _profilePicture,
-                    () => _modalBottomSheetMenu(
-                        ProfilePictureBottomSheet(_changeProfilePhoto, true)),
-                  ),
-                  SettingsItem(
-                    title: 'Username',
-                    subtitle: _profileUserName,
-                    fun: () => _modalBottomSheetMenu(
-                      NameBottomSheet(_changeName, _profileUserName, true),
+            child: Column(
+              children: <Widget>[
+                SettingsSection(
+                  title: 'My Profile',
+                  children: <Widget>[
+                    SettingsPhotoItem(
+                      user.imageUrl,
+                      () => _modalBottomSheetMenu(
+                          ProfilePictureBottomSheet(_changeProfilePhoto, true)),
                     ),
-                  ),
-                  SettingsItem(
-                    title: 'Change Password',
-                    fun: () =>
-                        _modalBottomSheetMenu(ChangePassword(_changePassword)),
-                  ),
-                  SettingsItem(
-                    title: 'Forgot Password',
-                    icon: Icons.restore,
-                    fun: () {},
-                  ),
-                ],
-              ),
-              SettingsSection(
-                title: 'Chatbot Profile',
-                children: <Widget>[
-                  SettingsPhotoItem(
-                    _chatbotImage,
-                    () => _modalBottomSheetMenu(
-                        ProfilePictureBottomSheet(_changeProfilePhoto, false)),
-                  ),
-                  SettingsItem(
-                    title: 'Chatbot Name',
-                    subtitle: _chatbotName,
-                    fun: () => _modalBottomSheetMenu(
-                      NameBottomSheet(_changeName, _chatbotName, false),
+                    SettingsItem(
+                      title: 'Username',
+                      subtitle: user.userName,
+                      fun: () => _modalBottomSheetMenu(
+                        NameBottomSheet(_changeName, user.userName, true),
+                      ),
                     ),
-                  ),
-                  SettingsItem(
-                    title: 'Reset Chat',
-                    icon: Icons.refresh,
-                    fun: () {},
-                  ),
-                ],
-              ),
-              SettingsSection(
-                title: 'Application',
-                children: <Widget>[
-                  SettingsItem(
-                    title: 'Change Theme',
-                    subtitle: 'Light theme',
-                    fun: () {},
-                  ),
-                  SettingsItem(
-                    title: 'Send Feedback',
-                    icon: Icons.report,
-                    fun: () {},
-                  ),
-                ],
-              ),
-            ],
+                    SettingsItem(
+                      title: 'Change Password',
+                      fun: () => _modalBottomSheetMenu(
+                          ChangePassword(_changePassword)),
+                    ),
+                  ],
+                ),
+                SettingsSection(
+                  title: 'Chatbot Profile',
+                  children: <Widget>[
+                    SettingsPhotoItem(
+                      user.chatBotImageUrl,
+                      () => _modalBottomSheetMenu(ProfilePictureBottomSheet(
+                          _changeProfilePhoto, false)),
+                    ),
+                    SettingsItem(
+                      title: 'Chatbot Name',
+                      subtitle: user.chatBotName,
+                      fun: () => _modalBottomSheetMenu(
+                        NameBottomSheet(_changeName, user.chatBotName, false),
+                      ),
+                    ),
+                    SettingsItem(
+                      title: 'Reset Chat',
+                      icon: Icons.refresh,
+                      fun: () {},
+                    ),
+                  ],
+                ),
+                SettingsSection(
+                  title: 'Application',
+                  children: <Widget>[
+                    SettingsItem(
+                      title: 'Change Theme',
+                      subtitle: 'Light theme',
+                      fun: () {},
+                    ),
+                    SettingsItem(
+                      title: 'Send Feedback',
+                      icon: Icons.report,
+                      fun: () {},
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

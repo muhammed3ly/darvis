@@ -1,11 +1,12 @@
-import './screens/home_screen.dart';
-import './providers/categories.dart';
-import './screens/authentication_screen.dart';
-import './screens/sign_up_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import './providers/categories.dart';
 import './providers/users.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import './screens/authentication_screen.dart';
+import './screens/home_screen.dart';
+import './screens/sign_up_screen.dart';
 
 void main() => runApp(MyApp());
 
