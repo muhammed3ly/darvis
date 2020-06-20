@@ -1,6 +1,11 @@
+import 'package:provider/provider.dart';
+
 import '../screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import '../helpers/check_internet_connection.dart';
+import '../providers/users.dart';
 
 class AuthScreen extends StatefulWidget {
   static const routeName = '/auth-screen';
@@ -31,9 +36,11 @@ class _AuthFormState extends State<AuthForm> {
   final auth = FirebaseAuth.instance;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  FocusNode passwordFocus = FocusNode();
 
   @override
   void dispose() {
+    passwordFocus.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -47,14 +54,20 @@ class _AuthFormState extends State<AuthForm> {
     try {
       email = email.trim();
       password = password.trim();
+
+      Provider.of<User>(context).isSigning = false;
       AuthResult res = await auth.signInWithEmailAndPassword(
           email: email, password: password);
     } catch (error) {
       var message = 'An error occurred';
+      if (error.message != null) message = error.message;
       Scaffold.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
-          backgroundColor: Theme.of(context).errorColor,
+          content: Text(
+            message,
+            style: TextStyle(fontSize: 18, color: Colors.white),
+          ),
+          backgroundColor: Color.fromRGBO(3, 155, 229, 1),
         ),
       );
     }
@@ -85,16 +98,6 @@ class _AuthFormState extends State<AuthForm> {
             SizedBox(
               height: 50,
             ),
-//              FittedBox(
-//                child: Container(
-//                  padding:
-//                      const EdgeInsets.symmetric(vertical: 60, horizontal: 10),
-//                  child: Image.asset(
-//                    'assets/images/logo.png',
-//                    fit: BoxFit.cover,
-//                  ),
-//                ),
-//              ),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 25),
@@ -104,13 +107,18 @@ class _AuthFormState extends State<AuthForm> {
                       FittedBox(
                         child: Container(
                           padding: const EdgeInsets.only(
-                              top: 60, bottom: 40, left: 10, right: 10),
+                            top: 60,
+                            bottom: 40,
+                            left: 10,
+                            right: 10,
+                          ),
                           child: Text(
                             'Darvis',
                             style: TextStyle(
-                                fontFamily: 'Signatra',
-                                fontSize: 120,
-                                color: Colors.white),
+                              fontFamily: 'Signatra',
+                              fontSize: 120,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -127,6 +135,8 @@ class _AuthFormState extends State<AuthForm> {
                                   email = value;
                                 });
                               },
+                              onEditingComplete: () =>
+                                  passwordFocus.requestFocus(),
                               keyboardType: TextInputType.emailAddress,
                               key: ValueKey('email'),
                               style:
@@ -152,6 +162,7 @@ class _AuthFormState extends State<AuthForm> {
                             ),
                             SizedBox(height: 20),
                             TextFormField(
+                              focusNode: passwordFocus,
                               onSaved: (value) => password = value,
                               onChanged: (value) {
                                 setState(() {
