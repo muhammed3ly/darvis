@@ -1,3 +1,4 @@
+import 'package:chat_bot/helpers/check_internet_connection.dart';
 import 'package:chat_bot/widgets/gradient_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,40 +19,10 @@ class MyFavoritesScreen extends StatefulWidget {
 }
 
 class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
-  bool first = true;
-
-  Future<void> init() async {
-    if (first) {
-      Provider.of<User>(context, listen: false).loadMessage();
-      first = false;
-      final user = await FirebaseAuth.instance.currentUser();
-      final userData =
-          await Firestore.instance.collection('users').document(user.uid).get();
-
-      Provider.of<User>(context, listen: false).setData(
-          user.email, userData['userName'], userData['imageUrl'], user.uid);
-
-      if (Provider.of<Categories>(context, listen: false).categories == null) {
-        final allDocuments = await Firestore.instance
-            .collection('users')
-            .document(user.uid)
-            .collection('categories')
-            .getDocuments();
-        Provider.of<Categories>(context, listen: false)
-            .set(allDocuments.documents.map((document) {
-          return {
-            'name': document.documentID as String,
-            'imageUrl': document.data['imageUrl'] as String,
-            'isFav': document.data['isFav'] as String,
-          };
-        }).toList());
-      }
-    }
-  }
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    init();
     String userId = Provider.of<User>(context, listen: false).userId;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
@@ -63,70 +34,77 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
         gradientEnd: Colors.black,
         toggle: widget.toggle,
       ),
-      body: Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(3, 155, 229, 1),
-              Colors.black87,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: [0, 1],
-          ),
-        ),
-        child: Consumer<Categories>(
-          builder: (_, categories, ch) => categories.categories == null
-              ? Center(child: CircularProgressIndicator())
-              : Padding(
-                  padding: EdgeInsets.all(10),
-                  child: GridView.builder(
-                    itemCount: categories.categories.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                    ),
-                    itemBuilder: (ctx, idx) {
-                      return GridTile(
-                        footer: GridTileBar(
-                          backgroundColor: Colors.black54,
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                categories.categories[idx]['name'],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => categories.toggleFavorite(
-                                    idx, true, userId),
-                                child: Icon(
-                                  categories.categories[idx]['isFav'] == 'true'
-                                      ? Icons.star
-                                      : Icons.star_border,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        child: Image.network(
-                          categories.categories[idx]['imageUrl'],
-                          fit: BoxFit.fill,
-                        ),
-                      );
-                    },
-                  ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Container(
+              height: height,
+              width: width,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromRGBO(3, 155, 229, 1),
+                    Colors.black87,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0, 1],
                 ),
-        ),
-      ),
+              ),
+              child: Consumer<Categories>(
+                builder: (_, categories, ch) => categories.categories == null
+                    ? Center(child: CircularProgressIndicator())
+                    : Padding(
+                        padding: EdgeInsets.all(10),
+                        child: GridView.builder(
+                          itemCount: categories.categories.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1,
+                            crossAxisSpacing: 20,
+                            mainAxisSpacing: 20,
+                          ),
+                          itemBuilder: (ctx, idx) {
+                            return GridTile(
+                              footer: GridTileBar(
+                                backgroundColor: Colors.black54,
+                                title: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      categories.categories[idx]['name'],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () => categories.toggleFavorite(
+                                          idx, true, userId),
+                                      child: Icon(
+                                        categories.categories[idx]['isFav'] ==
+                                                'true'
+                                            ? Icons.star
+                                            : Icons.star_border,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              child: Image.network(
+                                categories.categories[idx]['imageUrl'],
+                                fit: BoxFit.fill,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+              ),
+            ),
     );
   }
 }

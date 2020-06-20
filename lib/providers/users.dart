@@ -9,6 +9,7 @@ class Message {
   final String text;
   final bool byMe;
   final String time;
+
   Message({
     @required this.text,
     @required this.byMe,
@@ -19,13 +20,78 @@ class Message {
 class User with ChangeNotifier {
   String email, userName, imageUrl, userId;
   String chatBotName, chatBotImageUrl;
+  File pickedImage;
   List<Message> _chatMessages = [];
+  List<Map<String, String>> categories = [];
+  bool isSigning = false;
+  bool isLoaded = false;
 
-  void setData(String email, String userName, String imageUrl, String userId) {
+  void setData(
+      {String email,
+      String userName,
+      String imageUrl,
+      String userId,
+      File pickedImage,
+      List<Map<String, String>> categories}) {
     this.email = email;
     this.userName = userName;
     this.imageUrl = imageUrl;
     this.userId = userId;
+    this.pickedImage = pickedImage;
+    this.categories = categories;
+  }
+
+  Future<List<Map<String, String>>> loadData() async {
+    await loadMessage();
+    final user = await FirebaseAuth.instance.currentUser();
+    final userData =
+        await Firestore.instance.collection('users').document(user.uid).get();
+    setData(
+      userName: userData['userName'],
+      email: userData['email'],
+      userId: user.uid,
+      imageUrl: userData['imageUrl'],
+    );
+    final allDocuments = await Firestore.instance
+        .collection('users')
+        .document(user.uid)
+        .collection('categories')
+        .getDocuments();
+    return allDocuments.documents.map((document) {
+      return {
+        'name': document.documentID as String,
+        'imageUrl': document.data['imageUrl'] as String,
+        'isFav': document.data['isFav'] as String,
+      };
+    }).toList();
+  }
+
+  Future<bool> signUp() async {
+    var user = await FirebaseAuth.instance.currentUser();
+    userId = user.uid;
+    categories.forEach((type) async {
+      await Firestore.instance
+          .collection('users')
+          .document(user.uid)
+          .collection('categories')
+          .document(type['name'])
+          .setData({
+        'imageUrl': type['imageUrl'],
+        'isFav': type['isFav'],
+      });
+    });
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('user_image')
+        .child(user.uid + '.jpg');
+    await ref.putFile(pickedImage).onComplete;
+    final url = await ref.getDownloadURL();
+    await Firestore.instance.collection('users').document(user.uid).setData({
+      'userName': userName,
+      'email': email,
+      'imageUrl': url,
+    });
+    return true;
   }
 
   List<Message> get messages {

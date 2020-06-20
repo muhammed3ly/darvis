@@ -4,8 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Categories with ChangeNotifier {
   List<Map<String, String>> categories;
 
-  void init() async {
-    await Firestore.instance
+  Future<bool> init() async {
+    print('init');
+    if (categories != null) return true;
+    Firestore.instance
         .collection('/movie categories')
         .getDocuments()
         .then((onValue) {
@@ -18,13 +20,15 @@ class Categories with ChangeNotifier {
       }).toList();
       notifyListeners();
     });
+    return true;
   }
 
   void set(List<Map<String, String>> Rhs) {
     categories = Rhs;
     notifyListeners();
   }
-  void clear(){
+
+  void clear() {
     categories = null;
     notifyListeners();
   }

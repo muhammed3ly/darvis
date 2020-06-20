@@ -17,6 +17,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
+  void initState() {
+    FirebaseAuth.instance.signOut();
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
@@ -30,13 +37,45 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: Colors.blue,
           primaryColor: Color.fromRGBO(3, 155, 229, 1),
         ),
-        home: FutureBuilder(
-          future: FirebaseAuth.instance.currentUser(),
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.onAuthStateChanged,
           builder: (ctx, userSnapShort) {
-            if (userSnapShort.hasData) {
-              return HomeScreen();
+            print(userSnapShort.hasData);
+            print('here for the stream');
+            if (userSnapShort.hasData == false) return AuthScreen();
+            if (Provider.of<User>(ctx, listen: false).isSigning) {
+              return FutureBuilder(
+                future: Provider.of<User>(ctx, listen: false).signUp(),
+                builder: (ctx2, snapShot) {
+                  if (snapShot.hasData) {
+                    return HomeScreen();
+                  } else {
+                    return Scaffold(
+                      body: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                },
+              );
             } else {
-              return AuthScreen();
+              return FutureBuilder(
+                future: Provider.of<User>(ctx, listen: false).loadData(),
+                builder: (ctx2, snapShot) {
+                  if (snapShot.hasData) {
+                    print(snapShot.data);
+                    Provider.of<Categories>(ctx2, listen: false)
+                        .set(snapShot.data);
+                    return HomeScreen();
+                  } else {
+                    return Scaffold(
+                      body: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                },
+              );
             }
           },
         ),

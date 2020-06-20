@@ -29,18 +29,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void didChangeDependencies() {
-    if (first) {
-      step = 0;
-      Provider.of<Categories>(context, listen: false).init();
-      first = false;
-    }
+//    if (first) {
+//      step = 0;
+//      Provider.of<Categories>(context, listen: false).init();
+//      first = false;
+//    }
     super.didChangeDependencies();
   }
 
+  FocusNode focusNode1 = FocusNode();
+  FocusNode focusNode2 = FocusNode();
+  FocusNode focusNode3 = FocusNode();
+
+  final formKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
+    focusNode1.dispose();
+    focusNode2.dispose();
+    focusNode3.dispose();
     emailController.dispose();
-
     userNameController.dispose();
     confirmedPasswordController.dispose();
     passwordController.dispose();
@@ -48,7 +56,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   String email = '', password = '', userName = '', confirmedPassword = '';
-  final formKey = GlobalKey<FormState>();
   int step = 0;
   File pickedImage;
 
@@ -77,7 +84,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blueAccent,
-      body: step == 0 ? form1() : step == 1 ? form2() : form3(),
+      body: FutureBuilder(
+        future: Provider.of<Categories>(context, listen: false).init(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData)
+            return step == 0 ? form1() : step == 1 ? form2() : form3();
+          return Center(
+            child: Container(
+              child: CircularProgressIndicator(),
+              color: Colors.white,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -131,6 +150,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   email = value;
                                 });
                               },
+                              onEditingComplete: () =>
+                                  focusNode1.requestFocus(),
                               onSaved: (value) => email = value,
                               keyboardType: TextInputType.emailAddress,
                               key: ValueKey('email'),
@@ -163,6 +184,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   userName = value;
                                 });
                               },
+                              focusNode: focusNode1,
+                              onEditingComplete: () =>
+                                  focusNode2.requestFocus(),
                               controller: userNameController,
                               onSaved: (value) => userName = value,
                               keyboardType: TextInputType.emailAddress,
@@ -193,6 +217,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   password = value;
                                 });
                               },
+                              focusNode: focusNode2,
+                              onEditingComplete: () =>
+                                  focusNode3.requestFocus(),
                               controller: passwordController,
                               onSaved: (value) => password = value,
                               key: ValueKey('password'),
@@ -224,6 +251,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   confirmedPassword = value;
                                 });
                               },
+                              focusNode: focusNode3,
                               controller: confirmedPasswordController,
                               onSaved: (value) => password = value,
                               key: ValueKey('confirm password'),
@@ -438,48 +466,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Future<void> createUser() async {
+  bool Loading = false;
+
+  void createUser() {
     final auth = FirebaseAuth.instance;
+    setState(() {
+      Loading = true;
+    });
     try {
       email = email.trim();
       password = password.trim();
       var categories =
           Provider.of<Categories>(context, listen: false).categories;
-      AuthResult authResult = await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('user_image')
-          .child(authResult.user.uid + '.jpg');
-
-      await ref.putFile(pickedImage).onComplete;
-      final url = await ref.getDownloadURL();
-      await Firestore.instance
-          .collection('users')
-          .document(authResult.user.uid)
-          .setData({
-        'userName': userName,
-        'email': email,
-        'imageUrl': url,
-      });
-      categories.forEach((type) {
-        Firestore.instance
-            .collection('users')
-            .document(authResult.user.uid)
-            .collection('categories')
-            .document(type['name'])
-            .setData({
-          'imageUrl': type['imageUrl'],
-          'isFav': type['isFav'],
-        });
-      });
-
-      print('done firestore');
-      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+      Provider.of<User>(context, listen: false).setData(
+        categories: categories,
+        email: email,
+        pickedImage: pickedImage,
+        userName: userName,
+      );
+      Provider.of<User>(context, listen: false).isSigning = true;
+      auth.createUserWithEmailAndPassword(email: email, password: password);
     } catch (error) {
       print(error);
     }
+    setState(() {
+      Loading = false;
+    });
   }
 
   SafeArea form3() {
@@ -607,17 +619,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       color: Colors.white24,
                       border: Border.all(color: Colors.white),
                     ),
-                    child: FlatButton.icon(
-                      onPressed: createUser,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
-                      icon: Icon(Icons.done),
-                      label: Text(
-                        'Finish',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                    child: Loading
+                        ? FlatButton(
+                            child: CircularProgressIndicator(),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                          )
+                        : FlatButton.icon(
+                            onPressed: createUser,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            icon: Icon(Icons.done),
+                            label: Text(
+                              'Finish',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
                   ),
                 ],
               ),
