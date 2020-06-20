@@ -128,7 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         toggle: widget.toggle,
       ),
       body: Consumer<User>(
-        builder: (_, user, _2) => SingleChildScrollView(
+        builder: (_, user, __) => SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.only(top: 80),
             decoration: const BoxDecoration(

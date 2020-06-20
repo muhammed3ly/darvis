@@ -38,7 +38,6 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
     } catch (error) {
-      print(error);
       showDialog(
           context: context,
           child: AlertDialog(
@@ -99,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               padding: const EdgeInsets.only(
                                   top: 8.0, left: 8.0, right: 8.0),
                               child: Consumer<User>(
-                                builder: (_, user, _2) => ListView.builder(
+                                builder: (_, user, __) => ListView.builder(
                                   itemCount: user.messages.length,
                                   itemBuilder: (ctx, i) {
                                     String turn = 'middle';

@@ -1,7 +1,4 @@
-import 'package:chat_bot/helpers/check_internet_connection.dart';
 import 'package:chat_bot/widgets/gradient_appbar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
