@@ -22,7 +22,7 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
 
   Future<void> init() async {
     if (first) {
-      Provider.of<User>(context, listen: false).loadMessage();
+      await Provider.of<User>(context, listen: false).loadMessage();
       first = false;
       final user = await FirebaseAuth.instance.currentUser();
       final userData =

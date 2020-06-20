@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:chat_bot/providers/users.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/chat_screen_widgets/char_screen_header.dart';
 import '../widgets/chat_screen_widgets/message_bubble.dart';
 import '../widgets/chat_screen_widgets/typing_bar.dart';
-import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String routeName = '/chat';
