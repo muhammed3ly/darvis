@@ -5,7 +5,6 @@ class Categories with ChangeNotifier {
   List<Map<String, String>> categories;
 
   Future<bool> init() async {
-    print('init');
     if (categories != null) return true;
     Firestore.instance
         .collection('/movie categories')
@@ -23,9 +22,8 @@ class Categories with ChangeNotifier {
     return true;
   }
 
-  void set(List<Map<String, String>> Rhs) {
+  Future<void> set(List<Map<String, String>> Rhs) async {
     categories = Rhs;
-    notifyListeners();
   }
 
   void clear() {

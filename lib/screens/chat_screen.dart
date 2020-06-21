@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:chat_bot/providers/users.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/chat_screen_widgets/char_screen_header.dart';
 import '../widgets/chat_screen_widgets/message_bubble.dart';
 import '../widgets/chat_screen_widgets/typing_bar.dart';
-import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String routeName = '/chat';
@@ -38,7 +38,6 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
     } catch (error) {
-      print(error);
       showDialog(
           context: context,
           child: AlertDialog(
@@ -99,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               padding: const EdgeInsets.only(
                                   top: 8.0, left: 8.0, right: 8.0),
                               child: Consumer<User>(
-                                builder: (_, user, _2) => ListView.builder(
+                                builder: (_, user, __) => ListView.builder(
                                   itemCount: user.messages.length,
                                   itemBuilder: (ctx, i) {
                                     String turn = 'middle';

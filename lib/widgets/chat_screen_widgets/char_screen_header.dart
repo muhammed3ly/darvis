@@ -1,4 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_bot/providers/users.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreenHeader extends StatelessWidget {
   final Function toggle;
@@ -22,10 +25,14 @@ class ChatScreenHeader extends StatelessWidget {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 8),
               child: CircleAvatar(
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.transparent,
                 radius: 26,
-                backgroundImage: NetworkImage(
-                    'https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png'),
+                backgroundImage: Provider.of<User>(context)
+                        .chatBotImageUrl
+                        .contains('assets')
+                    ? AssetImage(Provider.of<User>(context).chatBotImageUrl)
+                    : CachedNetworkImageProvider(
+                        Provider.of<User>(context).chatBotImageUrl),
               ),
             ),
             Column(

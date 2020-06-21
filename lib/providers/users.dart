@@ -32,17 +32,34 @@ class User with ChangeNotifier {
       String imageUrl,
       String userId,
       File pickedImage,
-      List<Map<String, String>> categories}) {
+      List<Map<String, String>> categories,
+      chatBotImageUrl,
+      chatBotName}) {
     this.email = email;
     this.userName = userName;
     this.imageUrl = imageUrl;
     this.userId = userId;
     this.pickedImage = pickedImage;
     this.categories = categories;
+    this.chatBotImageUrl = chatBotImageUrl;
+    this.chatBotName = chatBotName;
   }
 
   Future<List<Map<String, String>>> loadData() async {
-    await loadMessage();
+    if (isLoaded) {
+      final allDocuments = await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .collection('categories')
+          .getDocuments();
+      return allDocuments.documents.map((document) {
+        return {
+          'name': document.documentID,
+          'imageUrl': document.data['imageUrl'] as String,
+          'isFav': document.data['isFav'] as String,
+        };
+      }).toList();
+    }
     final user = await FirebaseAuth.instance.currentUser();
     final userData =
         await Firestore.instance.collection('users').document(user.uid).get();
@@ -51,7 +68,10 @@ class User with ChangeNotifier {
       email: userData['email'],
       userId: user.uid,
       imageUrl: userData['imageUrl'],
+      chatBotImageUrl: userData['chatBotImageUrl'],
+      chatBotName: userData['chatBotName'],
     );
+    await loadMessage();
     final allDocuments = await Firestore.instance
         .collection('users')
         .document(user.uid)
@@ -59,15 +79,20 @@ class User with ChangeNotifier {
         .getDocuments();
     return allDocuments.documents.map((document) {
       return {
-        'name': document.documentID as String,
+        'name': document.documentID,
         'imageUrl': document.data['imageUrl'] as String,
         'isFav': document.data['isFav'] as String,
       };
     }).toList();
   }
 
-  Future<bool> signUp() async {
-    var user = await FirebaseAuth.instance.currentUser();
+  Future<void> signUp(String email, String userName, String password,
+      File pickedImage, List<Map<String, String>> categories) async {
+    isSigning = true;
+    notifyListeners();
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+    final user = await FirebaseAuth.instance.currentUser();
     userId = user.uid;
     categories.forEach((type) async {
       await Firestore.instance
@@ -90,8 +115,21 @@ class User with ChangeNotifier {
       'userName': userName,
       'email': email,
       'imageUrl': url,
+      'chatBotImageUrl': 'assets/images/chatbot.png',
+      'chatBotName': 'DARVIS'
     });
-    return true;
+    setData(
+      email: email,
+      userName: userName,
+      imageUrl: url,
+      userId: user.uid,
+      categories: categories,
+      chatBotImageUrl: 'assets/images/chatbot.png',
+      chatBotName: 'DARVIS',
+    );
+    isLoaded = true;
+    isSigning = false;
+    notifyListeners();
   }
 
   List<Message> get messages {
@@ -176,6 +214,7 @@ class User with ChangeNotifier {
           .document(doc.documentID)
           .delete();
     });
+    notifyListeners();
   }
 
   Future<void> sendFeedback(String text) async {
@@ -197,6 +236,5 @@ class User with ChangeNotifier {
       _chatMessages.add(Message(
           text: message['text'], byMe: message['byMe'], time: message['time']));
     });
-    notifyListeners();
   }
 }

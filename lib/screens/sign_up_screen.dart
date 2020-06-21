@@ -1,20 +1,18 @@
-import 'package:chat_bot/screens/authentication_screen.dart';
-import 'package:chat_bot/screens/home_screen.dart';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:provider/provider.dart';
-import '../providers/categories.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/categories.dart';
 import '../providers/users.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';
-
+  final Function toggleAuthMode;
+  SignUpScreen(this.toggleAuthMode);
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -83,16 +81,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueAccent,
       body: FutureBuilder(
         future: Provider.of<Categories>(context, listen: false).init(),
         builder: (context, snapshot) {
           if (snapshot.hasData)
             return step == 0 ? form1() : step == 1 ? form2() : form3();
-          return Center(
-            child: Container(
-              child: CircularProgressIndicator(),
-              color: Colors.white,
+          return Container(
+            height: double.infinity,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromRGBO(3, 155, 229, 1),
+                  Colors.black87,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: [0, 1],
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                Text(
+                  'Loading...',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
             ),
           );
         },
@@ -293,11 +310,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25.0),
                                     ),
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pushReplacementNamed(
-                                              AuthScreen.routeName);
-                                    },
+                                    onPressed: widget.toggleAuthMode,
                                     icon: Icon(Icons.navigate_before),
                                   ),
                                 ),
@@ -466,32 +479,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  bool Loading = false;
+  bool _loading = false;
 
-  void createUser() {
-    final auth = FirebaseAuth.instance;
-    setState(() {
-      Loading = true;
-    });
+  void createUser() async {
     try {
       email = email.trim();
       password = password.trim();
       var categories =
           Provider.of<Categories>(context, listen: false).categories;
-      Provider.of<User>(context, listen: false).setData(
-        categories: categories,
-        email: email,
-        pickedImage: pickedImage,
-        userName: userName,
-      );
-      Provider.of<User>(context, listen: false).isSigning = true;
-      auth.createUserWithEmailAndPassword(email: email, password: password);
+      Provider.of<User>(context, listen: false)
+          .signUp(email, userName, password, pickedImage, categories);
     } catch (error) {
       print(error);
     }
-    setState(() {
-      Loading = false;
-    });
   }
 
   SafeArea form3() {
@@ -619,12 +619,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       color: Colors.white24,
                       border: Border.all(color: Colors.white),
                     ),
-                    child: Loading
+                    child: _loading
                         ? FlatButton(
                             child: CircularProgressIndicator(),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25.0),
                             ),
+                            onPressed: null,
                           )
                         : FlatButton.icon(
                             onPressed: createUser,

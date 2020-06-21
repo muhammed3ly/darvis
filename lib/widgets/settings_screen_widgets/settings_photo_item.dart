@@ -16,6 +16,7 @@ class SettingsPhotoItem extends StatelessWidget {
             backgroundColor: Color.fromRGBO(20, 74, 100, 1),
             child: CircleAvatar(
               radius: 65,
+              backgroundColor: Colors.white,
               backgroundImage: image.contains('assets')
                   ? AssetImage(image)
                   : CachedNetworkImageProvider(image),

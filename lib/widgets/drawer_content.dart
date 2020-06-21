@@ -1,10 +1,9 @@
-import 'package:chat_bot/screens/authentication_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/categories.dart';
-import 'package:flutter/material.dart';
-import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
 
 class HiddenDrawer extends StatefulWidget {
   @override
@@ -64,8 +63,6 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
               onPressed: () async {
                 Provider.of<Categories>(context, listen: false).clear();
                 await FirebaseAuth.instance.signOut();
-                Navigator.of(context)
-                    .pushReplacementNamed(AuthScreen.routeName);
               },
               child: Text("Sign Out"),
             ),
