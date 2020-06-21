@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: Colors.blue,
           primaryColor: Color.fromRGBO(3, 155, 229, 1),
         ),
-        home: StreamBuilder(
+        home: StreamBuilder<FirebaseUser>(
           stream: FirebaseAuth.instance.onAuthStateChanged,
           builder: (ctx, userSnapShort) {
             print(userSnapShort.hasData);
