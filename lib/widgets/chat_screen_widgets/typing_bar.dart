@@ -38,7 +38,7 @@ class _TypingBarState extends State<TypingBar> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(8.0),
       child: TextField(
         controller: _messageController,
         onChanged: (value) {

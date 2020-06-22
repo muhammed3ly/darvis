@@ -494,156 +494,151 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  SafeArea form3() {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-    return SafeArea(
-      child: Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(3, 155, 229, 1),
-              Colors.black87,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: [0, 1],
-          ),
+  Container form3() {
+    return Container(
+      height: double.infinity,
+      width: double.infinity,
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color.fromRGBO(3, 155, 229, 1),
+            Colors.black87,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: [0, 1],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Sign up',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: 'Signatra', fontSize: 80, color: Colors.white),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Sign up',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontFamily: 'Signatra', fontSize: 80, color: Colors.white),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'What kind of movies do you like ?',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: Consumer<Categories>(
+                builder: (_, categories, ch) => categories.categories == null
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : GridView.builder(
+                        itemCount: categories.categories.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
+                        ),
+                        itemBuilder: (ctx, idx) {
+                          return GridTile(
+                            key: ValueKey(categories.categories[idx]['name']),
+                            footer: GridTileBar(
+                              backgroundColor: Colors.black54,
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    categories.categories[idx]['name'],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => categories.toggleFavorite(idx),
+                                    child: Icon(categories.categories[idx]
+                                                ['isFav'] ==
+                                            'true'
+                                        ? Icons.star
+                                        : Icons.star_border),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            child: Image.network(
+                              categories.categories[idx]['imageUrl'],
+                              fit: BoxFit.fill,
+                            ),
+                          );
+                        },
+                      ),
+              ),
             ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'What kind of movies do you like ?',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(6.0),
-                child: Consumer<Categories>(
-                  builder: (_, categories, ch) => categories.categories == null
-                      ? Center(
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.bottomLeft,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    border: Border.all(color: Colors.white),
+                  ),
+                  child: FlatButton.icon(
+                    label: Text('back'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        step--;
+                      });
+                    },
+                    icon: Icon(Icons.navigate_before),
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.bottomRight,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    border: Border.all(color: Colors.white),
+                  ),
+                  child: _loading
+                      ? FlatButton(
                           child: CircularProgressIndicator(),
-                        )
-                      : GridView.builder(
-                          itemCount: categories.categories.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
                           ),
-                          itemBuilder: (ctx, idx) {
-                            return GridTile(
-                              key: ValueKey(categories.categories[idx]['name']),
-                              footer: GridTileBar(
-                                backgroundColor: Colors.black54,
-                                title: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      categories.categories[idx]['name'],
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () =>
-                                          categories.toggleFavorite(idx),
-                                      child: Icon(categories.categories[idx]
-                                                  ['isFav'] ==
-                                              'true'
-                                          ? Icons.star
-                                          : Icons.star_border),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              child: Image.network(
-                                categories.categories[idx]['imageUrl'],
-                                fit: BoxFit.fill,
-                              ),
-                            );
-                          },
+                          onPressed: null,
+                        )
+                      : FlatButton.icon(
+                          onPressed: createUser,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          icon: Icon(Icons.done),
+                          label: Text(
+                            'Finish',
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    alignment: Alignment.bottomLeft,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      border: Border.all(color: Colors.white),
-                    ),
-                    child: FlatButton.icon(
-                      label: Text('back'),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          step--;
-                        });
-                      },
-                      icon: Icon(Icons.navigate_before),
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.bottomRight,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      border: Border.all(color: Colors.white),
-                    ),
-                    child: _loading
-                        ? FlatButton(
-                            child: CircularProgressIndicator(),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                            onPressed: null,
-                          )
-                        : FlatButton.icon(
-                            onPressed: createUser,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                            icon: Icon(Icons.done),
-                            label: Text(
-                              'Finish',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

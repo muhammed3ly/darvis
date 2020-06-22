@@ -3,11 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import './helpers/constants.dart';
 import './providers/categories.dart';
 import './providers/users.dart';
 import './screens/authentication_screen.dart';
 import './screens/home_screen.dart';
-import './helpers/constants.dart';
 
 void main() => runApp(MyApp());
 

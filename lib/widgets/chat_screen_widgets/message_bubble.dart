@@ -4,7 +4,7 @@ class ChatBubble extends StatelessWidget {
   final String _message, _turn;
   String _sender;
   final bool _byMe;
-  ChatBubble(Key key, this._byMe, this._message, this._turn) : super(key: key) {
+  ChatBubble(this._byMe, this._message, this._turn) {
     if (_byMe) {
       _sender = 'User';
     } else {

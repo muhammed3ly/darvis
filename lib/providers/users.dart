@@ -1,9 +1,12 @@
+import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
 
 class Message {
   final String text;
@@ -143,8 +146,51 @@ class User with ChangeNotifier {
         .collection('chats')
         .add(
             {'text': message.text, 'byMe': message.byMe, 'time': message.time});
-    _chatMessages.add(message);
+    _chatMessages.insert(0, message);
     notifyListeners();
+    if (message.byMe) {
+      await letDarvisReply(message.text);
+    }
+  }
+
+  Future<void> letDarvisReply(String text) async {
+    String url = 'http://darvisapi.us-east-2.elasticbeanstalk.com/darvis';
+    try {
+      final response = await http.post(url,
+          headers: {HttpHeaders.contentTypeHeader: 'application/json'},
+          body: convert
+              .jsonEncode({'Message': text, 'NewMessage': 0, 'Reply': "all"}));
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final responseData = convert.jsonDecode(response.body);
+        print(responseData);
+        addMessage(
+          new Message(
+            text: responseData['Response'],
+            byMe: false,
+            time: DateTime.now().toIso8601String(),
+          ),
+        );
+      } else {
+        addMessage(
+          new Message(
+            text:
+                'I can\'t talk now check the internet connection or try again later.',
+            byMe: false,
+            time: DateTime.now().toIso8601String(),
+          ),
+        );
+      }
+    } catch (error) {
+      addMessage(
+        new Message(
+          text:
+              'I can\'t talk now check the internet connection or try again later.',
+          byMe: false,
+          time: DateTime.now().toIso8601String(),
+        ),
+      );
+      print("reply: $error");
+    }
   }
 
   Future<void> updateUserName(String name) async {
@@ -214,6 +260,7 @@ class User with ChangeNotifier {
           .document(doc.documentID)
           .delete();
     });
+    _chatMessages.clear();
     notifyListeners();
   }
 
@@ -230,7 +277,7 @@ class User with ChangeNotifier {
         .collection('users')
         .document(userId)
         .collection('chats')
-        .orderBy('time', descending: false)
+        .orderBy('time', descending: true)
         .getDocuments();
     messages.documents.forEach((message) {
       _chatMessages.add(Message(

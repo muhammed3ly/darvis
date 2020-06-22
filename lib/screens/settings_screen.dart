@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:chat_bot/providers/users.dart';
+import 'package:chat_bot/widgets/settings_screen_widgets/bottom_sheets/send_feedback_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -92,11 +94,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _resetChat() async {
     try {
-      await Provider.of<User>(context, listen: false).resetChat();
+      final respone = await showDialog(
+        barrierDismissible: false,
+        context: context,
+        child: SimpleDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: Text('Are you sure you want to clear the chat?'),
+          children: <Widget>[
+            SimpleDialogOption(
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'Yes',
+                    style: TextStyle(color: Colors.green),
+                  )
+                ],
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+            SimpleDialogOption(
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.cancel,
+                    color: Colors.red,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'No',
+                    style: TextStyle(color: Colors.red),
+                  )
+                ],
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+          ],
+        ),
+      );
+      if (respone) {
+        await Provider.of<User>(context, listen: false).resetChat();
+      }
     } catch (error) {
       await showCantUpdate(error);
     }
-    Navigator.of(context).pop();
   }
 
   void _sendFeedback(String feedback) async {
@@ -184,7 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SettingsItem(
                       title: 'Reset Chat',
                       icon: Icons.refresh,
-                      fun: () {},
+                      fun: _resetChat,
                     ),
                   ],
                 ),
@@ -199,7 +249,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SettingsItem(
                       title: 'Send Feedback',
                       icon: Icons.report,
-                      fun: () {},
+                      fun: () => _modalBottomSheetMenu(
+                        SendFeedbackSheet(_sendFeedback),
+                      ),
                     ),
                   ],
                 ),

@@ -24,6 +24,7 @@ class Categories with ChangeNotifier {
 
   Future<void> set(List<Map<String, String>> Rhs) async {
     categories = Rhs;
+    print('what');
   }
 
   void clear() {

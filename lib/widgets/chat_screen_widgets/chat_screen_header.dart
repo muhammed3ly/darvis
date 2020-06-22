@@ -40,7 +40,7 @@ class ChatScreenHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Muhammed Aly',
+                  Provider.of<User>(context).chatBotName,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

@@ -4,7 +4,7 @@ import 'package:chat_bot/providers/users.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/chat_screen_widgets/char_screen_header.dart';
+import '../widgets/chat_screen_widgets/chat_screen_header.dart';
 import '../widgets/chat_screen_widgets/message_bubble.dart';
 import '../widgets/chat_screen_widgets/typing_bar.dart';
 
@@ -97,28 +97,41 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(
                                   top: 8.0, left: 8.0, right: 8.0),
-                              child: Consumer<User>(
-                                builder: (_, user, __) => ListView.builder(
-                                  itemCount: user.messages.length,
-                                  itemBuilder: (ctx, i) {
-                                    String turn = 'middle';
-                                    if (_last == null ||
-                                        _last != user.messages[i].byMe) {
-                                      turn = 'start';
-                                    } else if (i == user.messages.length - 1 ||
-                                        user.messages[i].byMe !=
-                                            user.messages[i + 1].byMe) {
-                                      turn = 'last';
-                                    }
-                                    _last = user.messages[i].byMe;
-                                    return ChatBubble(
-                                      ValueKey(user.messages[i].time),
-                                      user.messages[i].byMe,
-                                      user.messages[i].text,
-                                      turn,
-                                    );
-                                  },
-                                ),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                reverse: true,
+                                itemCount:
+                                    Provider.of<User>(context).messages.length,
+                                itemBuilder: (ctx, i) {
+                                  String turn = 'middle';
+                                  if (_last == null ||
+                                      _last !=
+                                          Provider.of<User>(context)
+                                              .messages[i]
+                                              .byMe) {
+                                    turn = 'start';
+                                  } else if (i ==
+                                          Provider.of<User>(context)
+                                                  .messages
+                                                  .length -
+                                              1 ||
+                                      Provider.of<User>(context)
+                                              .messages[i]
+                                              .byMe !=
+                                          Provider.of<User>(context)
+                                              .messages[i + 1]
+                                              .byMe) {
+                                    turn = 'last';
+                                  }
+                                  _last = Provider.of<User>(context)
+                                      .messages[i]
+                                      .byMe;
+                                  return ChatBubble(
+                                    Provider.of<User>(context).messages[i].byMe,
+                                    Provider.of<User>(context).messages[i].text,
+                                    turn,
+                                  );
+                                },
                               ),
                             ),
                           ),
