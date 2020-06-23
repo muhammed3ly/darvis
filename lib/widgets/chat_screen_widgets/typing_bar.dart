@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ class TypingBar extends StatefulWidget {
 }
 
 class _TypingBarState extends State<TypingBar> {
-  File _file;
   bool _ready;
   String _message = '';
   TextEditingController _messageController = TextEditingController();
@@ -46,24 +44,11 @@ class _TypingBarState extends State<TypingBar> {
             _message = value;
           });
         },
-        enabled: _ready,
         focusNode: textFieldFocusNode,
         keyboardType: TextInputType.multiline,
         maxLines: 5,
         minLines: 1,
         decoration: InputDecoration(
-          prefixIcon: InkWell(
-            onTap: () {
-              print('add attachment');
-            },
-            child: Transform.rotate(
-              angle: -45 * pi / 180,
-              child: Icon(
-                Icons.attachment,
-                color: Colors.black26,
-              ),
-            ),
-          ),
           hintText: 'Type a message...',
           filled: true,
           fillColor: Color.fromRGBO(227, 243, 251, 1),
@@ -77,25 +62,14 @@ class _TypingBarState extends State<TypingBar> {
             enableFeedback: _ready,
             onTap: _message.isNotEmpty
                 ? () async {
-                    setState(() {
-                      _ready = false;
-                    });
                     await Future.delayed(Duration(milliseconds: 50), () async {
                       _messageController.clear();
-                      if (_file != null) {
-                        await widget._sendMessage(_message, file: _file);
-                      } else {
-                        await widget._sendMessage(_message);
-                      }
-                      _messageController.clear();
+                      String sendMessage = _message;
                       setState(() {
-                        _file = null;
                         _message = '';
                       });
                       FocusScope.of(context).requestFocus(FocusNode());
-                    });
-                    setState(() {
-                      _ready = true;
+                      widget._sendMessage(sendMessage);
                     });
                   }
                 : null,

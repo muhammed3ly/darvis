@@ -16,7 +16,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _isLoading = true;
   }

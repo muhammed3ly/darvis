@@ -140,14 +140,24 @@ class User with ChangeNotifier {
   }
 
   Future<void> addMessage(Message message) async {
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .collection('chats')
-        .add(
-            {'text': message.text, 'byMe': message.byMe, 'time': message.time});
     _chatMessages.insert(0, message);
     notifyListeners();
+    try {
+      await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .collection('chats')
+          .add({
+        'text': message.text,
+        'byMe': message.byMe,
+        'time': message.time
+      });
+    } catch (error) {
+      _chatMessages.removeAt(0);
+      notifyListeners();
+      throw Exception(error);
+    }
+
     if (message.byMe) {
       await letDarvisReply(message.text);
     }

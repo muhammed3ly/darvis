@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:audioplayers/audio_cache.dart';
 import 'package:chat_bot/providers/users.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +17,15 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   double screenHeight;
-  bool first = true;
+  bool first;
   bool _last;
+  bool _replying;
+  @override
+  void initState() {
+    super.initState();
+    first = true;
+    _replying = false;
+  }
 
   @override
   void didChangeDependencies() {
@@ -28,8 +34,14 @@ class _ChatScreenState extends State<ChatScreen> {
         MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
   }
 
-  Future<void> _sendMessage(String message, {File file}) async {
+  Future<void> _sendMessage(String message) async {
+    AudioCache cache = AudioCache();
+    var sound;
     try {
+      setState(() {
+        _replying = true;
+      });
+      sound = await cache.loop("soundEffects/typing.mp3");
       await Provider.of<User>(context, listen: false).addMessage(
         Message(
           text: message,
@@ -42,8 +54,8 @@ class _ChatScreenState extends State<ChatScreen> {
           context: context,
           child: AlertDialog(
             title: Text('Message could not be sent.'),
-            content: Text(
-                'We couldn\'t send your message right now, try again later.'),
+            content: Text(error.message),
+            //'We couldn\'t send your message right now, try again later.'),
             actions: <Widget>[
               FlatButton(
                 child: Text('OK'),
@@ -52,6 +64,11 @@ class _ChatScreenState extends State<ChatScreen> {
             ],
           ));
     }
+    await sound.stop();
+    cache.clearCache();
+    setState(() {
+      _replying = false;
+    });
   }
 
   @override
@@ -92,6 +109,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Padding(
                       padding: EdgeInsets.all(8).add(EdgeInsets.only(top: 8)),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Expanded(
                             child: Padding(
@@ -135,6 +153,16 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                           ),
+                          if (_replying)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: ChatBubble(
+                                false,
+                                '',
+                                'start',
+                                replying: true,
+                              ),
+                            ),
                           TypingBar(_sendMessage),
                         ],
                       ),

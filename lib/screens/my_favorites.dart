@@ -26,7 +26,7 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GradientAppBar(
-        title: 'Favorites',
+        title: 'Genres',
         gradientBegin: Color.fromRGBO(3, 155, 229, 1),
         gradientEnd: Colors.black,
         toggle: widget.toggle,

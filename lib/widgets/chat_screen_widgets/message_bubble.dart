@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ChatBubble extends StatelessWidget {
   final String _message, _turn;
   String _sender;
-  final bool _byMe;
-  ChatBubble(this._byMe, this._message, this._turn) {
+  final bool _byMe, replying;
+  ChatBubble(this._byMe, this._message, this._turn, {this.replying = false}) {
     if (_byMe) {
       _sender = 'User';
     } else {
@@ -24,7 +25,8 @@ class ChatBubble extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(8),
           margin: EdgeInsets.only(top: _space),
-          constraints: BoxConstraints(minWidth: 70, maxWidth: 300),
+          constraints:
+              BoxConstraints(minWidth: 70, maxWidth: replying ? 70 : 300),
           decoration: BoxDecoration(
             color: _sender != 'User'
                 ? Color.fromRGBO(179, 223, 246, 1)
@@ -52,10 +54,15 @@ class ChatBubble extends StatelessWidget {
                       : Radius.circular(5),
             ),
           ),
-          child: Text(
-            _message,
-            softWrap: true,
-          ),
+          child: replying
+              ? SpinKitThreeBounce(
+                  color: Colors.black,
+                  size: 18,
+                )
+              : Text(
+                  _message,
+                  softWrap: true,
+                ),
         ),
       ],
     );
