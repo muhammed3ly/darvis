@@ -1,6 +1,7 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 
+import 'package:audioplayers/audio_cache.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -157,22 +158,27 @@ class User with ChangeNotifier {
       notifyListeners();
       throw Exception(error);
     }
-
     if (message.byMe) {
       await letDarvisReply(message.text);
     }
   }
 
   Future<void> letDarvisReply(String text) async {
-    String url = 'http://darvisapi.us-east-2.elasticbeanstalk.com/darvis';
+    AudioCache cache = AudioCache();
+    var sound;
+    sound = await cache.loop("soundEffects/typing.mp3");
+    String url = 'http://3.14.82.117/darvis';
     try {
       final response = await http.post(url,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
-          body: convert
-              .jsonEncode({'Message': text, 'NewMessage': 0, 'Reply': "all"}));
+          body: convert.jsonEncode({
+            'Message': text,
+            'NewMessage': 1,
+            'Reply': "all",
+            'NumberFilms': 10
+          }));
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseData = convert.jsonDecode(response.body);
-        print(responseData);
         addMessage(
           new Message(
             text: responseData['Response'],
@@ -180,6 +186,17 @@ class User with ChangeNotifier {
             time: DateTime.now().toIso8601String(),
           ),
         );
+        if (responseData['Activated Model'] == 'R') {
+          for (int i = 0; i < responseData['Films'].length; i++) {
+            addMessage(
+              new Message(
+                text: responseData['Films'][i].split('\n')[0],
+                byMe: false,
+                time: DateTime.now().toIso8601String(),
+              ),
+            );
+          }
+        }
       } else {
         addMessage(
           new Message(
@@ -201,6 +218,9 @@ class User with ChangeNotifier {
       );
       print("reply: $error");
     }
+
+    await sound.stop();
+    cache.clearCache();
   }
 
   Future<void> updateUserName(String name) async {

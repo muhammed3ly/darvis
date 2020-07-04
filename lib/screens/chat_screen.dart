@@ -35,13 +35,13 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _sendMessage(String message) async {
-    AudioCache cache = AudioCache();
-    var sound;
+    // AudioCache cache = AudioCache();
+    // var sound;
     try {
       setState(() {
         _replying = true;
       });
-      sound = await cache.loop("soundEffects/typing.mp3");
+      // sound = await cache.loop("soundEffects/typing.mp3");
       await Provider.of<User>(context, listen: false).addMessage(
         Message(
           text: message,
@@ -64,8 +64,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ],
           ));
     }
-    await sound.stop();
-    cache.clearCache();
+    // await sound.stop();
+    // cache.clearCache();
     setState(() {
       _replying = false;
     });
@@ -107,7 +107,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: Colors.white,
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(8).add(EdgeInsets.only(top: 8)),
+                      padding:
+                          EdgeInsets.all(8), //.add(EdgeInsets.only(top: 8)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -122,24 +123,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                     Provider.of<User>(context).messages.length,
                                 itemBuilder: (ctx, i) {
                                   String turn = 'middle';
-                                  if (_last == null ||
+                                  if (i == 0 ||
                                       _last !=
                                           Provider.of<User>(context)
                                               .messages[i]
                                               .byMe) {
                                     turn = 'start';
-                                  } else if (i ==
-                                          Provider.of<User>(context)
-                                                  .messages
-                                                  .length -
-                                              1 ||
-                                      Provider.of<User>(context)
-                                              .messages[i]
-                                              .byMe !=
-                                          Provider.of<User>(context)
-                                              .messages[i + 1]
-                                              .byMe) {
-                                    turn = 'last';
                                   }
                                   _last = Provider.of<User>(context)
                                       .messages[i]
@@ -155,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           if (_replying)
                             Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
+                              padding: const EdgeInsets.only(left: 8.0),
                               child: ChatBubble(
                                 false,
                                 '',

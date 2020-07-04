@@ -16,6 +16,7 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     double _space = 2.0;
     if (_turn == 'start') {
+      print(_message);
       _space = 7;
     }
     return Row(
@@ -23,8 +24,8 @@ class ChatBubble extends StatelessWidget {
           _sender == 'User' ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: <Widget>[
         Container(
-          padding: EdgeInsets.all(8),
-          margin: EdgeInsets.only(top: _space),
+          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.only(bottom: _space),
           constraints:
               BoxConstraints(minWidth: 70, maxWidth: replying ? 70 : 300),
           decoration: BoxDecoration(
@@ -32,26 +33,10 @@ class ChatBubble extends StatelessWidget {
                 ? Color.fromRGBO(179, 223, 246, 1)
                 : Color.fromRGBO(229, 244, 251, 1),
             borderRadius: BorderRadius.only(
-              topLeft: (_turn == 'start')
-                  ? Radius.circular(12)
-                  : (_sender == 'Bot')
-                      ? Radius.circular(5)
-                      : Radius.circular(12),
-              topRight: (_turn == 'start')
-                  ? Radius.circular(12)
-                  : (_sender == 'User')
-                      ? Radius.circular(5)
-                      : Radius.circular(12),
-              bottomLeft: _sender != 'Bot'
-                  ? Radius.circular(12)
-                  : (_turn == 'last')
-                      ? Radius.circular(12)
-                      : Radius.circular(5),
-              bottomRight: _sender != 'User'
-                  ? Radius.circular(12)
-                  : (_turn == 'last')
-                      ? Radius.circular(12)
-                      : Radius.circular(5),
+              topLeft: Radius.circular(5),
+              topRight: Radius.circular(5),
+              bottomLeft: Radius.circular(5),
+              bottomRight: Radius.circular(5),
             ),
           ),
           child: replying
@@ -61,6 +46,8 @@ class ChatBubble extends StatelessWidget {
                 )
               : Text(
                   _message,
+                  style: TextStyle(
+                      fontSize: 15 * MediaQuery.of(context).textScaleFactor),
                   softWrap: true,
                 ),
         ),
