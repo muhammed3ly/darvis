@@ -23,7 +23,7 @@ dependencies:
   http: ^0.12.1
   flutter_spinkit: "^2.1.0"
   audioplayers: ^0.15.1
-  #speech_to_text: ^2.2.0
+  flutter_rating_bar: ^3.0.1+1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -33,6 +33,7 @@ flutter:
    - assets/images/default-user-placeholder.png
    - assets/images/chatbot.png
    - assets/images/logo.png
+   - assets/images/movie_placeholder.png
    - assets/soundEffects/typing.mp3
   fonts:
     - family: Signatra

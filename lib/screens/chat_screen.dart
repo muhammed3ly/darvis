@@ -1,5 +1,6 @@
 import 'package:audioplayers/audio_cache.dart';
 import 'package:chat_bot/providers/users.dart';
+import 'package:chat_bot/widgets/chat_screen_widgets/recommendations_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -133,6 +134,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                   _last = Provider.of<User>(context)
                                       .messages[i]
                                       .byMe;
+                                  if (Provider.of<User>(context)
+                                          .messages[i]
+                                          .recommendations !=
+                                      null) {
+                                    return RecommendationsBubble(
+                                        Provider.of<User>(context)
+                                            .messages[i]
+                                            .text,
+                                        Provider.of<User>(context)
+                                            .messages[i]
+                                            .recommendations);
+                                  }
                                   return ChatBubble(
                                     Provider.of<User>(context).messages[i].byMe,
                                     Provider.of<User>(context).messages[i].text,

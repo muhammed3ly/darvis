@@ -16,7 +16,6 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     double _space = 2.0;
     if (_turn == 'start') {
-      print(_message);
       _space = 7;
     }
     return Row(

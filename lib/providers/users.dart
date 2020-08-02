@@ -13,11 +13,12 @@ class Message {
   final String text;
   final bool byMe;
   final String time;
-
+  final recommendations;
   Message({
     @required this.text,
     @required this.byMe,
     @required this.time,
+    this.recommendations,
   });
 }
 
@@ -140,6 +141,15 @@ class User with ChangeNotifier {
     return [..._chatMessages];
   }
 
+  Map<String, dynamic> toMap(rec) {
+    return {
+      'Title': rec['Title'],
+      'Poster': rec['Poster'],
+      'imdbRating': rec['imdbRating'],
+      'imdbID': rec['imdbID'],
+    };
+  }
+
   Future<void> addMessage(Message message) async {
     _chatMessages.insert(0, message);
     notifyListeners();
@@ -151,7 +161,10 @@ class User with ChangeNotifier {
           .add({
         'text': message.text,
         'byMe': message.byMe,
-        'time': message.time
+        'time': message.time,
+        'recommendations': message.recommendations == null
+            ? 'null'
+            : message.recommendations.map((i) => toMap(i)).toList()
       });
     } catch (error) {
       _chatMessages.removeAt(0);
@@ -163,11 +176,17 @@ class User with ChangeNotifier {
     }
   }
 
+  Future<dynamic> getFilmByID(String id) async {
+    String url = "http://www.omdbapi.com/?i=$id&apikey=eb4d3f87";
+    final response = await http.get(url);
+    return convert.jsonDecode(response.body);
+  }
+
   Future<void> letDarvisReply(String text) async {
     AudioCache cache = AudioCache();
     var sound;
     sound = await cache.loop("soundEffects/typing.mp3");
-    String url = 'http://3.14.82.117/darvis';
+    String url = 'http://3.230.233.147/darvis';
     try {
       final response = await http.post(url,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
@@ -179,27 +198,32 @@ class User with ChangeNotifier {
           }));
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseData = convert.jsonDecode(response.body);
-        addMessage(
-          new Message(
-            text: responseData['Response'],
-            byMe: false,
-            time: DateTime.now().toIso8601String(),
-          ),
-        );
-        if (responseData['Activated Model'] == 'R') {
-          for (int i = 0; i < responseData['Films'].length; i++) {
-            addMessage(
-              new Message(
-                text: responseData['Films'][i].split('\n')[0],
-                byMe: false,
-                time: DateTime.now().toIso8601String(),
-              ),
-            );
+        if (responseData['Activated Model'] == 'G') {
+          addMessage(
+            Message(
+              text: responseData['Response'],
+              byMe: false,
+              time: DateTime.now().toIso8601String(),
+            ),
+          );
+        } else if (responseData['Activated Model'] == 'R') {
+          final recs = [];
+          for (int i = 0; i < responseData['FilmsIDs'].length; i++) {
+            print(responseData['FilmsIDs'][i]);
+            recs.add(await getFilmByID(responseData['FilmsIDs'][i]));
           }
+          addMessage(
+            Message(
+              text: responseData['Response'],
+              byMe: false,
+              time: DateTime.now().toIso8601String(),
+              recommendations: recs,
+            ),
+          );
         }
       } else {
         addMessage(
-          new Message(
+          Message(
             text:
                 'I can\'t talk now check the internet connection or try again later.',
             byMe: false,
@@ -209,7 +233,7 @@ class User with ChangeNotifier {
       }
     } catch (error) {
       addMessage(
-        new Message(
+        Message(
           text:
               'I can\'t talk now check the internet connection or try again later.',
           byMe: false,
@@ -310,8 +334,18 @@ class User with ChangeNotifier {
         .orderBy('time', descending: true)
         .getDocuments();
     messages.documents.forEach((message) {
-      _chatMessages.add(Message(
-          text: message['text'], byMe: message['byMe'], time: message['time']));
+      if (message['recommendations'] != 'null') {
+        _chatMessages.add(Message(
+            text: message['text'],
+            byMe: message['byMe'],
+            time: message['time'],
+            recommendations: message['recommendations']));
+      } else {
+        _chatMessages.add(Message(
+            text: message['text'],
+            byMe: message['byMe'],
+            time: message['time']));
+      }
     });
   }
 }

@@ -48,6 +48,7 @@ class _TypingBarState extends State<TypingBar> {
         keyboardType: TextInputType.multiline,
         maxLines: 5,
         minLines: 1,
+        textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           hintText: 'Type a message...',
           filled: true,
