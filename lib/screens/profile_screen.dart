@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:chat_bot/providers/users.dart';
+import 'package:chat_bot/widgets/custom_appbar.dart';
+import 'package:chat_bot/widgets/settings_screen_widgets/bottom_sheets/send_feedback_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/gradient_appbar.dart';
 import '../widgets/settings_screen_widgets/bottom_sheets/name_bottom_sheet.dart';
 import '../widgets/settings_screen_widgets/bottom_sheets/password.dart';
 import '../widgets/settings_screen_widgets/bottom_sheets/profile_picture_bottom_sheet.dart';
@@ -13,16 +14,21 @@ import '../widgets/settings_screen_widgets/settings_item.dart';
 import '../widgets/settings_screen_widgets/settings_photo_item.dart';
 import '../widgets/settings_screen_widgets/settings_section.dart';
 
-class SettingsScreen extends StatefulWidget {
-  static const String routeName = '/settings';
-  final Function toggle;
-  SettingsScreen(this.toggle);
+class ProfileScreen extends StatefulWidget {
+  static const String routeName = '/profile';
+
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<ProfileScreen> {
   MediaQueryData mediaQuery;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void drawer() {
+    _scaffoldKey.currentState.openDrawer();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -31,17 +37,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> showCantUpdate(error) async {
     await showDialog(
-        context: context,
-        child: AlertDialog(
-          title: Text('Try again later!'),
-          content: Text(error),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        ));
+      context: context,
+      child: AlertDialog(
+        title: Text('Try again later!'),
+        content: Text(error),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
   }
 
   void _changeProfilePhoto(int mode, bool profile) async {
@@ -90,43 +97,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Navigator.of(context).pop();
   }
 
-  void _resetChat() async {
-    try {
-      await Provider.of<User>(context, listen: false).resetChat();
-    } catch (error) {
-      await showCantUpdate(error);
-    }
-    Navigator.of(context).pop();
-  }
-
-  void _sendFeedback(String feedback) async {
-    try {
-      await Provider.of<User>(context, listen: false).sendFeedback(feedback);
-    } catch (error) {
-      await showCantUpdate(error);
-    }
-    Navigator.of(context).pop();
-  }
-
-  void _modalBottomSheetMenu(Widget sheetDetails) {
-    showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.black.withOpacity(0),
-        builder: (builder) {
-          return sheetDetails;
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: GradientAppBar(
-        title: 'SETTINGS',
-        gradientBegin: Color.fromRGBO(3, 155, 229, 1),
-        gradientEnd: Colors.black,
-        toggle: widget.toggle,
-      ),
+      key: _scaffoldKey,
+      appBar: CustomAppbar(title: 'Profile', openDrawer: drawer),
       body: Consumer<User>(
         builder: (_, user, __) => SingleChildScrollView(
           child: Container(
@@ -149,20 +125,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: <Widget>[
                     SettingsPhotoItem(
                       user.imageUrl,
-                      () => _modalBottomSheetMenu(
-                          ProfilePictureBottomSheet(_changeProfilePhoto, true)),
+                      () {},
                     ),
                     SettingsItem(
                       title: 'Username',
                       subtitle: user.userName,
-                      fun: () => _modalBottomSheetMenu(
-                        NameBottomSheet(_changeName, user.userName, true),
-                      ),
+                      fun: () {},
                     ),
                     SettingsItem(
                       title: 'Change Password',
-                      fun: () => _modalBottomSheetMenu(
-                          ChangePassword(_changePassword)),
+                      fun: () {},
                     ),
                   ],
                 ),
@@ -171,15 +143,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: <Widget>[
                     SettingsPhotoItem(
                       user.chatBotImageUrl,
-                      () => _modalBottomSheetMenu(ProfilePictureBottomSheet(
-                          _changeProfilePhoto, false)),
+                      () {},
                     ),
                     SettingsItem(
                       title: 'Chatbot Name',
                       subtitle: user.chatBotName,
-                      fun: () => _modalBottomSheetMenu(
-                        NameBottomSheet(_changeName, user.chatBotName, false),
-                      ),
+                      fun: () {},
                     ),
                     SettingsItem(
                       title: 'Reset Chat',
