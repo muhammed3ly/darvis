@@ -1,3 +1,4 @@
+import 'package:chat_bot/screens/my_favorites.dart';
 import 'package:chat_bot/screens/temp_splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import './helpers/constants.dart';
 import './providers/categories.dart';
 import './providers/users.dart';
 import './screens/authentication_screen.dart';
-import './screens/home_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -30,6 +30,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Constants.customColor,
           accentColor: Colors.white,
+          fontFamily: 'Poppins',
         ),
         home: Consumer<User>(
           builder: (_, user, __) => StreamBuilder(
@@ -38,7 +39,9 @@ class _MyAppState extends State<MyApp> {
                 if (userSnapShort.hasData == false) {
                   return AuthScreen();
                 }
-                return user.isSigning ? TempSplashScreen() : HomeScreen();
+                return user.isSigning
+                    ? TempSplashScreen()
+                    : MyFavoritesScreen();
               }),
         ),
       ),
