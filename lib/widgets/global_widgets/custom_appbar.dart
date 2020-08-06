@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
-  final double _preferredHeight = 100.0;
+  final double _preferredHeight = 85.0;
 
   final String title;
   final Function openDrawer;
@@ -61,8 +61,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
               Image.asset(
                 'assets/images/Asset 01.png',
                 fit: BoxFit.fitWidth,
-                width: MediaQuery.of(context).size.width * 0.28,
-              )
+                width: MediaQuery.of(context).size.width * 0.2,
+              ),
             ],
           ),
         ),

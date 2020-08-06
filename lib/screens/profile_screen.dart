@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:chat_bot/providers/users.dart';
-import 'package:chat_bot/widgets/custom_appbar.dart';
+import 'package:chat_bot/widgets/global_widgets/custom_appbar.dart';
 import 'package:chat_bot/widgets/settings_screen_widgets/bottom_sheets/send_feedback_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
