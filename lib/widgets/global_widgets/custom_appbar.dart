@@ -21,16 +21,9 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
+              bottomLeft: Radius.circular(14),
+              bottomRight: Radius.circular(14),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black,
-                offset: Offset(0.0, 1.0),
-                blurRadius: 6.0,
-              ),
-            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

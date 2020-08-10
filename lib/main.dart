@@ -1,7 +1,9 @@
 import 'package:chat_bot/screens/my_favorites.dart';
+import 'package:chat_bot/screens/profile_screen.dart';
 import 'package:chat_bot/screens/temp_splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import './helpers/constants.dart';
@@ -24,7 +26,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => Categories()),
         ChangeNotifierProvider(create: (_) => User())
       ],
-      child: MaterialApp(
+      child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Darvis',
         theme: ThemeData(
@@ -44,6 +46,10 @@ class _MyAppState extends State<MyApp> {
                     : MyFavoritesScreen();
               }),
         ),
+        routes: {
+          ProfileScreen.routeName: (context) => ProfileScreen(),
+          MyFavoritesScreen.routeName: (context) => MyFavoritesScreen(),
+        },
       ),
     );
   }

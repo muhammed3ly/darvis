@@ -1,3 +1,5 @@
+import 'package:chat_bot/screens/my_favorites.dart';
+import 'package:chat_bot/screens/profile_screen.dart';
 import 'package:chat_bot/widgets/global_widgets/drawer_sections.dart/chat_navigation_section.dart';
 import 'package:chat_bot/widgets/global_widgets/drawer_sections.dart/navigation_section_item.dart';
 import 'package:flutter/material.dart';
@@ -21,14 +23,16 @@ class NavigationSection extends StatelessWidget {
             icon: Icons.person,
             title: 'Profile',
             onTap: () {
-              debugPrint('profile');
+              Navigator.of(context)
+                  .pushReplacementNamed(ProfileScreen.routeName);
             },
           ),
           NavigationSectionItem(
             icon: FontAwesomeIcons.film,
             title: 'Movies Genres',
             onTap: () {
-              debugPrint('Movies Genres');
+              Navigator.of(context)
+                  .pushReplacementNamed(MyFavoritesScreen.routeName);
             },
           ),
           ChatNavigationSectionItem(),

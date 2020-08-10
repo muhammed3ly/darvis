@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -70,7 +72,7 @@ class User with ChangeNotifier {
         await Firestore.instance.collection('users').document(user.uid).get();
     setData(
       userName: userData['userName'],
-      email: userData['email'],
+      email: user.email,
       userId: user.uid,
       imageUrl: userData['imageUrl'],
       chatBotImageUrl: userData['chatBotImageUrl'],
@@ -248,56 +250,110 @@ class User with ChangeNotifier {
   }
 
   Future<void> updateUserName(String name) async {
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'userName': name.trim()}, merge: true);
+    String oldUserName = userName;
     userName = name.trim();
     notifyListeners();
+    try {
+      await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .setData({'userName': name.trim()}, merge: true);
+    } on PlatformException {
+      userName = oldUserName;
+      notifyListeners();
+      showError(
+        'Couldn\'t change username',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      userName = oldUserName;
+      notifyListeners();
+      showError(
+        'Couldn\'t change username',
+        'Please check your internet connection.',
+      );
+    }
   }
 
-  Future<void> updatePassword(String newPassword) async {
-    final user = await FirebaseAuth.instance.currentUser();
-    await user.updatePassword(newPassword);
+  Future<void> updatePassword(String oldPassword, String newPassword) async {
+    try {
+      final user = await FirebaseAuth.instance.currentUser();
+      AuthCredential authCredential = EmailAuthProvider.getCredential(
+        email: user.email,
+        password: oldPassword,
+      );
+      await user.reauthenticateWithCredential(authCredential);
+      await user.updatePassword(newPassword);
+    } on PlatformException {
+      showError(
+        'Couldn\'t change password',
+        'Couldn\'t change password as you entered a wrong current password.',
+      );
+    } catch (error) {
+      showError(
+        'Couldn\'t change password',
+        'Please check your internet connection.',
+      );
+    }
+  }
+
+  Future<void> changeEmail(String emaill, String password) async {
+    try {
+      final user = await FirebaseAuth.instance.currentUser();
+
+      this.email = emaill;
+      notifyListeners();
+      AuthCredential authCredential = EmailAuthProvider.getCredential(
+        email: user.email,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(authCredential);
+      await user.updateEmail(emaill);
+    } on PlatformException catch (error) {
+      showError(
+        'Couldn\'t change your email',
+        error.message == 'ERROR_EMAIL_ALREADY_IN_USE'
+            ? 'This email already exists'
+            : 'Couldn\'t change email as you entered a wrong current password.',
+      );
+    } catch (error) {
+      showError(
+        'Couldn\'t change your email',
+        'Please check your internet connection.',
+      );
+    }
   }
 
   Future<void> updateUserImage(File file) async {
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('user_image')
-        .child(userId + '.jpg');
-    await ref.putFile(file).onComplete;
-    final url = await ref.getDownloadURL();
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'imageUrl': url}, merge: true);
-    imageUrl = url;
-    notifyListeners();
-  }
-
-  Future<void> updateChatBotImage(File file) async {
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('chatbot_image')
-        .child(userId + '_chatbot.jpg');
-    await ref.putFile(file).onComplete;
-    final url = await ref.getDownloadURL();
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'chatBotImageUrl': url}, merge: true);
-    chatBotImageUrl = url;
-    notifyListeners();
-  }
-
-  Future<void> updateChatBotName(String name) async {
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'chatBotName': name.trim()}, merge: true);
-    chatBotName = name.trim();
-    notifyListeners();
+    String prevImage = this.imageUrl;
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_image')
+          .child(userId + '.jpg');
+      await ref.putFile(file).onComplete;
+      final url = await ref.getDownloadURL();
+      imageUrl = url;
+      notifyListeners();
+      await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .setData({'imageUrl': url}, merge: true);
+    } on PlatformException {
+      this.imageUrl = prevImage;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      this.imageUrl = prevImage;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    }
   }
 
   Future<void> resetChat() async {
@@ -347,5 +403,20 @@ class User with ChangeNotifier {
             time: message['time']));
       }
     });
+  }
+
+  void showError(String title, String message) {
+    Get.rawSnackbar(
+      titleText: title ??
+          Text(
+            title,
+            style: TextStyle(color: Colors.white),
+          ),
+      messageText: Text(
+        message,
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.red[700],
+    );
   }
 }
