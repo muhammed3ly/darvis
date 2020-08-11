@@ -1,4 +1,5 @@
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:chat_bot/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class ChatNavigationSectionItem extends StatelessWidget {
@@ -7,7 +8,9 @@ class ChatNavigationSectionItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 22, bottom: 15),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).pushReplacementNamed(ChatScreen.routeName);
+        },
         child: Row(
           children: <Widget>[
             AvatarGlow(

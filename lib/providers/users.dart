@@ -32,6 +32,7 @@ class User with ChangeNotifier {
   List<Map<String, String>> categories = [];
   bool isSigning = false;
   bool isLoaded = false;
+  int _replying = 0;
 
   void setData(
       {String email,
@@ -153,28 +154,53 @@ class User with ChangeNotifier {
   }
 
   Future<void> addMessage(Message message) async {
-    _chatMessages.insert(0, message);
+    if (_replying > 0) {
+      _chatMessages.insert(1, message);
+    } else {
+      _chatMessages.insert(0, message);
+    }
     notifyListeners();
     try {
-      await Firestore.instance
-          .collection('users')
-          .document(userId)
-          .collection('chats')
-          .add({
-        'text': message.text,
-        'byMe': message.byMe,
-        'time': message.time,
-        'recommendations': message.recommendations == null
-            ? 'null'
-            : message.recommendations.map((i) => toMap(i)).toList()
-      });
+      if (message.byMe) {
+        _replying++;
+        await Future.wait([
+          Firestore.instance
+              .collection('users')
+              .document(userId)
+              .collection('chats')
+              .add({
+            'text': message.text,
+            'byMe': message.byMe,
+            'time': message.time,
+            'recommendations': message.recommendations == null
+                ? 'null'
+                : message.recommendations.map((i) => toMap(i)).toList()
+          }),
+          letDarvisReply(message.text)
+        ]);
+        _replying--;
+      } else {
+        await Firestore.instance
+            .collection('users')
+            .document(userId)
+            .collection('chats')
+            .add({
+          'text': message.text,
+          'byMe': message.byMe,
+          'time': message.time,
+          'recommendations': message.recommendations == null
+              ? 'null'
+              : message.recommendations.map((i) => toMap(i)).toList()
+        });
+      }
     } catch (error) {
+      if (_replying > 0) {
+        _chatMessages.removeAt(0);
+        _replying = 0;
+      }
       _chatMessages.removeAt(0);
       notifyListeners();
-      throw Exception(error);
-    }
-    if (message.byMe) {
-      await letDarvisReply(message.text);
+      showError('Could\'t send your message', error);
     }
   }
 
@@ -187,9 +213,23 @@ class User with ChangeNotifier {
   Future<void> letDarvisReply(String text) async {
     AudioCache cache = AudioCache();
     var sound;
-    sound = await cache.loop("soundEffects/typing.mp3");
-    String url = 'http://3.230.233.147/darvis';
+    bool soundRan = false;
     try {
+      if (_replying == 1) {
+        soundRan = true;
+        sound = await cache.loop("soundEffects/typing.mp3");
+        _chatMessages.insert(
+          0,
+          Message(
+            text: '..sudo..replying..',
+            byMe: false,
+            time: DateTime.now().toIso8601String(),
+          ),
+        );
+        notifyListeners();
+      }
+      String url = 'http://3.230.233.147/darvis';
+
       final response = await http.post(url,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
           body: convert.jsonEncode({
@@ -211,7 +251,6 @@ class User with ChangeNotifier {
         } else if (responseData['Activated Model'] == 'R') {
           final recs = [];
           for (int i = 0; i < responseData['FilmsIDs'].length; i++) {
-            print(responseData['FilmsIDs'][i]);
             recs.add(await getFilmByID(responseData['FilmsIDs'][i]));
           }
           addMessage(
@@ -244,8 +283,11 @@ class User with ChangeNotifier {
       );
       print("reply: $error");
     }
-
-    await sound.stop();
+    if (soundRan) {
+      await sound.stop();
+      _chatMessages.removeAt(0);
+      notifyListeners();
+    }
     cache.clearCache();
   }
 
@@ -357,21 +399,39 @@ class User with ChangeNotifier {
   }
 
   Future<void> resetChat() async {
-    final msgs = await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .collection('chats')
-        .getDocuments();
-    msgs.documents.forEach((doc) async {
-      await Firestore.instance
+    var tmpList = _chatMessages;
+    try {
+      _chatMessages.clear();
+      notifyListeners();
+      final msgs = await Firestore.instance
           .collection('users')
           .document(userId)
           .collection('chats')
-          .document(doc.documentID)
-          .delete();
-    });
-    _chatMessages.clear();
-    notifyListeners();
+          .getDocuments();
+      await Future.forEach(msgs.documents, (doc) async {
+        Firestore.instance
+            .collection('users')
+            .document(userId)
+            .collection('chats')
+            .document(doc.documentID)
+            .delete();
+      });
+    } on PlatformException {
+      _chatMessages = tmpList;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      _chatMessages = tmpList;
+      notifyListeners();
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    }
   }
 
   Future<void> sendFeedback(String text) async {
