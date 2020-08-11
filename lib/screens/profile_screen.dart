@@ -24,14 +24,13 @@ class _SettingsScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       key: _scaffoldKey,
       backgroundColor: Color.fromRGBO(243, 240, 248, 1),
       appBar: CustomAppbar(title: 'Profile', openDrawer: drawer),
       drawer: CustomDrawer(),
-      body: Container(
-        margin: const EdgeInsets.only(top: 30),
+      body: SafeArea(
         child: ListView(
+          padding: const EdgeInsets.only(top: 20),
           shrinkWrap: true,
           physics: BouncingScrollPhysics(),
           children: <Widget>[

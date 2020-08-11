@@ -1,3 +1,4 @@
+import 'package:chat_bot/screens/chat_screen.dart';
 import 'package:chat_bot/screens/my_favorites.dart';
 import 'package:chat_bot/screens/profile_screen.dart';
 import 'package:chat_bot/screens/temp_splash.dart';
@@ -49,6 +50,7 @@ class _MyAppState extends State<MyApp> {
         routes: {
           ProfileScreen.routeName: (context) => ProfileScreen(),
           MyFavoritesScreen.routeName: (context) => MyFavoritesScreen(),
+          ChatScreen.routeName: (context) => ChatScreen(),
         },
       ),
     );
