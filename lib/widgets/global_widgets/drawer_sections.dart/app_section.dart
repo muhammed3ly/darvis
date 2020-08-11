@@ -105,7 +105,7 @@ class _AppSectionState extends State<AppSection> {
                 color: Colors.amber,
               ),
               onRatingUpdate: (rating) {
-                print(rating);
+                debugPrint(rating.toString());
               },
             ),
           ),

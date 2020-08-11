@@ -84,7 +84,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Provider.of<User>(context, listen: false)
           .signUp(email, userName, password, pickedImage, categories);
     } catch (error) {
-      print(error);
+      debugPrint(error);
     }
   }
 

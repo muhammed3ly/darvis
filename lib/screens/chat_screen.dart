@@ -6,6 +6,7 @@ import 'package:chat_bot/widgets/chat_screen_widgets/typing_bar.dart';
 import 'package:chat_bot/widgets/global_widgets/custom_appbar.dart';
 import 'package:chat_bot/widgets/global_widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   GlobalKey<ScaffoldState> _scaffoldKey;
+  ScrollController _listController;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,77 +163,113 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Column(
                     children: <Widget>[
                       Expanded(
-                        child: ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: Provider.of<User>(context).messages.length,
-                          reverse: true,
-                          padding: const EdgeInsets.only(bottom: 15),
-                          itemBuilder: (_, i) {
-                            String turn = 'middle';
-                            if (i ==
-                                    Provider.of<User>(context).messages.length -
-                                        1 ||
-                                (i <
+                        child: Stack(
+                          children: <Widget>[
+                            ListView.builder(
+                              controller: _listController,
+                              physics: BouncingScrollPhysics(),
+                              itemCount:
+                                  Provider.of<User>(context).messages.length,
+                              reverse: true,
+                              padding: const EdgeInsets.only(bottom: 15),
+                              itemBuilder: (_, i) {
+                                String turn = 'middle';
+                                if (i ==
                                         Provider.of<User>(context)
                                                 .messages
                                                 .length -
-                                            1 &&
-                                    Provider.of<User>(context)
-                                            .messages[i + 1]
-                                            .byMe !=
+                                            1 ||
+                                    (i <
+                                            Provider.of<User>(context)
+                                                    .messages
+                                                    .length -
+                                                1 &&
                                         Provider.of<User>(context)
-                                            .messages[i]
-                                            .byMe)) {
-                              turn = 'start';
-                            }
-                            if (Provider.of<User>(context)
+                                                .messages[i + 1]
+                                                .byMe !=
+                                            Provider.of<User>(context)
+                                                .messages[i]
+                                                .byMe)) {
+                                  turn = 'start';
+                                }
+                                if (Provider.of<User>(context)
+                                        .messages[i]
+                                        .recommendations !=
+                                    null) {
+                                  return ChatBubble.chatbotRecommendation(
+                                    ValueKey(Provider.of<User>(context)
+                                        .messages[i]
+                                        .time),
+                                    {
+                                      'message': Provider.of<User>(context)
+                                          .messages[i]
+                                          .text,
+                                      'list': Provider.of<User>(context)
+                                          .messages[i]
+                                          .recommendations
+                                    },
+                                    newMessage: turn == 'start',
+                                  );
+                                } else if (Provider.of<User>(context)
                                     .messages[i]
-                                    .recommendations !=
-                                null) {
-                              return ChatBubble.chatbotRecommendation(
-                                ValueKey(Provider.of<User>(context)
-                                    .messages[i]
-                                    .time),
-                                {
-                                  'message': Provider.of<User>(context)
-                                      .messages[i]
-                                      .text,
-                                  'list': Provider.of<User>(context)
-                                      .messages[i]
-                                      .recommendations
-                                },
-                                newMessage: turn == 'start',
-                              );
-                            } else if (Provider.of<User>(context)
-                                .messages[i]
-                                .byMe) {
-                              return ChatBubble.user(
-                                ValueKey(Provider.of<User>(context)
-                                    .messages[i]
-                                    .time),
-                                Provider.of<User>(context).messages[i].text,
-                                newMessage: turn == 'start',
-                              );
-                            } else if (Provider.of<User>(context)
-                                    .messages[i]
-                                    .text ==
-                                '..sudo..replying..') {
-                              return ChatBubble.typing(
-                                ValueKey('typing'),
-                                newMessage: Provider.of<User>(context)
-                                    .messages[i + 1]
-                                    .byMe,
-                              );
-                            } else {
-                              return ChatBubble.chatbot(
-                                ValueKey(Provider.of<User>(context)
-                                    .messages[i]
-                                    .time),
-                                Provider.of<User>(context).messages[i].text,
-                                newMessage: turn == 'start',
-                              );
-                            }
-                          },
+                                    .byMe) {
+                                  return ChatBubble.user(
+                                    ValueKey(Provider.of<User>(context)
+                                        .messages[i]
+                                        .time),
+                                    Provider.of<User>(context).messages[i].text,
+                                    newMessage: turn == 'start',
+                                  );
+                                } else if (Provider.of<User>(context)
+                                        .messages[i]
+                                        .text ==
+                                    '..sudo..replying..') {
+                                  return ChatBubble.typing(
+                                    ValueKey('typing'),
+                                    newMessage: Provider.of<User>(context)
+                                        .messages[i + 1]
+                                        .byMe,
+                                  );
+                                } else {
+                                  return ChatBubble.chatbot(
+                                    ValueKey(Provider.of<User>(context)
+                                        .messages[i]
+                                        .time),
+                                    Provider.of<User>(context).messages[i].text,
+                                    newMessage: turn == 'start',
+                                  );
+                                }
+                              },
+                            ),
+                            if (_listController.offset > 20)
+                              Positioned(
+                                right: 0,
+                                bottom: 15,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _listController.animateTo(
+                                      0,
+                                      duration: Duration(milliseconds: 200),
+                                      curve: Curves.bounceInOut,
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.grey[200],
+                                    ),
+                                    child: Icon(
+                                      FontAwesomeIcons.angleDoubleDown,
+                                      size: 18 *
+                                          MediaQuery.of(context)
+                                              .textScaleFactor,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       TypingBar(_sendMessage),
@@ -252,6 +290,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
+    _listController = ScrollController(initialScrollOffset: 0);
     super.initState();
     _scaffoldKey = new GlobalKey<ScaffoldState>();
   }

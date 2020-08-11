@@ -178,8 +178,8 @@ class User with ChangeNotifier {
           }),
           letDarvisReply(message.text)
         ]);
-        _replying--;
       } else {
+        _replying--;
         await Firestore.instance
             .collection('users')
             .document(userId)
@@ -211,13 +211,8 @@ class User with ChangeNotifier {
   }
 
   Future<void> letDarvisReply(String text) async {
-    AudioCache cache = AudioCache();
-    var sound;
-    bool soundRan = false;
     try {
       if (_replying == 1) {
-        soundRan = true;
-        sound = await cache.loop("soundEffects/typing.mp3");
         _chatMessages.insert(
           0,
           Message(
@@ -281,14 +276,12 @@ class User with ChangeNotifier {
           time: DateTime.now().toIso8601String(),
         ),
       );
-      print("reply: $error");
+      debugPrint("reply: $error");
     }
-    if (soundRan) {
-      await sound.stop();
+    if (_replying == 0) {
       _chatMessages.removeAt(0);
       notifyListeners();
     }
-    cache.clearCache();
   }
 
   Future<void> updateUserName(String name) async {

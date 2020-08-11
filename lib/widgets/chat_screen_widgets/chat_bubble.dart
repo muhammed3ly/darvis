@@ -1,5 +1,17 @@
+import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+enum MessageType {
+  Normal,
+  List,
+  Typing,
+}
+
+enum Sender {
+  User,
+  Chatbot,
+}
 
 class ChatBubble extends StatefulWidget {
   final Sender _sender;
@@ -29,19 +41,11 @@ class ChatBubble extends StatefulWidget {
   _ChatBubbleState createState() => _ChatBubbleState();
 }
 
-enum MessageType {
-  Normal,
-  List,
-  Typing,
-}
-
-enum Sender {
-  User,
-  Chatbot,
-}
-
 class _ChatBubbleState extends State<ChatBubble> {
   Color _backGroundColor;
+  AudioCache _cache;
+  var _sound;
+  bool _firstRun;
   @override
   Widget build(BuildContext context) {
     return Wrap(
@@ -76,6 +80,28 @@ class _ChatBubbleState extends State<ChatBubble> {
     _backGroundColor = widget._sender == Sender.Chatbot
         ? Color.fromRGBO(160, 210, 254, 1)
         : Color.fromRGBO(219, 238, 255, 1);
+    _firstRun = true;
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    if (_firstRun) {
+      _firstRun = false;
+      if (widget._messageType == MessageType.Typing) {
+        _cache = AudioCache();
+        _sound = await _cache.loop("soundEffects/typing.mp3");
+      }
+    }
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    if (widget._messageType == MessageType.Typing) {
+      await _sound.stop();
+      _cache.clearCache();
+    }
   }
 
   Widget _listMessageBuilder() {
