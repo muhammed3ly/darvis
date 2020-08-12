@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-//    FirebaseAuth.instance.signOut();
+    FirebaseAuth.instance.signOut();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => Categories()),

@@ -79,7 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         future: Provider.of<Categories>(context, listen: false).init(),
         builder: (context, snapshot) {
           if (snapshot.hasData)
-            return step == 0 ? form1() : step == 1 ? form2() : form3();
+            return step == 0 ? form3() : step == 1 ? form2() : form3();
           return Container(
             height: double.infinity,
             width: double.infinity,
@@ -100,7 +100,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           );
         },
       ),
-      appBar: step >= 1 ? CustomAppbar() : null,
+      appBar: step >= 0 ? CustomAppbar() : null,
     );
   }
 
@@ -667,111 +667,190 @@ class _SignUpScreenState extends State<SignUpScreen> {
       decoration: BoxDecoration(
         color: Color.fromRGBO(244, 240, 247, 1),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Kind Of Movies',
-                style: TextStyle(
-                    fontSize: 35,
-                    color: Color.fromRGBO(53, 77, 175, 1),
-                    fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'do you prefer ?                        ',
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: 17,
-                  color: Color.fromRGBO(92, 92, 92, 1),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(25.0),
+      child: Container(
+        height: MediaQuery.of(context).size.height -
+            100 -
+            MediaQuery.of(context).padding.top,
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Consumer<Categories>(
                 builder: (_, categories, ch) => categories.categories == null
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
-                    : GridView.builder(
-                        itemCount: categories.categories.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.9,
-                          crossAxisSpacing: 40,
-                          mainAxisSpacing: 20,
-                        ),
-                        itemBuilder: (ctx, idx) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(20.0),
-                            child: GridTile(
-                              key: ValueKey(categories.categories[idx]['name']),
-                              footer: GridTileBar(
+                    : ListView(
+                        children: <Widget>[
+                          GridView.builder(
+                            padding: EdgeInsets.only(top: 16,bottom: 8,right: 8,left: 8),
+                            shrinkWrap: true,
+                            physics: ScrollPhysics(),
+                            itemCount: categories.categories.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.9,
+                              crossAxisSpacing: 40,
+                              mainAxisSpacing: 20,
+                            ),
+                            itemBuilder: (ctx, idx) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(20.0),
+                                child: GridTile(
+                                  key: ValueKey(
+                                      categories.categories[idx]['name']),
+                                  footer: GridTileBar(
 //                                backgroundColor: Colors.black54,
-                                title: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      categories.categories[idx]['name'],
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                      ),
+                                    title: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text(
+                                          categories.categories[idx]['name'],
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () =>
+                                              categories.toggleFavorite(idx),
+                                          child: Icon(categories.categories[idx]
+                                                      ['isFav'] ==
+                                                  'true'
+                                              ? Icons.star
+                                              : Icons.star_border),
+                                        ),
+                                      ],
                                     ),
-                                    GestureDetector(
-                                      onTap: () =>
-                                          categories.toggleFavorite(idx),
-                                      child: Icon(categories.categories[idx]
-                                                  ['isFav'] ==
-                                              'true'
-                                          ? Icons.star
-                                          : Icons.star_border),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: <Widget>[
-                                  Image.network(
-                                    categories.categories[idx]['imageUrl'],
-                                    fit: BoxFit.fill,
                                   ),
-                                  if (categories.categories[idx]['isFav'] ==
-                                      'true')
-                                    Opacity(
-                                      child: Container(
-                                        color: Colors.blueAccent,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: <Widget>[
+                                      Image.network(
+                                        categories.categories[idx]['imageUrl'],
+                                        fit: BoxFit.fill,
                                       ),
-                                      opacity: 0.6,
-                                    ),
-                                  if (categories.categories[idx]['isFav'] ==
-                                      'true')
-                                    Icon(
-                                      Icons.favorite_border,
-                                      size: 70,
+                                      if (categories.categories[idx]['isFav'] ==
+                                          'true')
+                                        Opacity(
+                                          child: Container(
+                                            color: Colors.blueAccent,
+                                          ),
+                                          opacity: 0.6,
+                                        ),
+                                      if (categories.categories[idx]['isFav'] ==
+                                          'true')
+                                        Icon(
+                                          Icons.favorite_border,
+                                          size: 70,
+                                          color: Colors.white,
+                                        )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          InkWell(
+                            onTap: createUser,
+                            child: Container(
+                              margin: EdgeInsets.only(bottom: 15),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(53, 77, 175, 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(40)),
+                              ),
+                              width: MediaQuery.of(context).size.width - 150,
+                              height: 60,
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  SizedBox(
+                                    width: 50,
+                                  ),
+                                  Text(
+                                    'Finish',
+                                    style: TextStyle(
+                                      fontSize: 18,
                                       color: Colors.white,
-                                    )
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 30,
+                                  ),
+                                  FlatButton(
+                                    child: Container(
+                                      child: Icon(
+                                        Icons.check,
+                                        color: Colors.green,
+                                        size: 25,
+                                      ),
+                                      padding: EdgeInsets.all(3),
+//                    height: 70,
+//                    width: 30,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                          );
-                        },
+                          ),
+                        ],
                       ),
               ),
             ),
-          ),
+            Container(
+              height: 110,
+              width: double.infinity,
+//              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+//                    Color.fromRGBO(255,255, 255, 0.7),
+                    Color.fromRGBO(244, 240, 247, 0.8),
+                    Color.fromRGBO(244, 240, 247, 0.8),
+                    Color.fromRGBO(244, 240, 247, 0.7),
+                    Color.fromRGBO(244, 240, 247, 0.6),
+                    Color.fromRGBO(244, 240, 247, 0.3),
+                    Color.fromRGBO(244, 240, 247, 0.2),
+//                    Color.fromRGBO(244, 240, 247, 0.2),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+//              color: Color.fromRGBO(244, 240, 247, 0.8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Kind Of Movies',
+                    style: TextStyle(
+                        fontSize: 35,
+                        color: Color.fromRGBO(53, 77, 175, 1),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'do you prefer ?                        ',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontSize: 19,
+                      color: Color.fromRGBO(92, 92, 92, 1),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 //          Padding(
 //            padding: const EdgeInsets.all(8.0),
 //            child: Row(
@@ -827,54 +906,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 //              ],
 //            ),
 //          ),
-          InkWell(
-            onTap: createUser,
-            child: Container(
-              margin: EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(53, 77, 175, 1),
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-              ),
-              width: MediaQuery.of(context).size.width - 150,
-              height: 70,
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  SizedBox(
-                    width: 50,
-                  ),
-                  Text(
-                    'Finish',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  FlatButton(
-                    child: Container(
-                      child: Icon(
-                        Icons.check,
-                        color: Colors.green,
-                        size: 25,
-                      ),
-                      padding: EdgeInsets.all(3),
-//                    height: 70,
-//                    width: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
