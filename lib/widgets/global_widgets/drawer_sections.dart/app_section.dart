@@ -95,7 +95,7 @@ class _AppSectionState extends State<AppSection> {
             child: Hero(
               tag: 'rating',
               child: RatingBar(
-                initialRating: 0, //TODO: a5er rating hwa 7ato
+                initialRating: 0,
                 tapOnlyMode: true,
                 direction: Axis.horizontal,
                 allowHalfRating: true,
