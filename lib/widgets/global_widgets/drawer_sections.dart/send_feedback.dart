@@ -88,8 +88,7 @@ class _SendFeedbackState extends State<SendFeedback>
   void validateThenEdit() {
     String feedback = _feedbackTEC.text;
     if (feedback.trimRight().isEmpty || _rating == 0.0) {
-      showError(
-          'Please give us rating (at least 1 star) and mention your reasons.');
+      showError('Please mention your reasons for this rating.');
     } else {
       Provider.of<User>(context, listen: false).sendFeedback(feedback, _rating);
       closeScreen();

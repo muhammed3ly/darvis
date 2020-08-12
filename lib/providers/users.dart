@@ -25,7 +25,6 @@ class Message {
 
 class User with ChangeNotifier {
   String email, userName, imageUrl, userId;
-  String chatBotName, chatBotImageUrl;
   File pickedImage;
   List<Message> _chatMessages = [];
   List<Map<String, String>> categories = [];
@@ -33,23 +32,20 @@ class User with ChangeNotifier {
   bool isLoaded = false;
   int _replying = 0;
 
-  void setData(
-      {String email,
-      String userName,
-      String imageUrl,
-      String userId,
-      File pickedImage,
-      List<Map<String, String>> categories,
-      chatBotImageUrl,
-      chatBotName}) {
+  void setData({
+    String email,
+    String userName,
+    String imageUrl,
+    String userId,
+    File pickedImage,
+    List<Map<String, String>> categories,
+  }) {
     this.email = email;
     this.userName = userName;
     this.imageUrl = imageUrl;
     this.userId = userId;
     this.pickedImage = pickedImage;
     this.categories = categories;
-    this.chatBotImageUrl = chatBotImageUrl;
-    this.chatBotName = chatBotName;
   }
 
   Future<List<Map<String, String>>> loadData() async {
@@ -75,8 +71,6 @@ class User with ChangeNotifier {
       email: user.email,
       userId: user.uid,
       imageUrl: userData['imageUrl'],
-      chatBotImageUrl: userData['chatBotImageUrl'],
-      chatBotName: userData['chatBotName'],
     );
     await loadMessage();
     final allDocuments = await Firestore.instance
@@ -95,8 +89,6 @@ class User with ChangeNotifier {
 
   Future<void> signUp(String email, String userName, String password,
       File pickedImage, List<Map<String, String>> categories) async {
-    isSigning = true;
-    notifyListeners();
     await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
     final user = await FirebaseAuth.instance.currentUser();
@@ -112,18 +104,19 @@ class User with ChangeNotifier {
         'isFav': type['isFav'],
       });
     });
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('user_image')
-        .child(user.uid + '.jpg');
-    await ref.putFile(pickedImage).onComplete;
-    final url = await ref.getDownloadURL();
+    String url = 'default';
+    if (pickedImage != null) {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_image')
+          .child(user.uid + '.jpg');
+      await ref.putFile(pickedImage).onComplete;
+      url = await ref.getDownloadURL();
+    }
     await Firestore.instance.collection('users').document(user.uid).setData({
       'userName': userName,
       'email': email,
       'imageUrl': url,
-      'chatBotImageUrl': 'assets/images/chatbot.png',
-      'chatBotName': 'DARVIS'
     });
     setData(
       email: email,
@@ -131,11 +124,8 @@ class User with ChangeNotifier {
       imageUrl: url,
       userId: user.uid,
       categories: categories,
-      chatBotImageUrl: 'assets/images/chatbot.png',
-      chatBotName: 'DARVIS',
     );
     isLoaded = true;
-    isSigning = false;
     notifyListeners();
   }
 
@@ -240,7 +230,6 @@ class User with ChangeNotifier {
           }));
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseData = convert.jsonDecode(response.body);
-        debugPrint(responseData['Classification']);
         if (responseData['Activated Model'] == 'G') {
           addMessage(
             Message(
@@ -255,12 +244,18 @@ class User with ChangeNotifier {
             recs.add(await getFilmByID(responseData['FilmsIDs'][i]));
           }
           addMessage(
-            Message(
-              text: responseData['Response'],
-              byMe: false,
-              time: DateTime.now().toIso8601String(),
-              recommendations: recs,
-            ),
+            (recs.length > 0)
+                ? Message(
+                    text: responseData['Response'],
+                    byMe: false,
+                    time: DateTime.now().toIso8601String(),
+                    recommendations: recs,
+                  )
+                : Message(
+                    text: responseData['Response'],
+                    byMe: false,
+                    time: DateTime.now().toIso8601String(),
+                  ),
           );
         }
       } else {

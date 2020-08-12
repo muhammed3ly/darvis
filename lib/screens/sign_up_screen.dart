@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:chat_bot/screens/my_favorites.dart';
+import 'package:chat_bot/screens/sign_in_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../widgets/appbar_without_Drawer.dart';
@@ -11,9 +14,6 @@ import '../providers/users.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';
-  final Function toggleAuthMode;
-
-  SignUpScreen(this.toggleAuthMode);
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -36,7 +36,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String email = '', password = '', userName = '', confirmedPassword = '';
 
   int step = 0;
+  bool signingUp;
   File pickedImage;
+  @override
+  void initState() {
+    super.initState();
+    signingUp = false;
+  }
 
   void pickImage(ImageSource source) async {
     var pickedImageFile = await ImagePicker.pickImage(
@@ -62,13 +68,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-//    print(step);
     return Scaffold(
       body: FutureBuilder(
         future: Provider.of<Categories>(context, listen: false).init(),
         builder: (context, snapshot) {
           if (snapshot.hasData)
-            return step == 0 ? form1() : step == 1 ? form2() : form3();
+            return WillPopScope(
+                onWillPop: () async {
+                  return Future.value(!signingUp);
+                },
+                child: step == 0 ? form1() : step == 1 ? form2() : form3());
           return Container(
             height: double.infinity,
             width: double.infinity,
@@ -89,19 +98,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
           );
         },
       ),
-      appBar: step >= 0 ? CustomAppbar() : null,
+      appBar: step >= 1 ? CustomAppbar() : null,
     );
   }
 
   void createUser() async {
     try {
+      setState(() {
+        signingUp = true;
+      });
       email = email.trim();
       password = password.trim();
       var categories =
           Provider.of<Categories>(context, listen: false).categories;
-      Provider.of<User>(context, listen: false)
+      await Provider.of<User>(context, listen: false)
           .signUp(email, userName, password, pickedImage, categories);
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed(MyFavoritesScreen.routeName);
+      }
+    } on PlatformException catch (error) {
+      if (mounted) {
+        signingUp = false;
+      }
+      Get.rawSnackbar(
+        messageText: Text(
+          error.message,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red[700],
+      );
     } catch (error) {
+      if (mounted) {
+        signingUp = false;
+      }
       debugPrint(error);
     }
   }
@@ -118,15 +147,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  Center form1() {
+  Widget form1() {
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-    return Center(
+    final height =
+        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
+    return SafeArea(
       child: SingleChildScrollView(
         child: Container(
           height: height,
           width: width,
-          padding: EdgeInsets.only(top: 40),
           decoration: BoxDecoration(
             color: Color.fromRGBO(244, 240, 247, 1),
           ),
@@ -134,6 +163,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: <Widget>[
               FittedBox(
                 child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 10,
+                  ),
                   height: 160,
                   child: Image.asset('assets/images/logo.jpg'),
                 ),
@@ -179,26 +211,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     keyboardType: TextInputType.emailAddress,
                                     key: ValueKey('email'),
                                     style: TextStyle(
-                                        fontSize: 16, color: Colors.black54),
+                                      fontSize: 16,
+                                    ),
+                                    textInputAction: TextInputAction.next,
                                     decoration: InputDecoration(
-                                      enabledBorder: const OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
                                       hintText: 'Ex. JohnMac@gmail.com',
                                       hintStyle: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey,
                                       ),
                                       isDense: true,
-                                      contentPadding: EdgeInsets.all(8),
-                                      errorStyle: TextStyle(color: Colors.red),
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 8),
+                                      errorStyle: TextStyle(
+                                        color: Colors.red,
+                                        height: 0.5,
+                                      ),
                                     ),
                                     validator: (email) {
                                       if (email.isEmpty)
@@ -209,6 +242,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     },
                                     controller: emailController,
                                   ),
+                                  SizedBox(
+                                    height: 8,
+                                  )
                                 ],
                               ),
                             ),
@@ -247,32 +283,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     keyboardType: TextInputType.emailAddress,
                                     key: ValueKey('User Name'),
                                     style: TextStyle(
-                                        fontSize: 16, color: Colors.black54),
+                                      fontSize: 16,
+                                    ),
+                                    textInputAction: TextInputAction.next,
                                     decoration: InputDecoration(
-                                      enabledBorder: const OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
                                       hintText: 'John M',
                                       hintStyle: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey,
                                       ),
                                       isDense: true,
-                                      contentPadding: EdgeInsets.all(8),
-                                      errorStyle: TextStyle(color: Colors.red),
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 8),
+                                      errorStyle: TextStyle(
+                                        color: Colors.red,
+                                        height: 0.5,
+                                      ),
                                     ),
                                     validator: (userName) {
                                       if (userName.isEmpty)
                                         return 'enter your user name';
                                       return null;
                                     },
+                                  ),
+                                  SizedBox(
+                                    height: 8,
                                   ),
                                 ],
                               ),
@@ -318,28 +358,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       return null;
                                     },
                                     style: TextStyle(
-                                        fontSize: 16, color: Colors.black54),
+                                      fontSize: 16,
+                                    ),
+                                    textInputAction: TextInputAction.next,
                                     decoration: InputDecoration(
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      enabledBorder: const OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
                                       hintText: '* * * * * * * * * * *',
                                       hintStyle: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey,
                                       ),
                                       isDense: true,
-                                      contentPadding: EdgeInsets.all(8),
-                                      errorStyle: TextStyle(color: Colors.red),
+                                      errorStyle: TextStyle(
+                                        color: Colors.red,
+                                        height: 0.5,
+                                      ),
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 8),
                                     ),
                                     obscureText: true,
+                                  ),
+                                  SizedBox(
+                                    height: 8,
                                   ),
                                 ],
                               ),
@@ -382,28 +426,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       return null;
                                     },
                                     style: TextStyle(
-                                        fontSize: 16, color: Colors.black54),
+                                      fontSize: 16,
+                                    ),
+                                    textInputAction: TextInputAction.done,
                                     decoration: InputDecoration(
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      enabledBorder: const OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
                                       hintText: '* * * * * * * * * * *',
                                       hintStyle: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey,
                                       ),
                                       isDense: true,
-                                      contentPadding: EdgeInsets.all(8),
-                                      errorStyle: TextStyle(color: Colors.red),
+                                      errorStyle: TextStyle(
+                                        color: Colors.red,
+                                        height: 0.5,
+                                      ),
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 8),
                                     ),
                                     obscureText: true,
+                                  ),
+                                  SizedBox(
+                                    height: 8,
                                   ),
                                 ],
                               ),
@@ -435,6 +483,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           fontSize: 20, color: Colors.white),
                                     ),
                                     FlatButton(
+                                      onPressed: null,
                                       child: Container(
                                         child: Icon(
                                           Icons.check,
@@ -442,7 +491,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           size: 22,
                                         ),
                                         padding: EdgeInsets.all(3),
-//
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius: BorderRadius.all(
@@ -465,7 +513,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               InkWell(
-                onTap: widget.toggleAuthMode,
+                onTap: () => Navigator.of(context)
+                    .pushReplacementNamed(SignInScreen.routeName),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(53, 77, 175, 1),
@@ -544,7 +593,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     backgroundColor: Colors.white,
                     radius: 80,
                     backgroundImage: pickedImage == null
-                        ? AssetImage('assets/images/avatar.jpg')
+                        ? AssetImage('assets/images/Author__Placeholder.png')
                         : FileImage(pickedImage),
                   ),
                   SizedBox(
@@ -662,7 +711,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Container(
       height: double.infinity,
       width: double.infinity,
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
         color: Color.fromRGBO(244, 240, 247, 1),
       ),
@@ -672,270 +720,226 @@ class _SignUpScreenState extends State<SignUpScreen> {
             MediaQuery.of(context).padding.top,
         child: Stack(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Consumer<Categories>(
-                builder: (_, categories, ch) => categories.categories == null
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : ListView(
-                        children: <Widget>[
-                          GridView.builder(
-                            padding: EdgeInsets.only(
-                                top: 16, bottom: 8, right: 8, left: 8),
-                            shrinkWrap: true,
-                            physics: ScrollPhysics(),
-                            itemCount: categories.categories.length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.9,
-                              crossAxisSpacing: 40,
-                              mainAxisSpacing: 20,
+            Consumer<Categories>(
+              builder: (_, categories, ch) => categories.categories == null
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : ListView(
+                      physics: BouncingScrollPhysics(),
+                      children: <Widget>[
+                        GridView.builder(
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.1,
+                            bottom: 8,
+                          ).add(
+                            EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.05,
                             ),
-                            itemBuilder: (ctx, idx) {
-                              return Column(
-                                children: [
-                                  Container(
-                                    height: 130,
-                                    key: ValueKey(
-                                        categories.categories[idx]['name']),
-                                    child: GestureDetector(
-                                      onTap: () =>
-                                          categories.toggleFavorite(idx),
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: <Widget>[
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                            child: Image.network(
-                                              categories.categories[idx]
-                                                  ['imageUrl'],
-                                              fit: BoxFit.fill,
-                                            ),
+                          ),
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          itemCount: categories.categories.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.7,
+                            crossAxisSpacing: 40,
+                          ),
+                          itemBuilder: (ctx, idx) {
+                            return Column(
+                              children: [
+                                Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.25,
+                                  key: ValueKey(
+                                      categories.categories[idx]['name']),
+                                  child: GestureDetector(
+                                    onTap: () => categories.toggleFavorite(idx),
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: <Widget>[
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                          child: Image.network(
+                                            categories.categories[idx]
+                                                ['imageUrl'],
+                                            fit: BoxFit.fill,
                                           ),
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                            child: Opacity(
-                                              child: Container(
-                                                color: Colors.blueAccent,
-                                              ),
-                                              opacity:
-                                                  categories.categories[idx]
-                                                              ['isFav'] ==
-                                                          'true'
-                                                      ? 0.6
-                                                      : 0,
+                                        ),
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                          child: AnimatedOpacity(
+                                            duration:
+                                                Duration(milliseconds: 200),
+                                            child: Container(
+                                              color: Colors.blueAccent,
                                             ),
-                                          ),
-                                          Icon(
-                                            Icons.favorite_border,
-                                            size: categories.categories[idx]
+                                            opacity: categories.categories[idx]
                                                         ['isFav'] ==
                                                     'true'
-                                                ? 70
+                                                ? 0.6
                                                 : 0,
-                                            color: Colors.white,
-                                          )
-                                        ],
-                                      ),
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.favorite_border,
+                                          size: categories.categories[idx]
+                                                      ['isFav'] ==
+                                                  'true'
+                                              ? 70
+                                              : 0,
+                                          color: Colors.white,
+                                        )
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 5,
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  categories.categories[idx]['name'],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromRGBO(77, 75, 78, 1),
+                                    fontSize: 20,
                                   ),
-                                  Text(
-                                    categories.categories[idx]['name'],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(77, 75, 78, 1),
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          InkWell(
-                            onTap: createUser,
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 15),
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(53, 77, 175, 1),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(40)),
-                              ),
-                              width: MediaQuery.of(context).size.width - 150,
-                              height: 60,
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: 50,
-                                  ),
-                                  Text(
-                                    'Finish',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  FlatButton(
-                                    child: Container(
-                                      child: Icon(
-                                        Icons.check,
-                                        color: Colors.green,
-                                        size: 25,
-                                      ),
-                                      padding: EdgeInsets.all(3),
-//                    height: 70,
-//                    width: 30,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        InkWell(
+                          onTap: createUser,
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 15).add(
+                              EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.05,
                               ),
                             ),
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(53, 77, 175, 1),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(40)),
+                            ),
+                            height: 60,
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                SizedBox(
+                                  width: 50,
+                                ),
+                                Text(
+                                  'Finish',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 30,
+                                ),
+                                AnimatedSwitcher(
+                                  duration: Duration(milliseconds: 200),
+                                  child: signingUp
+                                      ? CircularProgressIndicator()
+                                      : FlatButton(
+                                          onPressed: null,
+                                          child: Container(
+                                            child: Icon(
+                                              Icons.check,
+                                              color: Colors.green,
+                                              size: 25,
+                                            ),
+                                            padding: EdgeInsets.all(3),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-              ),
+                        ),
+                      ],
+                    ),
             ),
             Container(
-              height: 90,
+              height: MediaQuery.of(context).size.height * 0.2,
               width: double.infinity,
-//              padding: EdgeInsets.all(2),
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.05,
+                top: 15,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-//                    Color.fromRGBO(255,255, 255, 0.7),
-                    Color.fromRGBO(244, 240, 247, 0.8),
+                    Color.fromRGBO(244, 240, 247, 1),
+                    Color.fromRGBO(244, 240, 247, 0.9),
                     Color.fromRGBO(244, 240, 247, 0.8),
                     Color.fromRGBO(244, 240, 247, 0.7),
                     Color.fromRGBO(244, 240, 247, 0.6),
-                    Color.fromRGBO(244, 240, 247, 0.3),
-                    Color.fromRGBO(244, 240, 247, 0.2),
-//                    Color.fromRGBO(244, 240, 247, 0.2),
+                    Color.fromRGBO(244, 240, 247, 0.5),
+                    Colors.white.withOpacity(0)
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
-//              color: Color.fromRGBO(244, 240, 247, 0.8),
               ),
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Kind Of Movies',
-                    style: TextStyle(
-                        fontSize: 35,
-                        color: Color.fromRGBO(53, 77, 175, 1),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'do you prefer ?                        ',
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 19,
-                      color: Color.fromRGBO(92, 92, 92, 1),
-                      fontWeight: FontWeight.bold,
+                children: [
+                  GestureDetector(
+                    onTap: signingUp
+                        ? null
+                        : () {
+                            setState(() {
+                              step--;
+                            });
+                          },
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      color: Theme.of(context).primaryColor,
+                      size: 40,
                     ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Kind Of Movies',
+                        style: TextStyle(
+                            fontSize: 35,
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'do you prefer ?',
+                        style: TextStyle(
+                          fontSize: 19,
+                          color: Color.fromRGBO(92, 92, 92, 1),
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-//          Padding(
-//            padding: const EdgeInsets.all(8.0),
-//            child: Row(
-//              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//              children: <Widget>[
-//                Container(
-//                  alignment: Alignment.bottomLeft,
-//                  height: 35,
-//                  decoration: BoxDecoration(
-//                    color: Colors.white24,
-//                    border: Border.all(color: Colors.white),
-//                  ),
-//                  child: FlatButton.icon(
-//                    label: Text('back'),
-//                    shape: RoundedRectangleBorder(
-//                      borderRadius: BorderRadius.circular(25.0),
-//                    ),
-//                    onPressed: () {
-//                      setState(() {
-//                        step--;
-//                      });
-//                    },
-//                    icon: Icon(Icons.navigate_before),
-//                  ),
-//                ),
-//                Container(
-//                  alignment: Alignment.bottomRight,
-//                  height: 35,
-//                  decoration: BoxDecoration(
-//                    color: Colors.white24,
-//                    border: Border.all(color: Colors.white),
-//                  ),
-//                  child: _loading
-//                      ? FlatButton(
-//                          child: CircularProgressIndicator(),
-//                          shape: RoundedRectangleBorder(
-//                            borderRadius: BorderRadius.circular(25.0),
-//                          ),
-//                          onPressed: null,
-//                        )
-//                      : FlatButton.icon(
-//                          onPressed: createUser,
-//                          shape: RoundedRectangleBorder(
-//                            borderRadius: BorderRadius.circular(25.0),
-//                          ),
-//                          icon: Icon(Icons.done),
-//                          label: Text(
-//                            'Finish',
-//                            style: TextStyle(fontSize: 16),
-//                          ),
-//                        ),
-//                ),
-//              ],
-//            ),
-//          ),
           ],
         ),
       ),
     );
   }
-//
-//  void goToForm2() {
-//    if (!formKey.currentState.validate()) return;
-//    FocusScope.of(context).unfocus();
-//    formKey.currentState.save();
-//    setState(() {
-//      step++;
-//    });
-//  }
-//
-//  void pickImage() async {
-//    var pickedImageFile = await ImagePicker.pickImage(
-//      source: ImageSource.camera,
-//      imageQuality: 50,
-//      maxWidth: 150,
-//    );
-//    if (pickedImageFile == null) return;
-//    setState(() {
-//      pickedImage = pickedImageFile;
-//    });
-//  }
 }

@@ -39,8 +39,9 @@ class Categories with ChangeNotifier {
     return ret;
   }
 
-  Future<void> set(List<Map<String, String>> Rhs) async {
+  void set(List<Map<String, String>> Rhs) {
     categories = Rhs;
+    notifyListeners();
   }
 
   void clear() {
