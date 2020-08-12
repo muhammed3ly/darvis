@@ -240,6 +240,7 @@ class User with ChangeNotifier {
           }));
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseData = convert.jsonDecode(response.body);
+        debugPrint(responseData['Classification']);
         if (responseData['Activated Model'] == 'G') {
           addMessage(
             Message(
@@ -338,6 +339,7 @@ class User with ChangeNotifier {
   }
 
   Future<void> changeEmail(String emaill, String password) async {
+    String currentEmail = this.email;
     try {
       final user = await FirebaseAuth.instance.currentUser();
 
@@ -350,6 +352,8 @@ class User with ChangeNotifier {
       await user.reauthenticateWithCredential(authCredential);
       await user.updateEmail(emaill);
     } on PlatformException catch (error) {
+      this.email = currentEmail;
+      notifyListeners();
       showError(
         'Couldn\'t change your email',
         error.message == 'ERROR_EMAIL_ALREADY_IN_USE'
@@ -357,6 +361,8 @@ class User with ChangeNotifier {
             : 'Couldn\'t change email as you entered a wrong current password.',
       );
     } catch (error) {
+      this.email = currentEmail;
+      notifyListeners();
       showError(
         'Couldn\'t change your email',
         'Please check your internet connection.',
@@ -478,11 +484,12 @@ class User with ChangeNotifier {
 
   void showError(String title, String message) {
     Get.rawSnackbar(
-      titleText: title ??
-          Text(
-            title,
-            style: TextStyle(color: Colors.white),
-          ),
+      titleText: title != null
+          ? Text(
+              title,
+              style: TextStyle(color: Colors.white),
+            )
+          : null,
       messageText: Text(
         message,
         style: TextStyle(color: Colors.white),
