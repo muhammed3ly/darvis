@@ -31,23 +31,34 @@ class _SettingsScreenState extends State<ProfileScreen> {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.only(top: 20),
-          shrinkWrap: true,
           physics: BouncingScrollPhysics(),
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 90,
-                  backgroundImage:
-                      Provider.of<User>(context).imageUrl == 'default'
-                          ? AssetImage('assets/images/Author__Placeholder.png')
-                          : NetworkImage(
-                              Provider.of<User>(context).imageUrl,
-                            ),
-                ),
+                ClipOval(
+                  child: FittedBox(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: FadeInImage(
+                        fit: BoxFit.cover,
+                        placeholder:
+                            AssetImage('assets/images/Author__Placeholder.png'),
+                        image: Provider.of<User>(context).imageUrl == 'default'
+                            ? AssetImage(
+                                'assets/images/Author__Placeholder.png')
+                            : NetworkImage(
+                                Provider.of<User>(context).imageUrl,
+                              ),
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
             SizedBox(

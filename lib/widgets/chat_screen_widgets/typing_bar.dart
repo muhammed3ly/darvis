@@ -25,7 +25,7 @@ class _TypingBarState extends State<TypingBar> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
@@ -54,6 +54,9 @@ class _TypingBarState extends State<TypingBar> {
                 fontWeight: FontWeight.w500,
               ),
               textCapitalization: TextCapitalization.sentences,
+              maxLines: 5,
+              minLines: 1,
+              textInputAction: TextInputAction.newline,
               decoration: InputDecoration(
                 isDense: true,
                 filled: true,
@@ -104,13 +107,13 @@ class _TypingBarState extends State<TypingBar> {
   }
 
   void _trySendingMessage() {
-    widget._sendMessage(_messageController.text);
-    // if (mounted) {
-    setState(() {
-      _messageController.clear();
-      _canSend = false;
-    });
-    FocusScope.of(context).unfocus();
-    // }
+    widget._sendMessage(_messageController.text.trim());
+    if (mounted) {
+      setState(() {
+        _messageController.clear();
+        _canSend = false;
+      });
+      FocusScope.of(context).unfocus();
+    }
   }
 }

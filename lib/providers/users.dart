@@ -1,7 +1,6 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 
-import 'package:audioplayers/audio_cache.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -150,6 +149,12 @@ class User with ChangeNotifier {
       'Poster': rec['Poster'],
       'imdbRating': rec['imdbRating'],
       'imdbID': rec['imdbID'],
+      'Director': rec['Director'],
+      'Writer': rec['Writer'],
+      'Actors': rec['Actors'],
+      'Plot': rec['Plot'],
+      'Released': rec['Released'],
+      'Runtime': rec['Runtime'],
     };
   }
 
@@ -205,7 +210,7 @@ class User with ChangeNotifier {
   }
 
   Future<dynamic> getFilmByID(String id) async {
-    String url = "http://www.omdbapi.com/?i=$id&apikey=eb4d3f87";
+    String url = "http://www.omdbapi.com/?i=$id&apikey=eb4d3f87&plot=full";
     final response = await http.get(url);
     return convert.jsonDecode(response.body);
   }
@@ -419,7 +424,6 @@ class User with ChangeNotifier {
     } catch (error) {
       _chatMessages = tmpList;
       notifyListeners();
-      notifyListeners();
       showError(
         'Couldn\'t change your image',
         'Please check your internet connection.',
@@ -427,11 +431,25 @@ class User with ChangeNotifier {
     }
   }
 
-  Future<void> sendFeedback(String text) async {
-    await Firestore.instance.collection('feedback').add({
-      'userId': userId,
-      'feedback': text.trim(),
-    });
+  Future<void> sendFeedback(String text, double rating) async {
+    try {
+      await Firestore.instance.collection('feedback').add({
+        'userId': userId,
+        'rating': rating,
+        'feedback': text.trim(),
+        'date': DateTime.now().toIso8601String(),
+      });
+    } on PlatformException {
+      showError(
+        'Couldn\'t send your feedback',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      showError(
+        'Couldn\'t send your feedback',
+        'Please check your internet connection.',
+      );
+    }
   }
 
   Future<void> loadMessage() async {

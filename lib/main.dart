@@ -11,6 +11,7 @@ import './helpers/constants.dart';
 import './providers/categories.dart';
 import './providers/users.dart';
 import './screens/authentication_screen.dart';
+import 'helpers/custom_route.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,6 +35,12 @@ class _MyAppState extends State<MyApp> {
           primarySwatch: Constants.customColor,
           accentColor: Colors.white,
           fontFamily: 'Poppins',
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CustomPageTransitionBuilder(),
+              TargetPlatform.iOS: CustomPageTransitionBuilder(),
+            },
+          ),
         ),
         home: Consumer<User>(
           builder: (_, user, __) => StreamBuilder(
