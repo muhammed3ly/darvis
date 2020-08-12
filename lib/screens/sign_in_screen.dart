@@ -50,12 +50,18 @@ class _SignInScreenState extends State<SignInScreen> {
     } catch (error) {
       var message = 'An error occurred';
       if (error.message != null) message = error.message;
-
+      if (error.code == 'ERROR_USER_NOT_FOUND') message = "user not found";
+      if (error.code == 'ERROR_WRONG_PASSWORD')
+        message = "wrong password! please try again";
       Scaffold.of(context).showSnackBar(
         SnackBar(
           content: Text(
             message,
-            style: TextStyle(fontSize: 18, color: Colors.white),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+            ),
           ),
           backgroundColor: Color.fromRGBO(53, 77, 175, 1),
         ),

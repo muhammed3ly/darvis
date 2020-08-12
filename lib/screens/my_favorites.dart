@@ -50,108 +50,110 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : Container(
-                    height: MediaQuery.of(context).size.height,
-                    child: Stack(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Consumer<Categories>(
-                            builder: (_, categories, ch) => categories
-                                        .categories ==
-                                    null
-                                ? Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : GridView.builder(
-                                    padding: EdgeInsets.only(
-                                        top: 16, bottom: 8, right: 8, left: 8),
-                                    shrinkWrap: true,
-                                    physics: ScrollPhysics(),
-                                    itemCount: categories.categories.length,
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      childAspectRatio: 0.9,
-                                      crossAxisSpacing: 40,
-                                      mainAxisSpacing: 20,
-                                    ),
-                                    itemBuilder: (ctx, idx) {
-                                      return Column(
-                                        children: [
-                                          Container(
-                                            height: 130,
-                                            key: ValueKey(categories
-                                                .categories[idx]['name']),
-                                            child: GestureDetector(
-                                              onTap: () => categories
-                                                  .toggleFavorite(idx),
-                                              child: Stack(
-                                                fit: StackFit.expand,
-                                                children: <Widget>[
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20.0),
-                                                    child: Image.network(
-                                                      categories.categories[idx]
-                                                          ['imageUrl'],
-                                                      fit: BoxFit.fill,
-                                                    ),
-                                                  ),
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20.0),
-                                                    child: Opacity(
-                                                      child: Container(
-                                                        color:
-                                                            Colors.blueAccent,
+                : SafeArea(
+                  child: Container(
+                      height: MediaQuery.of(context).size.height ,
+                      child: Stack(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Consumer<Categories>(
+                              builder: (_, categories, ch) => categories
+                                          .categories ==
+                                      null
+                                  ? Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : GridView.builder(
+                                      padding: EdgeInsets.only(
+                                          top: 16, bottom: 8, right: 8, left: 8),
+                                      shrinkWrap: true,
+                                      physics: ScrollPhysics(),
+                                      itemCount: categories.categories.length,
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        childAspectRatio: 0.9,
+                                        crossAxisSpacing: 40,
+                                        mainAxisSpacing: 20,
+                                      ),
+                                      itemBuilder: (ctx, idx) {
+                                        return Column(
+                                          children: [
+                                            Container(
+                                              height: 130,
+                                              key: ValueKey(categories
+                                                  .categories[idx]['name']),
+                                              child: GestureDetector(
+                                                onTap: () => categories
+                                                    .toggleFavorite(idx),
+                                                child: Stack(
+                                                  fit: StackFit.expand,
+                                                  children: <Widget>[
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                      child: Image.network(
+                                                        categories.categories[idx]
+                                                            ['imageUrl'],
+                                                        fit: BoxFit.fill,
                                                       ),
-                                                      opacity:
-                                                          categories.categories[
-                                                                          idx][
-                                                                      'isFav'] ==
-                                                                  'true'
-                                                              ? 0.6
-                                                              : 0,
                                                     ),
-                                                  ),
-                                                  Icon(
-                                                    Icons.favorite_border,
-                                                    size: categories.categories[
-                                                                idx]['isFav'] ==
-                                                            'true'
-                                                        ? 70
-                                                        : 0,
-                                                    color: Colors.white,
-                                                  )
-                                                ],
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                      child: Opacity(
+                                                        child: Container(
+                                                          color:
+                                                              Colors.blueAccent,
+                                                        ),
+                                                        opacity:
+                                                            categories.categories[
+                                                                            idx][
+                                                                        'isFav'] ==
+                                                                    'true'
+                                                                ? 0.6
+                                                                : 0,
+                                                      ),
+                                                    ),
+                                                    Icon(
+                                                      Icons.favorite_border,
+                                                      size: categories.categories[
+                                                                  idx]['isFav'] ==
+                                                              'true'
+                                                          ? 70
+                                                          : 0,
+                                                      color: Colors.white,
+                                                    )
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            categories.categories[idx]['name'],
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color:
-                                                  Color.fromRGBO(77, 75, 78, 1),
-                                              fontSize: 20,
+                                            SizedBox(
+                                              height: 5,
                                             ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                            Text(
+                                              categories.categories[idx]['name'],
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color:
+                                                    Color.fromRGBO(77, 75, 78, 1),
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                ),
           );
   }
 }
