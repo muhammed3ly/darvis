@@ -1,7 +1,6 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 
-import 'package:audioplayers/audio_cache.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -26,7 +25,6 @@ class Message {
 
 class User with ChangeNotifier {
   String email, userName, imageUrl, userId;
-  String chatBotName, chatBotImageUrl;
   File pickedImage;
   List<Message> _chatMessages = [];
   List<Map<String, String>> categories = [];
@@ -34,23 +32,20 @@ class User with ChangeNotifier {
   bool isLoaded = false;
   int _replying = 0;
 
-  void setData(
-      {String email,
-      String userName,
-      String imageUrl,
-      String userId,
-      File pickedImage,
-      List<Map<String, String>> categories,
-      chatBotImageUrl,
-      chatBotName}) {
+  void setData({
+    String email,
+    String userName,
+    String imageUrl,
+    String userId,
+    File pickedImage,
+    List<Map<String, String>> categories,
+  }) {
     this.email = email;
     this.userName = userName;
     this.imageUrl = imageUrl;
     this.userId = userId;
     this.pickedImage = pickedImage;
     this.categories = categories;
-    this.chatBotImageUrl = chatBotImageUrl;
-    this.chatBotName = chatBotName;
   }
 
   Future<List<Map<String, String>>> loadData() async {
@@ -76,8 +71,6 @@ class User with ChangeNotifier {
       email: user.email,
       userId: user.uid,
       imageUrl: userData['imageUrl'],
-      chatBotImageUrl: userData['chatBotImageUrl'],
-      chatBotName: userData['chatBotName'],
     );
     await loadMessage();
     final allDocuments = await Firestore.instance
@@ -96,8 +89,6 @@ class User with ChangeNotifier {
 
   Future<void> signUp(String email, String userName, String password,
       File pickedImage, List<Map<String, String>> categories) async {
-    isSigning = true;
-    notifyListeners();
     await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
     final user = await FirebaseAuth.instance.currentUser();
@@ -113,18 +104,19 @@ class User with ChangeNotifier {
         'isFav': type['isFav'],
       });
     });
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('user_image')
-        .child(user.uid + '.jpg');
-    await ref.putFile(pickedImage).onComplete;
-    final url = await ref.getDownloadURL();
+    String url = 'default';
+    if (pickedImage != null) {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_image')
+          .child(user.uid + '.jpg');
+      await ref.putFile(pickedImage).onComplete;
+      url = await ref.getDownloadURL();
+    }
     await Firestore.instance.collection('users').document(user.uid).setData({
       'userName': userName,
       'email': email,
       'imageUrl': url,
-      'chatBotImageUrl': 'assets/images/chatbot.png',
-      'chatBotName': 'DARVIS'
     });
     setData(
       email: email,
@@ -132,11 +124,8 @@ class User with ChangeNotifier {
       imageUrl: url,
       userId: user.uid,
       categories: categories,
-      chatBotImageUrl: 'assets/images/chatbot.png',
-      chatBotName: 'DARVIS',
     );
     isLoaded = true;
-    isSigning = false;
     notifyListeners();
   }
 
@@ -150,6 +139,12 @@ class User with ChangeNotifier {
       'Poster': rec['Poster'],
       'imdbRating': rec['imdbRating'],
       'imdbID': rec['imdbID'],
+      'Director': rec['Director'],
+      'Writer': rec['Writer'],
+      'Actors': rec['Actors'],
+      'Plot': rec['Plot'],
+      'Released': rec['Released'],
+      'Runtime': rec['Runtime'],
     };
   }
 
@@ -178,8 +173,8 @@ class User with ChangeNotifier {
           }),
           letDarvisReply(message.text)
         ]);
-        _replying--;
       } else {
+        _replying--;
         await Firestore.instance
             .collection('users')
             .document(userId)
@@ -205,19 +200,14 @@ class User with ChangeNotifier {
   }
 
   Future<dynamic> getFilmByID(String id) async {
-    String url = "http://www.omdbapi.com/?i=$id&apikey=eb4d3f87";
+    String url = "http://www.omdbapi.com/?i=$id&apikey=eb4d3f87&plot=full";
     final response = await http.get(url);
     return convert.jsonDecode(response.body);
   }
 
   Future<void> letDarvisReply(String text) async {
-    AudioCache cache = AudioCache();
-    var sound;
-    bool soundRan = false;
     try {
       if (_replying == 1) {
-        soundRan = true;
-        sound = await cache.loop("soundEffects/typing.mp3");
         _chatMessages.insert(
           0,
           Message(
@@ -254,12 +244,18 @@ class User with ChangeNotifier {
             recs.add(await getFilmByID(responseData['FilmsIDs'][i]));
           }
           addMessage(
-            Message(
-              text: responseData['Response'],
-              byMe: false,
-              time: DateTime.now().toIso8601String(),
-              recommendations: recs,
-            ),
+            (recs.length > 0)
+                ? Message(
+                    text: responseData['Response'],
+                    byMe: false,
+                    time: DateTime.now().toIso8601String(),
+                    recommendations: recs,
+                  )
+                : Message(
+                    text: responseData['Response'],
+                    byMe: false,
+                    time: DateTime.now().toIso8601String(),
+                  ),
           );
         }
       } else {
@@ -281,14 +277,12 @@ class User with ChangeNotifier {
           time: DateTime.now().toIso8601String(),
         ),
       );
-      print("reply: $error");
+      debugPrint("reply: $error");
     }
-    if (soundRan) {
-      await sound.stop();
+    if (_replying == 0) {
       _chatMessages.removeAt(0);
       notifyListeners();
     }
-    cache.clearCache();
   }
 
   Future<void> updateUserName(String name) async {
@@ -340,6 +334,7 @@ class User with ChangeNotifier {
   }
 
   Future<void> changeEmail(String emaill, String password) async {
+    String currentEmail = this.email;
     try {
       final user = await FirebaseAuth.instance.currentUser();
 
@@ -352,6 +347,8 @@ class User with ChangeNotifier {
       await user.reauthenticateWithCredential(authCredential);
       await user.updateEmail(emaill);
     } on PlatformException catch (error) {
+      this.email = currentEmail;
+      notifyListeners();
       showError(
         'Couldn\'t change your email',
         error.message == 'ERROR_EMAIL_ALREADY_IN_USE'
@@ -359,6 +356,8 @@ class User with ChangeNotifier {
             : 'Couldn\'t change email as you entered a wrong current password.',
       );
     } catch (error) {
+      this.email = currentEmail;
+      notifyListeners();
       showError(
         'Couldn\'t change your email',
         'Please check your internet connection.',
@@ -426,7 +425,6 @@ class User with ChangeNotifier {
     } catch (error) {
       _chatMessages = tmpList;
       notifyListeners();
-      notifyListeners();
       showError(
         'Couldn\'t change your image',
         'Please check your internet connection.',
@@ -434,11 +432,25 @@ class User with ChangeNotifier {
     }
   }
 
-  Future<void> sendFeedback(String text) async {
-    await Firestore.instance.collection('feedback').add({
-      'userId': userId,
-      'feedback': text.trim(),
-    });
+  Future<void> sendFeedback(String text, double rating) async {
+    try {
+      await Firestore.instance.collection('feedback').add({
+        'userId': userId,
+        'rating': rating,
+        'feedback': text.trim(),
+        'date': DateTime.now().toIso8601String(),
+      });
+    } on PlatformException {
+      showError(
+        'Couldn\'t send your feedback',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      showError(
+        'Couldn\'t send your feedback',
+        'Please check your internet connection.',
+      );
+    }
   }
 
   Future<void> loadMessage() async {
@@ -467,11 +479,12 @@ class User with ChangeNotifier {
 
   void showError(String title, String message) {
     Get.rawSnackbar(
-      titleText: title ??
-          Text(
-            title,
-            style: TextStyle(color: Colors.white),
-          ),
+      titleText: title != null
+          ? Text(
+              title,
+              style: TextStyle(color: Colors.white),
+            )
+          : null,
       messageText: Text(
         message,
         style: TextStyle(color: Colors.white),

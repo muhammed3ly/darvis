@@ -1,5 +1,18 @@
+import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:chat_bot/screens/movie_details_screen.dart';
+
+enum MessageType {
+  Normal,
+  List,
+  Typing,
+}
+
+enum Sender {
+  User,
+  Chatbot,
+}
 
 class ChatBubble extends StatefulWidget {
   final Sender _sender;
@@ -29,19 +42,11 @@ class ChatBubble extends StatefulWidget {
   _ChatBubbleState createState() => _ChatBubbleState();
 }
 
-enum MessageType {
-  Normal,
-  List,
-  Typing,
-}
-
-enum Sender {
-  User,
-  Chatbot,
-}
-
 class _ChatBubbleState extends State<ChatBubble> {
   Color _backGroundColor;
+  AudioCache _cache;
+  var _sound;
+  bool _firstRun;
   @override
   Widget build(BuildContext context) {
     return Wrap(
@@ -76,6 +81,28 @@ class _ChatBubbleState extends State<ChatBubble> {
     _backGroundColor = widget._sender == Sender.Chatbot
         ? Color.fromRGBO(160, 210, 254, 1)
         : Color.fromRGBO(219, 238, 255, 1);
+    _firstRun = true;
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    if (_firstRun) {
+      _firstRun = false;
+      if (widget._messageType == MessageType.Typing) {
+        _cache = AudioCache();
+        _sound = await _cache.loop("soundEffects/typing.mp3");
+      }
+    }
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    if (widget._messageType == MessageType.Typing) {
+      await _sound.stop();
+      _cache.clearCache();
+    }
   }
 
   Widget _listMessageBuilder() {
@@ -102,44 +129,69 @@ class _ChatBubbleState extends State<ChatBubble> {
               scrollDirection: Axis.horizontal,
               itemCount: widget.message['list'].length,
               itemBuilder: (_, i) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5).add(
-                    EdgeInsets.only(
-                      left: i == 0 ? 10 : 0,
-                      right: i == widget.message['list'].length - 1 ? 10 : 0,
+                String heroTag = widget.message['list'][i]['imdbID'] +
+                    DateTime.now().toIso8601String();
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailsScreen(
+                          widget.message['list'][i],
+                          widget.message['list'],
+                          heroTag,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 5).add(
+                      EdgeInsets.only(
+                        left: i == 0 ? 10 : 0,
+                        right: i == widget.message['list'].length - 1 ? 10 : 0,
+                      ),
                     ),
-                  ),
-                  constraints: BoxConstraints(maxWidth: 150),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 6,
-                        child: Container(
-                          width: double.infinity,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: Image.network(
-                              widget.message['list'][i]['Poster'],
-                              fit: BoxFit.cover,
+                    constraints: BoxConstraints(maxWidth: 150),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Expanded(
+                          flex: 6,
+                          child: Hero(
+                            tag: heroTag,
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: FadeInImage(
+                                  fit: BoxFit.cover,
+                                  placeholder: AssetImage(
+                                      'assets/images/movie_placeholder.png'),
+                                  image: NetworkImage(
+                                    widget.message['list'][i]['Poster'],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            widget.message['list'][i]['Title'],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
+                        Expanded(
+                          flex: 1,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              widget.message['list'][i]['Title'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

@@ -37,6 +37,11 @@ class _ProfileItemState extends State<ProfileItem> {
     if (widget.value.trim() != _controller.text.trim() &&
         _controller.text.trim().isNotEmpty) {
       widget.editFunction(_controller.text);
+      if (mounted) {
+        setState(() {
+          _editing = false;
+        });
+      }
     } else if (_controller.text.trim().isEmpty) {
       if (mounted) {
         Scaffold.of(context).showSnackBar(

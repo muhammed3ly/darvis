@@ -88,7 +88,6 @@ class _EditEmailState extends State<EditEmail> with TickerProviderStateMixin {
     } else if (!email.contains('@')) {
       showError('Please enter valid email.');
     } else {
-      print('object');
       widget.editEmail(email, password);
       closeScreen();
     }

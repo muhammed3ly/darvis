@@ -1,3 +1,4 @@
+import 'package:chat_bot/screens/sign_in_screen.dart';
 import 'package:chat_bot/widgets/global_widgets/drawer_sections.dart/custom_drawer_header.dart';
 import 'package:chat_bot/widgets/global_widgets/drawer_sections.dart/navigation_section.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -50,6 +51,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
+                    Navigator.of(context)
+                        .pushReplacementNamed(SignInScreen.routeName);
                   },
                 ),
               ),

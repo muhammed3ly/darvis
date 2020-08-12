@@ -1,3 +1,4 @@
+import 'package:chat_bot/widgets/global_widgets/drawer_sections.dart/send_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -91,22 +92,27 @@ class _AppSectionState extends State<AppSection> {
               color: Color.fromRGBO(221, 220, 240, 1),
               borderRadius: BorderRadius.circular(30),
             ),
-            child: RatingBar(
-              initialRating: 0,
-              tapOnlyMode: true,
-              direction: Axis.horizontal,
-              allowHalfRating: true,
-              itemCount: 5,
-              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-              unratedColor: Colors.white,
-              itemSize: 30 * MediaQuery.of(context).textScaleFactor,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
+            child: Hero(
+              tag: 'rating',
+              child: RatingBar(
+                initialRating: 0, //TODO: a5er rating hwa 7ato
+                tapOnlyMode: true,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                unratedColor: Colors.white,
+                itemSize: 30 * MediaQuery.of(context).textScaleFactor,
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  Navigator.of(context).push(PageRouteBuilder(
+                      opaque: false,
+                      pageBuilder: (_, __, ___) => SendFeedback(rating)));
+                },
               ),
-              onRatingUpdate: (rating) {
-                print(rating);
-              },
             ),
           ),
           SizedBox(

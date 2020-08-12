@@ -14,7 +14,7 @@ dependencies:
   cached_network_image: ^2.2.0+1
   font_awesome_flutter: ^8.8.1
   provider: ^3.0.0
-  cloud_firestore: ^0.13.6
+  cloud_firestore: ^0.12.9+5
   firebase_auth: ^0.16.1
   firebase_storage: ^3.1.6
   percent_indicator: ^2.1.4
@@ -32,8 +32,10 @@ flutter:
   uses-material-design: true
   assets:
    - assets/images/default-user-placeholder.png
+   - assets/images/avatar.jpg
    - assets/images/chatbot.png
-   - assets/images/logo.png
+   - assets/images/logo.jpg
+   - assets/images/Bar01.png
    - assets/images/movie_placeholder.png
    - assets/images/Asset 01.png
    - assets/images/Asset 05.png
