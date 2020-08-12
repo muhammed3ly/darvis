@@ -39,9 +39,8 @@ class Categories with ChangeNotifier {
     return ret;
   }
 
-  void set(List<Map<String, String>> Rhs) {
-    categories = Rhs;
-    notifyListeners();
+  void setCategories(List<Map<String, String>> categories) {
+    this.categories = categories;
   }
 
   void clear() {

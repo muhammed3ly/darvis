@@ -248,6 +248,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void drawer() {
     _scaffoldKey.currentState.openDrawer();
+    try {
+      FocusManager.instance.primaryFocus.unfocus();
+    } catch (error) {
+      debugPrint(error.message);
+    }
   }
 
   @override
@@ -272,7 +277,12 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       child: SimpleDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          borderRadius: BorderRadius.all(
+            Radius.circular(
+              20.0,
+            ),
+          ),
+        ),
         title: Text('Are you sure you want to clear the chat?'),
         children: <Widget>[
           SimpleDialogOption(

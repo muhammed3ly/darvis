@@ -50,6 +50,8 @@ class User with ChangeNotifier {
 
   Future<List<Map<String, String>>> loadData() async {
     if (isLoaded) {
+      isLoaded = false;
+      notifyListeners();
       final allDocuments = await Firestore.instance
           .collection('users')
           .document(userId)
