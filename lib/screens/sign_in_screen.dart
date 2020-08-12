@@ -4,6 +4,8 @@ import 'package:chat_bot/screens/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -59,18 +61,34 @@ class _SignInScreenState extends State<SignInScreen> {
       email = email.trim();
       password = password.trim();
       Provider.of<User>(context).isSigning = false;
-      await auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      await auth.signInWithEmailAndPassword(email: email, password: password);
+      Navigator.of(context).pushReplacementNamed(MyFavoritesScreen.routeName);
+    } on PlatformException catch (error) {
+      if (mounted) {
+        setState(() {
+          _isSigning = false;
+        });
+      }
+      Get.rawSnackbar(
+        messageText: Text(
+          error.message,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red[700],
+      );
     } catch (error) {
-      setState(() {
-        _isSigning = false;
-      });
-      var message = 'An error occurred';
-      if (error.message != null) message = error.message;
-      if (error.code == 'ERROR_USER_NOT_FOUND') message = "user not found";
-      if (error.code == 'ERROR_WRONG_PASSWORD')
-        message = "wrong password! please try again";
-      print(message);
+      if (mounted) {
+        setState(() {
+          _isSigning = false;
+        });
+      }
+      Get.rawSnackbar(
+        messageText: Text(
+          error,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red[700],
+      );
     }
     setState(() {
       _isSigning = false;
@@ -107,7 +125,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: Image.asset('assets/images/logo.jpg'),
                           ),
                           SizedBox(
-                            height: 35,
+                            height: 50,
                           ),
                           Form(
                             key: formKey,
@@ -153,26 +171,21 @@ class _SignInScreenState extends State<SignInScreen> {
                                           fontSize: 17,
                                         ),
                                         decoration: InputDecoration(
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          enabledBorder:
-                                              const OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Colors.white,
-                                            ),
-                                          ),
+                                          border: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          errorBorder: InputBorder.none,
+                                          disabledBorder: InputBorder.none,
                                           hintText: 'Ex. JohnMac@gmail.com',
                                           hintStyle: TextStyle(
                                             fontSize: 15,
                                             color: Colors.grey,
                                           ),
                                           isDense: true,
-                                          contentPadding: EdgeInsets.all(8),
-                                          errorStyle:
-                                              TextStyle(color: Colors.red),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          errorStyle: TextStyle(
+                                              color: Colors.red, height: 0.5),
                                         ),
                                         validator: (email) {
                                           if (email.isEmpty)
@@ -182,6 +195,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                           return null;
                                         },
                                       ),
+                                      SizedBox(
+                                        height: 8,
+                                      )
                                     ],
                                   ),
                                 ),
@@ -244,17 +260,21 @@ class _SignInScreenState extends State<SignInScreen> {
                                             color: Colors.grey,
                                           ),
                                           isDense: true,
-                                          contentPadding: EdgeInsets.all(8),
-                                          errorStyle:
-                                              TextStyle(color: Colors.red),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          errorStyle: TextStyle(
+                                              color: Colors.red, height: 0.5),
                                         ),
                                         obscureText: true,
                                       ),
+                                      SizedBox(
+                                        height: 8,
+                                      )
                                     ],
                                   ),
                                 ),
                                 SizedBox(
-                                  height: 40,
+                                  height: 20,
                                 ),
                                 _isSigning
                                     ? CircularProgressIndicator(
