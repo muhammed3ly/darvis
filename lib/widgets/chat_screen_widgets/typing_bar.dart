@@ -10,21 +10,87 @@ class TypingBar extends StatefulWidget {
 }
 
 class _TypingBarState extends State<TypingBar> {
-  bool _ready;
-  String _message = '';
-  TextEditingController _messageController = TextEditingController();
-  final outlineBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(50)),
-    borderSide: BorderSide(
-      width: 0,
-      color: Color.fromRGBO(227, 243, 251, 1),
-    ),
-  );
-  FocusNode textFieldFocusNode = FocusNode();
+  bool _canSend;
+  TextEditingController _messageController;
   @override
-  void initState() {
-    super.initState();
-    _ready = true;
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.01,
+      ).add(
+        const EdgeInsets.only(
+          bottom: 15,
+        ),
+      ),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 2,
+            offset: Offset(0, 0),
+          ),
+        ],
+      ),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              onChanged: (value) {
+                setState(() {
+                  if (value.trim().isNotEmpty) {
+                    _canSend = true;
+                  } else {
+                    _canSend = false;
+                  }
+                });
+              },
+              style: TextStyle(
+                color: Color.fromRGBO(53, 77, 175, 1),
+                fontWeight: FontWeight.w500,
+              ),
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 5,
+              minLines: 1,
+              textInputAction: TextInputAction.newline,
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.all(0),
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                hintText: 'Type a message',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          InkWell(
+            onTap: _canSend ? _trySendingMessage : null,
+            child: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.rotationZ(-0.25 * pi),
+              child: Icon(
+                Icons.send,
+                color: _canSend
+                    ? Color.fromRGBO(53, 77, 175, 1)
+                    : Color.fromRGBO(53, 77, 175, 1).withOpacity(0.6),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -34,78 +100,20 @@ class _TypingBarState extends State<TypingBar> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        controller: _messageController,
-        onChanged: (value) {
-          setState(() {
-            _message = value;
-          });
-        },
-        focusNode: textFieldFocusNode,
-        keyboardType: TextInputType.multiline,
-        maxLines: 5,
-        minLines: 1,
-        textCapitalization: TextCapitalization.sentences,
-        decoration: InputDecoration(
-          hintText: 'Type a message...',
-          filled: true,
-          fillColor: Color.fromRGBO(227, 243, 251, 1),
-          focusedBorder: outlineBorder,
-          disabledBorder: outlineBorder,
-          enabledBorder: outlineBorder,
-          border: outlineBorder,
-          errorBorder: outlineBorder,
-          focusedErrorBorder: outlineBorder,
-          suffixIcon: InkWell(
-            enableFeedback: _ready,
-            onTap: _message.isNotEmpty
-                ? () async {
-                    await Future.delayed(Duration(milliseconds: 50), () async {
-                      _messageController.clear();
-                      String sendMessage = _message;
-                      setState(() {
-                        _message = '';
-                      });
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      widget._sendMessage(sendMessage);
-                    });
-                  }
-                : null,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircleAvatar(
-                backgroundColor: _message.isNotEmpty
-                    ? Color.fromRGBO(3, 155, 229, 1)
-                    : Color.fromRGBO(141, 209, 243, 1),
-                child: Center(
-                  child: _ready
-                      ? Container(
-                          transform: _message.isNotEmpty
-                              ? (Matrix4.rotationZ(-45 * pi / 180)
-                                ..translate(-17.0, 9))
-                              : null,
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Icons.send,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                new AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+  void initState() {
+    super.initState();
+    _messageController = TextEditingController();
+    _canSend = false;
+  }
+
+  void _trySendingMessage() {
+    widget._sendMessage(_messageController.text.trim());
+    if (mounted) {
+      setState(() {
+        _messageController.clear();
+        _canSend = false;
+      });
+      FocusScope.of(context).unfocus();
+    }
   }
 }

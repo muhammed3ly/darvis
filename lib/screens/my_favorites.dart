@@ -1,5 +1,6 @@
 import 'package:chat_bot/screens/temp_splash.dart';
-import 'package:chat_bot/widgets/custom_appbar.dart';
+import 'package:chat_bot/widgets/global_widgets/custom_appbar.dart';
+import 'package:chat_bot/widgets/global_widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -44,7 +45,7 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
         : Scaffold(
             key: _scaffoldKey,
             extendBodyBehindAppBar: true,
-            drawer: Drawer(),
+            drawer: CustomDrawer(),
             appBar: CustomAppbar(title: 'Genres', openDrawer: drawer),
             body: isLoading
                 ? Center(

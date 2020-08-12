@@ -1,18 +1,15 @@
 import 'dart:io';
 
+import 'package:chat_bot/providers/categories.dart';
 import 'package:chat_bot/providers/users.dart';
-import 'package:chat_bot/widgets/custom_appbar.dart';
-import 'package:chat_bot/widgets/settings_screen_widgets/bottom_sheets/send_feedback_sheet.dart';
+import 'package:chat_bot/widgets/global_widgets/custom_appbar.dart';
+import 'package:chat_bot/widgets/global_widgets/custom_drawer.dart';
+import 'package:chat_bot/widgets/profile_screen_widgets/favorite_profile_item.dart';
+import 'package:chat_bot/widgets/profile_screen_widgets/profile_item.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
-import '../widgets/settings_screen_widgets/bottom_sheets/name_bottom_sheet.dart';
-import '../widgets/settings_screen_widgets/bottom_sheets/password.dart';
-import '../widgets/settings_screen_widgets/bottom_sheets/profile_picture_bottom_sheet.dart';
-import '../widgets/settings_screen_widgets/settings_item.dart';
-import '../widgets/settings_screen_widgets/settings_photo_item.dart';
-import '../widgets/settings_screen_widgets/settings_section.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const String routeName = '/profile';
@@ -22,36 +19,209 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<ProfileScreen> {
-  MediaQueryData mediaQuery;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: Color.fromRGBO(243, 240, 248, 1),
+      appBar: CustomAppbar(title: 'Profile', openDrawer: drawer),
+      drawer: CustomDrawer(),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.only(top: 20),
+          physics: BouncingScrollPhysics(),
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ClipOval(
+                  child: FittedBox(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: FadeInImage(
+                        fit: BoxFit.cover,
+                        placeholder:
+                            AssetImage('assets/images/Author__Placeholder.png'),
+                        image: Provider.of<User>(context).imageUrl == 'default'
+                            ? AssetImage(
+                                'assets/images/Author__Placeholder.png')
+                            : NetworkImage(
+                                Provider.of<User>(context).imageUrl,
+                              ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                FlatButton.icon(
+                  color: Colors.white,
+                  shape: StadiumBorder(),
+                  icon: Icon(
+                    Icons.camera_alt,
+                    color: Color.fromRGBO(53, 77, 175, 1),
+                  ),
+                  label: Text(
+                    'Open Camera',
+                    style: TextStyle(color: Colors.grey[400]),
+                  ),
+                  onPressed: () => _changeProfilePhoto(1),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                FlatButton.icon(
+                  color: Colors.white,
+                  shape: StadiumBorder(),
+                  icon: Icon(
+                    FontAwesomeIcons.images,
+                    color: Color.fromRGBO(53, 77, 175, 1),
+                  ),
+                  label: Text(
+                    'From Gallery',
+                    style: TextStyle(color: Colors.grey[400]),
+                  ),
+                  onPressed: () => _changeProfilePhoto(0),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Divider(
+              color: Colors.white,
+              thickness: 2.0,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Hero(
+              tag: 'Email',
+              child: Material(
+                color: Colors.transparent,
+                child: ProfileItem(
+                  title: 'Email Address',
+                  value: Provider.of<User>(context).email,
+                  editFunction: _changeEmail,
+                ),
+              ),
+            ),
+            ProfileItem(
+              title: 'User Name',
+              value: Provider.of<User>(context).userName,
+              editFunction: _changeName,
+            ),
+            Hero(
+              tag: 'Password',
+              child: Material(
+                color: Colors.transparent,
+                child: ProfileItem(
+                  title: 'Password',
+                  value: '********',
+                  editFunction: _changePassword,
+                  password: true,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Divider(
+              color: Colors.white,
+              thickness: 2.0,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Container(
+              margin: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.12,
+              ),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    FontAwesomeIcons.heart,
+                    color: Color.fromRGBO(53, 77, 175, 1),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    'Favorites',
+                    style: TextStyle(
+                      fontSize: 20 * MediaQuery.of(context).textScaleFactor,
+                      color: Color.fromRGBO(53, 77, 175, 1),
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.1,
+              ),
+              child: Provider.of<Categories>(context).favs.length > 0
+                  ? Wrap(
+                      spacing: 10,
+                      children: Provider.of<Categories>(context).favs.map(
+                        (e) {
+                          return FavoriteProfileItem(
+                            id: e['index'],
+                            title: e['name'],
+                          );
+                        },
+                      ).toList(),
+                    )
+                  : Text(
+                      'No favories.',
+                      textAlign: TextAlign.center,
+                    ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void drawer() {
     _scaffoldKey.currentState.openDrawer();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    mediaQuery = MediaQuery.of(context);
+  void _changeEmail(String email, String password) async {
+    await Provider.of<User>(context, listen: false)
+        .changeEmail(email, password);
   }
 
-  Future<void> showCantUpdate(error) async {
-    await showDialog(
-      context: context,
-      child: AlertDialog(
-        title: Text('Try again later!'),
-        content: Text(error),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
+  void _changeName(String name) async {
+    await Provider.of<User>(context, listen: false).updateUserName(name);
   }
 
-  void _changeProfilePhoto(int mode, bool profile) async {
+  void _changePassword(String oldPassword, String newPassword) async {
+    await Provider.of<User>(context, listen: false)
+        .updatePassword(oldPassword, newPassword);
+  }
+
+  void _changeProfilePhoto(int mode) async {
     PickedFile pickedFile;
     ImagePicker picker = ImagePicker();
     if (mode == 0) {
@@ -63,120 +233,6 @@ class _SettingsScreenState extends State<ProfileScreen> {
       return;
     }
     final File file = File(pickedFile.path);
-    try {
-      if (profile) {
-        await Provider.of<User>(context, listen: false).updateUserImage(file);
-      } else {
-        Provider.of<User>(context, listen: false).updateChatBotImage(file);
-      }
-    } catch (error) {
-      await showCantUpdate(error);
-    }
-    Navigator.of(context).pop();
-  }
-
-  void _changeName(String name, bool user) async {
-    try {
-      if (user) {
-        await Provider.of<User>(context, listen: false).updateUserName(name);
-      } else {
-        await Provider.of<User>(context, listen: false).updateChatBotName(name);
-      }
-    } catch (error) {
-      await showCantUpdate(error);
-    }
-    Navigator.of(context).pop();
-  }
-
-  void _changePassword(String password) async {
-    try {
-      await Provider.of<User>(context, listen: false).updatePassword(password);
-    } catch (error) {
-      await showCantUpdate(error);
-    }
-    Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      key: _scaffoldKey,
-      appBar: CustomAppbar(title: 'Profile', openDrawer: drawer),
-      body: Consumer<User>(
-        builder: (_, user, __) => SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.only(top: 80),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromRGBO(3, 155, 229, 1),
-                  Colors.black,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: [0, 1],
-              ),
-            ),
-            child: Column(
-              children: <Widget>[
-                SettingsSection(
-                  title: 'My Profile',
-                  children: <Widget>[
-                    SettingsPhotoItem(
-                      user.imageUrl,
-                      () {},
-                    ),
-                    SettingsItem(
-                      title: 'Username',
-                      subtitle: user.userName,
-                      fun: () {},
-                    ),
-                    SettingsItem(
-                      title: 'Change Password',
-                      fun: () {},
-                    ),
-                  ],
-                ),
-                SettingsSection(
-                  title: 'Chatbot Profile',
-                  children: <Widget>[
-                    SettingsPhotoItem(
-                      user.chatBotImageUrl,
-                      () {},
-                    ),
-                    SettingsItem(
-                      title: 'Chatbot Name',
-                      subtitle: user.chatBotName,
-                      fun: () {},
-                    ),
-                    SettingsItem(
-                      title: 'Reset Chat',
-                      icon: Icons.refresh,
-                      fun: () {},
-                    ),
-                  ],
-                ),
-                SettingsSection(
-                  title: 'Application',
-                  children: <Widget>[
-                    SettingsItem(
-                      title: 'Change Theme',
-                      subtitle: 'Light theme',
-                      fun: () {},
-                    ),
-                    SettingsItem(
-                      title: 'Send Feedback',
-                      icon: Icons.report,
-                      fun: () {},
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    await Provider.of<User>(context, listen: false).updateUserImage(file);
   }
 }

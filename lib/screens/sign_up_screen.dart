@@ -33,19 +33,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final formKey = GlobalKey<FormState>();
 
-  @override
-  void dispose() {
-    focusNode1.dispose();
-    focusNode2.dispose();
-    focusNode3.dispose();
-    emailController.dispose();
-    userNameController.dispose();
-    confirmedPasswordController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
   String email = '', password = '', userName = '', confirmedPassword = '';
+
   int step = 0;
   File pickedImage;
 
@@ -102,6 +91,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       appBar: step >= 0 ? CustomAppbar() : null,
     );
+  }
+
+  void createUser() async {
+    try {
+      email = email.trim();
+      password = password.trim();
+      var categories =
+          Provider.of<Categories>(context, listen: false).categories;
+      Provider.of<User>(context, listen: false)
+          .signUp(email, userName, password, pickedImage, categories);
+    } catch (error) {
+      debugPrint(error);
+    }
+  }
+
+  @override
+  void dispose() {
+    focusNode1.dispose();
+    focusNode2.dispose();
+    focusNode3.dispose();
+    emailController.dispose();
+    userNameController.dispose();
+    confirmedPasswordController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   Center form1() {
@@ -644,21 +658,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  bool _loading = false;
-
-  void createUser() async {
-    try {
-      email = email.trim();
-      password = password.trim();
-      var categories =
-          Provider.of<Categories>(context, listen: false).categories;
-      Provider.of<User>(context, listen: false)
-          .signUp(email, userName, password, pickedImage, categories);
-    } catch (error) {
-      print(error);
-    }
-  }
-
   Container form3() {
     return Container(
       height: double.infinity,
@@ -910,5 +909,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  void goToForm2() {
+    if (!formKey.currentState.validate()) return;
+    FocusScope.of(context).unfocus();
+    formKey.currentState.save();
+    setState(() {
+      step++;
+    });
+  }
+
+  void pickImage() async {
+    var pickedImageFile = await ImagePicker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 50,
+      maxWidth: 150,
+    );
+    if (pickedImageFile == null) return;
+    setState(() {
+      pickedImage = pickedImageFile;
+    });
   }
 }

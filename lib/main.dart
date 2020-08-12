@@ -1,13 +1,17 @@
+import 'package:chat_bot/screens/chat_screen.dart';
 import 'package:chat_bot/screens/my_favorites.dart';
+import 'package:chat_bot/screens/profile_screen.dart';
 import 'package:chat_bot/screens/temp_splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import './helpers/constants.dart';
 import './providers/categories.dart';
 import './providers/users.dart';
 import './screens/authentication_screen.dart';
+import 'helpers/custom_route.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,13 +30,19 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => Categories()),
         ChangeNotifierProvider(create: (_) => User())
       ],
-      child: MaterialApp(
+      child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Darvis',
         theme: ThemeData(
           primarySwatch: Constants.customColor,
           accentColor: Colors.white,
           fontFamily: 'Poppins',
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CustomPageTransitionBuilder(),
+              TargetPlatform.iOS: CustomPageTransitionBuilder(),
+            },
+          ),
         ),
         home: Consumer<User>(
           builder: (_, user, __) => StreamBuilder(
@@ -46,6 +56,11 @@ class _MyAppState extends State<MyApp> {
                     : MyFavoritesScreen();
               }),
         ),
+        routes: {
+          ProfileScreen.routeName: (context) => ProfileScreen(),
+          MyFavoritesScreen.routeName: (context) => MyFavoritesScreen(),
+          ChatScreen.routeName: (context) => ChatScreen(),
+        },
       ),
     );
   }

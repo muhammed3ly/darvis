@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
-  final double _preferredHeight = 100.0;
+  final double _preferredHeight = 85.0;
 
   final String title;
   final Function openDrawer;
@@ -21,16 +21,9 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
+              bottomLeft: Radius.circular(14),
+              bottomRight: Radius.circular(14),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black,
-                offset: Offset(0.0, 1.0),
-                blurRadius: 6.0,
-              ),
-            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -61,8 +54,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
               Image.asset(
                 'assets/images/Asset 01.png',
                 fit: BoxFit.fitWidth,
-                width: MediaQuery.of(context).size.width * 0.28,
-              )
+                width: MediaQuery.of(context).size.width * 0.2,
+              ),
             ],
           ),
         ),

@@ -1,11 +1,12 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 
-import 'package:audioplayers/audio_cache.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -30,6 +31,7 @@ class User with ChangeNotifier {
   List<Map<String, String>> categories = [];
   bool isSigning = false;
   bool isLoaded = false;
+  int _replying = 0;
 
   void setData(
       {String email,
@@ -70,7 +72,7 @@ class User with ChangeNotifier {
         await Firestore.instance.collection('users').document(user.uid).get();
     setData(
       userName: userData['userName'],
-      email: userData['email'],
+      email: user.email,
       userId: user.uid,
       imageUrl: userData['imageUrl'],
       chatBotImageUrl: userData['chatBotImageUrl'],
@@ -147,47 +149,87 @@ class User with ChangeNotifier {
       'Poster': rec['Poster'],
       'imdbRating': rec['imdbRating'],
       'imdbID': rec['imdbID'],
+      'Director': rec['Director'],
+      'Writer': rec['Writer'],
+      'Actors': rec['Actors'],
+      'Plot': rec['Plot'],
+      'Released': rec['Released'],
+      'Runtime': rec['Runtime'],
     };
   }
 
   Future<void> addMessage(Message message) async {
-    _chatMessages.insert(0, message);
+    if (_replying > 0) {
+      _chatMessages.insert(1, message);
+    } else {
+      _chatMessages.insert(0, message);
+    }
     notifyListeners();
     try {
-      await Firestore.instance
-          .collection('users')
-          .document(userId)
-          .collection('chats')
-          .add({
-        'text': message.text,
-        'byMe': message.byMe,
-        'time': message.time,
-        'recommendations': message.recommendations == null
-            ? 'null'
-            : message.recommendations.map((i) => toMap(i)).toList()
-      });
+      if (message.byMe) {
+        _replying++;
+        await Future.wait([
+          Firestore.instance
+              .collection('users')
+              .document(userId)
+              .collection('chats')
+              .add({
+            'text': message.text,
+            'byMe': message.byMe,
+            'time': message.time,
+            'recommendations': message.recommendations == null
+                ? 'null'
+                : message.recommendations.map((i) => toMap(i)).toList()
+          }),
+          letDarvisReply(message.text)
+        ]);
+      } else {
+        _replying--;
+        await Firestore.instance
+            .collection('users')
+            .document(userId)
+            .collection('chats')
+            .add({
+          'text': message.text,
+          'byMe': message.byMe,
+          'time': message.time,
+          'recommendations': message.recommendations == null
+              ? 'null'
+              : message.recommendations.map((i) => toMap(i)).toList()
+        });
+      }
     } catch (error) {
+      if (_replying > 0) {
+        _chatMessages.removeAt(0);
+        _replying = 0;
+      }
       _chatMessages.removeAt(0);
       notifyListeners();
-      throw Exception(error);
-    }
-    if (message.byMe) {
-      await letDarvisReply(message.text);
+      showError('Could\'t send your message', error);
     }
   }
 
   Future<dynamic> getFilmByID(String id) async {
-    String url = "http://www.omdbapi.com/?i=$id&apikey=eb4d3f87";
+    String url = "http://www.omdbapi.com/?i=$id&apikey=eb4d3f87&plot=full";
     final response = await http.get(url);
     return convert.jsonDecode(response.body);
   }
 
   Future<void> letDarvisReply(String text) async {
-    AudioCache cache = AudioCache();
-    var sound;
-    sound = await cache.loop("soundEffects/typing.mp3");
-    String url = 'http://3.230.233.147/darvis';
     try {
+      if (_replying == 1) {
+        _chatMessages.insert(
+          0,
+          Message(
+            text: '..sudo..replying..',
+            byMe: false,
+            time: DateTime.now().toIso8601String(),
+          ),
+        );
+        notifyListeners();
+      }
+      String url = 'http://3.230.233.147/darvis';
+
       final response = await http.post(url,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
           body: convert.jsonEncode({
@@ -198,6 +240,7 @@ class User with ChangeNotifier {
           }));
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseData = convert.jsonDecode(response.body);
+        debugPrint(responseData['Classification']);
         if (responseData['Activated Model'] == 'G') {
           addMessage(
             Message(
@@ -209,7 +252,6 @@ class User with ChangeNotifier {
         } else if (responseData['Activated Model'] == 'R') {
           final recs = [];
           for (int i = 0; i < responseData['FilmsIDs'].length; i++) {
-            print(responseData['FilmsIDs'][i]);
             recs.add(await getFilmByID(responseData['FilmsIDs'][i]));
           }
           addMessage(
@@ -240,89 +282,180 @@ class User with ChangeNotifier {
           time: DateTime.now().toIso8601String(),
         ),
       );
-      print("reply: $error");
+      debugPrint("reply: $error");
     }
-
-    await sound.stop();
-    cache.clearCache();
+    if (_replying == 0) {
+      _chatMessages.removeAt(0);
+      notifyListeners();
+    }
   }
 
   Future<void> updateUserName(String name) async {
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'userName': name.trim()}, merge: true);
+    String oldUserName = userName;
     userName = name.trim();
     notifyListeners();
-  }
-
-  Future<void> updatePassword(String newPassword) async {
-    final user = await FirebaseAuth.instance.currentUser();
-    await user.updatePassword(newPassword);
-  }
-
-  Future<void> updateUserImage(File file) async {
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('user_image')
-        .child(userId + '.jpg');
-    await ref.putFile(file).onComplete;
-    final url = await ref.getDownloadURL();
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'imageUrl': url}, merge: true);
-    imageUrl = url;
-    notifyListeners();
-  }
-
-  Future<void> updateChatBotImage(File file) async {
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('chatbot_image')
-        .child(userId + '_chatbot.jpg');
-    await ref.putFile(file).onComplete;
-    final url = await ref.getDownloadURL();
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'chatBotImageUrl': url}, merge: true);
-    chatBotImageUrl = url;
-    notifyListeners();
-  }
-
-  Future<void> updateChatBotName(String name) async {
-    await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .setData({'chatBotName': name.trim()}, merge: true);
-    chatBotName = name.trim();
-    notifyListeners();
-  }
-
-  Future<void> resetChat() async {
-    final msgs = await Firestore.instance
-        .collection('users')
-        .document(userId)
-        .collection('chats')
-        .getDocuments();
-    msgs.documents.forEach((doc) async {
+    try {
       await Firestore.instance
           .collection('users')
           .document(userId)
-          .collection('chats')
-          .document(doc.documentID)
-          .delete();
-    });
-    _chatMessages.clear();
-    notifyListeners();
+          .setData({'userName': name.trim()}, merge: true);
+    } on PlatformException {
+      userName = oldUserName;
+      notifyListeners();
+      showError(
+        'Couldn\'t change username',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      userName = oldUserName;
+      notifyListeners();
+      showError(
+        'Couldn\'t change username',
+        'Please check your internet connection.',
+      );
+    }
   }
 
-  Future<void> sendFeedback(String text) async {
-    await Firestore.instance.collection('feedback').add({
-      'userId': userId,
-      'feedback': text.trim(),
-    });
+  Future<void> updatePassword(String oldPassword, String newPassword) async {
+    try {
+      final user = await FirebaseAuth.instance.currentUser();
+      AuthCredential authCredential = EmailAuthProvider.getCredential(
+        email: user.email,
+        password: oldPassword,
+      );
+      await user.reauthenticateWithCredential(authCredential);
+      await user.updatePassword(newPassword);
+    } on PlatformException {
+      showError(
+        'Couldn\'t change password',
+        'Couldn\'t change password as you entered a wrong current password.',
+      );
+    } catch (error) {
+      showError(
+        'Couldn\'t change password',
+        'Please check your internet connection.',
+      );
+    }
+  }
+
+  Future<void> changeEmail(String emaill, String password) async {
+    String currentEmail = this.email;
+    try {
+      final user = await FirebaseAuth.instance.currentUser();
+
+      this.email = emaill;
+      notifyListeners();
+      AuthCredential authCredential = EmailAuthProvider.getCredential(
+        email: user.email,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(authCredential);
+      await user.updateEmail(emaill);
+    } on PlatformException catch (error) {
+      this.email = currentEmail;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your email',
+        error.message == 'ERROR_EMAIL_ALREADY_IN_USE'
+            ? 'This email already exists'
+            : 'Couldn\'t change email as you entered a wrong current password.',
+      );
+    } catch (error) {
+      this.email = currentEmail;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your email',
+        'Please check your internet connection.',
+      );
+    }
+  }
+
+  Future<void> updateUserImage(File file) async {
+    String prevImage = this.imageUrl;
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_image')
+          .child(userId + '.jpg');
+      await ref.putFile(file).onComplete;
+      final url = await ref.getDownloadURL();
+      imageUrl = url;
+      notifyListeners();
+      await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .setData({'imageUrl': url}, merge: true);
+    } on PlatformException {
+      this.imageUrl = prevImage;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      this.imageUrl = prevImage;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    }
+  }
+
+  Future<void> resetChat() async {
+    var tmpList = _chatMessages;
+    try {
+      _chatMessages.clear();
+      notifyListeners();
+      final msgs = await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .collection('chats')
+          .getDocuments();
+      await Future.forEach(msgs.documents, (doc) async {
+        Firestore.instance
+            .collection('users')
+            .document(userId)
+            .collection('chats')
+            .document(doc.documentID)
+            .delete();
+      });
+    } on PlatformException {
+      _chatMessages = tmpList;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      _chatMessages = tmpList;
+      notifyListeners();
+      showError(
+        'Couldn\'t change your image',
+        'Please check your internet connection.',
+      );
+    }
+  }
+
+  Future<void> sendFeedback(String text, double rating) async {
+    try {
+      await Firestore.instance.collection('feedback').add({
+        'userId': userId,
+        'rating': rating,
+        'feedback': text.trim(),
+        'date': DateTime.now().toIso8601String(),
+      });
+    } on PlatformException {
+      showError(
+        'Couldn\'t send your feedback',
+        'Please check your internet connection.',
+      );
+    } catch (error) {
+      showError(
+        'Couldn\'t send your feedback',
+        'Please check your internet connection.',
+      );
+    }
   }
 
   Future<void> loadMessage() async {
@@ -347,5 +480,21 @@ class User with ChangeNotifier {
             time: message['time']));
       }
     });
+  }
+
+  void showError(String title, String message) {
+    Get.rawSnackbar(
+      titleText: title != null
+          ? Text(
+              title,
+              style: TextStyle(color: Colors.white),
+            )
+          : null,
+      messageText: Text(
+        message,
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.red[700],
+    );
   }
 }
