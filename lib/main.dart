@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
                             ConnectionState.waiting) {
                           return SplashScreen();
                         }
-                        categories.set(snapshot.data);
+                        categories.setCategories(snapshot.data);
                         return MyFavoritesScreen();
                       });
                 });

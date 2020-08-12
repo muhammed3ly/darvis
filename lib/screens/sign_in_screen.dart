@@ -1,3 +1,4 @@
+import 'package:chat_bot/providers/categories.dart';
 import 'package:chat_bot/providers/users.dart';
 import 'package:chat_bot/screens/my_favorites.dart';
 import 'package:chat_bot/screens/sign_up_screen.dart';
@@ -27,7 +28,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   void initState() {
-//    emailController.value.text = "emailController"
     super.initState();
     _isSigning = false;
   }
@@ -51,8 +51,9 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       email = email.trim();
       password = password.trim();
-      Provider.of<User>(context).isSigning = false;
       await auth.signInWithEmailAndPassword(email: email, password: password);
+      final cats = await Provider.of<User>(context, listen: false).loadData();
+      Provider.of<Categories>(context, listen: false).setCategories(cats);
       Navigator.of(context).pushReplacementNamed(MyFavoritesScreen.routeName);
     } on PlatformException catch (error) {
       if (mounted) {
