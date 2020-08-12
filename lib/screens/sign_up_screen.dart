@@ -68,7 +68,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         future: Provider.of<Categories>(context, listen: false).init(),
         builder: (context, snapshot) {
           if (snapshot.hasData)
-            return step == 0 ? form3() : step == 1 ? form2() : form3();
+            return step == 0 ? form1() : step == 1 ? form2() : form3();
           return Container(
             height: double.infinity,
             width: double.infinity,
@@ -682,7 +682,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     : ListView(
                         children: <Widget>[
                           GridView.builder(
-                            padding: EdgeInsets.only(top: 16,bottom: 8,right: 8,left: 8),
+                            padding: EdgeInsets.only(
+                                top: 16, bottom: 8, right: 8, left: 8),
                             shrinkWrap: true,
                             physics: ScrollPhysics(),
                             itemCount: categories.categories.length,
@@ -694,62 +695,68 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               mainAxisSpacing: 20,
                             ),
                             itemBuilder: (ctx, idx) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(20.0),
-                                child: GridTile(
-                                  key: ValueKey(
-                                      categories.categories[idx]['name']),
-                                  footer: GridTileBar(
-//                                backgroundColor: Colors.black54,
-                                    title: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Text(
-                                          categories.categories[idx]['name'],
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20,
+                              return Column(
+                                children: [
+                                  Container(
+                                    height: 130,
+                                    key: ValueKey(
+                                        categories.categories[idx]['name']),
+                                    child: GestureDetector(
+                                      onTap: () =>
+                                          categories.toggleFavorite(idx),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: <Widget>[
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Image.network(
+                                              categories.categories[idx]
+                                                  ['imageUrl'],
+                                              fit: BoxFit.fill,
+                                            ),
                                           ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () =>
-                                              categories.toggleFavorite(idx),
-                                          child: Icon(categories.categories[idx]
-                                                      ['isFav'] ==
-                                                  'true'
-                                              ? Icons.star
-                                              : Icons.star_border),
-                                        ),
-                                      ],
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Opacity(
+                                              child: Container(
+                                                color: Colors.blueAccent,
+                                              ),
+                                              opacity:
+                                                  categories.categories[idx]
+                                                              ['isFav'] ==
+                                                          'true'
+                                                      ? 0.6
+                                                      : 0,
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.favorite_border,
+                                            size: categories.categories[idx]
+                                                        ['isFav'] ==
+                                                    'true'
+                                                ? 70
+                                                : 0,
+                                            color: Colors.white,
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: <Widget>[
-                                      Image.network(
-                                        categories.categories[idx]['imageUrl'],
-                                        fit: BoxFit.fill,
-                                      ),
-                                      if (categories.categories[idx]['isFav'] ==
-                                          'true')
-                                        Opacity(
-                                          child: Container(
-                                            color: Colors.blueAccent,
-                                          ),
-                                          opacity: 0.6,
-                                        ),
-                                      if (categories.categories[idx]['isFav'] ==
-                                          'true')
-                                        Icon(
-                                          Icons.favorite_border,
-                                          size: 70,
-                                          color: Colors.white,
-                                        )
-                                    ],
+                                  SizedBox(
+                                    height: 5,
                                   ),
-                                ),
+                                  Text(
+                                    categories.categories[idx]['name'],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromRGBO(77, 75, 78, 1),
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
                               );
                             },
                           ),
@@ -808,7 +815,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             Container(
-              height: 110,
+              height: 90,
               width: double.infinity,
 //              padding: EdgeInsets.all(2),
               decoration: BoxDecoration(
@@ -910,25 +917,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-
-  void goToForm2() {
-    if (!formKey.currentState.validate()) return;
-    FocusScope.of(context).unfocus();
-    formKey.currentState.save();
-    setState(() {
-      step++;
-    });
-  }
-
-  void pickImage() async {
-    var pickedImageFile = await ImagePicker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 50,
-      maxWidth: 150,
-    );
-    if (pickedImageFile == null) return;
-    setState(() {
-      pickedImage = pickedImageFile;
-    });
-  }
+//
+//  void goToForm2() {
+//    if (!formKey.currentState.validate()) return;
+//    FocusScope.of(context).unfocus();
+//    formKey.currentState.save();
+//    setState(() {
+//      step++;
+//    });
+//  }
+//
+//  void pickImage() async {
+//    var pickedImageFile = await ImagePicker.pickImage(
+//      source: ImageSource.camera,
+//      imageQuality: 50,
+//      maxWidth: 150,
+//    );
+//    if (pickedImageFile == null) return;
+//    setState(() {
+//      pickedImage = pickedImageFile;
+//    });
+//  }
 }

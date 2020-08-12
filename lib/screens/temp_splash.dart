@@ -8,15 +8,7 @@ class TempSplashScreen extends StatelessWidget {
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(3, 155, 229, 1),
-              Colors.black87,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: [0, 1],
-          ),
+          color: Color.fromRGBO(244, 240, 247, 1),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

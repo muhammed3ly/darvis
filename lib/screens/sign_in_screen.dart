@@ -45,19 +45,19 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       email = email.trim();
       password = password.trim();
-
       Provider.of<User>(context).isSigning = false;
       await auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (error) {
       var message = 'An error occurred';
       if (error.message != null) message = error.message;
+
       Scaffold.of(context).showSnackBar(
         SnackBar(
           content: Text(
             message,
             style: TextStyle(fontSize: 18, color: Colors.white),
           ),
-          backgroundColor: Color.fromRGBO(3, 155, 229, 1),
+          backgroundColor: Color.fromRGBO(53, 77, 175, 1),
         ),
       );
     }
@@ -93,7 +93,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: Image.asset('assets/images/logo.jpg'),
                           ),
                         ),
-                        SizedBox(height: 35,),
+                        SizedBox(
+                          height: 35,
+                        ),
                         Form(
                           key: formKey,
                           child: Column(

@@ -21,7 +21,6 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
   void drawer() {
     _scaffoldKey.currentState.openDrawer();
   }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -52,73 +51,105 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
                     child: CircularProgressIndicator(),
                   )
                 : Container(
-                    height: height,
-                    width: width,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color.fromRGBO(3, 155, 229, 1),
-                          Colors.black87,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: [0, 1],
-                      ),
-                    ),
-                    child: Consumer<Categories>(
-                      builder: (_, categories, ch) => categories.categories ==
-                              null
-                          ? Center(child: CircularProgressIndicator())
-                          : Padding(
-                              padding: EdgeInsets.all(10),
-                              child: GridView.builder(
-                                itemCount: categories.categories.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 1,
-                                  crossAxisSpacing: 20,
-                                  mainAxisSpacing: 20,
-                                ),
-                                itemBuilder: (ctx, idx) {
-                                  return GridTile(
-                                    footer: GridTileBar(
-                                      backgroundColor: Colors.black54,
-                                      title: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
+                    height: MediaQuery.of(context).size.height,
+                    child: Stack(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Consumer<Categories>(
+                            builder: (_, categories, ch) => categories
+                                        .categories ==
+                                    null
+                                ? Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : GridView.builder(
+                                    padding: EdgeInsets.only(
+                                        top: 16, bottom: 8, right: 8, left: 8),
+                                    shrinkWrap: true,
+                                    physics: ScrollPhysics(),
+                                    itemCount: categories.categories.length,
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 0.9,
+                                      crossAxisSpacing: 40,
+                                      mainAxisSpacing: 20,
+                                    ),
+                                    itemBuilder: (ctx, idx) {
+                                      return Column(
+                                        children: [
+                                          Container(
+                                            height: 130,
+                                            key: ValueKey(categories
+                                                .categories[idx]['name']),
+                                            child: GestureDetector(
+                                              onTap: () => categories
+                                                  .toggleFavorite(idx),
+                                              child: Stack(
+                                                fit: StackFit.expand,
+                                                children: <Widget>[
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20.0),
+                                                    child: Image.network(
+                                                      categories.categories[idx]
+                                                          ['imageUrl'],
+                                                      fit: BoxFit.fill,
+                                                    ),
+                                                  ),
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20.0),
+                                                    child: Opacity(
+                                                      child: Container(
+                                                        color:
+                                                            Colors.blueAccent,
+                                                      ),
+                                                      opacity:
+                                                          categories.categories[
+                                                                          idx][
+                                                                      'isFav'] ==
+                                                                  'true'
+                                                              ? 0.6
+                                                              : 0,
+                                                    ),
+                                                  ),
+                                                  Icon(
+                                                    Icons.favorite_border,
+                                                    size: categories.categories[
+                                                                idx]['isFav'] ==
+                                                            'true'
+                                                        ? 70
+                                                        : 0,
+                                                    color: Colors.white,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
                                           Text(
                                             categories.categories[idx]['name'],
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color:
+                                                  Color.fromRGBO(77, 75, 78, 1),
                                               fontSize: 20,
                                             ),
                                           ),
-                                          GestureDetector(
-                                            onTap: () =>
-                                                categories.toggleFavorite(
-                                                    idx, true, userId),
-                                            child: Icon(
-                                              categories.categories[idx]
-                                                          ['isFav'] ==
-                                                      'true'
-                                                  ? Icons.star
-                                                  : Icons.star_border,
-                                            ),
-                                          ),
                                         ],
-                                      ),
-                                    ),
-                                    child: Image.network(
-                                      categories.categories[idx]['imageUrl'],
-                                      fit: BoxFit.fill,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
           );
