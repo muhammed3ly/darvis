@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
+import '../widgets/appbar_without_Drawer.dart';
 import '../providers/categories.dart';
 import '../providers/users.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';
   final Function toggleAuthMode;
+
   SignUpScreen(this.toggleAuthMode);
+
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
@@ -24,16 +26,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passwordController = TextEditingController();
   final confirmedPasswordController = TextEditingController();
   final userNameController = TextEditingController();
-
-  @override
-  void didChangeDependencies() {
-//    if (first) {
-//      step = 0;
-//      Provider.of<Categories>(context, listen: false).init();
-//      first = false;
-//    }
-    super.didChangeDependencies();
-  }
 
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
@@ -57,12 +49,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int step = 0;
   File pickedImage;
 
-  void pickImage() async {
+  void pickImage(ImageSource source) async {
     var pickedImageFile = await ImagePicker.pickImage(
-      source: ImageSource.camera,
+      source: source,
       imageQuality: 50,
       maxWidth: 150,
     );
+
     if (pickedImageFile == null) return;
     setState(() {
       pickedImage = pickedImageFile;
@@ -80,6 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+//    print(step);
     return Scaffold(
       body: FutureBuilder(
         future: Provider.of<Categories>(context, listen: false).init(),
@@ -90,15 +84,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             height: double.infinity,
             width: double.infinity,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromRGBO(3, 155, 229, 1),
-                  Colors.black87,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: [0, 1],
-              ),
+              color: Color.fromRGBO(244, 240, 247, 1),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -107,13 +93,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 CircularProgressIndicator(),
                 Text(
                   'Loading...',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Color.fromRGBO(53, 77, 175, 1)),
                 ),
               ],
             ),
           );
         },
       ),
+      appBar: step >= 1 ? CustomAppbar() : null,
     );
   }
 
@@ -125,228 +112,374 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Container(
           height: height,
           width: width,
+          padding: EdgeInsets.only(top: 40),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(3, 155, 229, 1),
-                Colors.black87,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              stops: [0, 1],
-            ),
+            color: Color.fromRGBO(244, 240, 247, 1),
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              FittedBox(
+                child: Container(
+                  height: 160,
+                  child: Image.asset('assets/images/logo.jpg'),
+                ),
+              ),
               Expanded(
                 child: Container(
-                  padding:
-                      EdgeInsets.only(left: 25, right: 25, top: height / 7),
+                  padding: EdgeInsets.only(left: 40, right: 40),
                   child: ListView(
                     children: <Widget>[
-                      Text(
-                        'Sign up',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: 'Signatra',
-                            fontSize: 80,
-                            color: Colors.white),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
                       Form(
                         key: formKey,
                         child: Column(
                           children: <Widget>[
-                            TextFormField(
-                              onChanged: (value) {
-                                setState(() {
-                                  email = value;
-                                });
-                              },
-                              onEditingComplete: () =>
-                                  focusNode1.requestFocus(),
-                              onSaved: (value) => email = value,
-                              keyboardType: TextInputType.emailAddress,
-                              key: ValueKey('email'),
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white),
-                              decoration: InputDecoration(
-                                filled: true,
-                                errorStyle: TextStyle(color: Colors.white),
-                                fillColor: Colors.white10,
-                                labelText: 'Email Address',
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 10),
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                                border: InputBorder.none,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
-                              validator: (email) {
-                                if (email.isEmpty)
-                                  return 'enter your email address';
-                                if (!email.contains('@'))
-                                  return 'enter a valid email address';
-                                return null;
-                              },
-                              controller: emailController,
-                            ),
-                            SizedBox(height: 10),
-                            TextFormField(
-                              onChanged: (value) {
-                                setState(() {
-                                  userName = value;
-                                });
-                              },
-                              focusNode: focusNode1,
-                              onEditingComplete: () =>
-                                  focusNode2.requestFocus(),
-                              controller: userNameController,
-                              onSaved: (value) => userName = value,
-                              keyboardType: TextInputType.emailAddress,
-                              key: ValueKey('User Name'),
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white),
-                              decoration: InputDecoration(
-                                filled: true,
-                                errorStyle: TextStyle(color: Colors.white),
-                                fillColor: Colors.white10,
-                                labelText: 'User Name',
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 10),
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                                border: InputBorder.none,
-                              ),
-                              validator: (userName) {
-                                if (userName.isEmpty)
-                                  return 'enter your user name';
-                                return null;
-                              },
-                            ),
-                            SizedBox(height: 10),
-                            TextFormField(
-                              onChanged: (value) {
-                                setState(() {
-                                  password = value;
-                                });
-                              },
-                              focusNode: focusNode2,
-                              onEditingComplete: () =>
-                                  focusNode3.requestFocus(),
-                              controller: passwordController,
-                              onSaved: (value) => password = value,
-                              key: ValueKey('password'),
-                              validator: (value) {
-                                if (value.isEmpty) return 'enter your password';
-                                if (value.length < 6)
-                                  return 'Password must be at least 6 characters long';
-                                return null;
-                              },
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white),
-                              decoration: InputDecoration(
-                                filled: true,
-                                errorStyle: TextStyle(color: Colors.white),
-                                fillColor: Colors.white10,
-                                labelText: 'Password',
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 10),
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                                border: InputBorder.none,
-                              ),
-                              obscureText: true,
-                            ),
-                            SizedBox(height: 10),
-                            TextFormField(
-                              onChanged: (value) {
-                                setState(() {
-                                  confirmedPassword = value;
-                                });
-                              },
-                              focusNode: focusNode3,
-                              controller: confirmedPasswordController,
-                              onSaved: (value) => password = value,
-                              key: ValueKey('confirm password'),
-                              validator: (value) {
-//                                formKey.currentState.save();
-                                if (confirmedPassword != password ||
-                                    value.isEmpty)
-                                  return 'password dosen\'t match';
-                                return null;
-                              },
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white),
-                              decoration: InputDecoration(
-                                filled: true,
-                                errorStyle: TextStyle(color: Colors.white),
-                                fillColor: Colors.white10,
-                                labelText: 'Confirm Password',
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 10),
-                                labelStyle: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                                border: InputBorder.none,
-                              ),
-                              obscureText: true,
-                            ),
-                            SizedBox(height: 34),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Container(
-                                  alignment: Alignment.bottomLeft,
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white24,
-                                    border: Border.all(color: Colors.white),
-                                  ),
-                                  child: FlatButton.icon(
-                                    label: Text('back'),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25.0),
-                                    ),
-                                    onPressed: widget.toggleAuthMode,
-                                    icon: Icon(Icons.navigate_before),
-                                  ),
-                                ),
-                                Opacity(
-                                  opacity: (password.isEmpty ||
-                                          email.isEmpty ||
-                                          userName.isEmpty ||
-                                          confirmedPassword.isEmpty)
-                                      ? 0.5
-                                      : 1.0,
-                                  child: Container(
-                                    alignment: Alignment.bottomRight,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white24,
-                                      border: Border.all(color: Colors.white),
-                                    ),
-                                    child: FlatButton.icon(
-                                      label: Text('Next'),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(25.0),
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      'Email Address',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromRGBO(53, 77, 175, 1),
                                       ),
-                                      onPressed: (password.isEmpty ||
-                                              email.isEmpty ||
-                                              userName.isEmpty ||
-                                              confirmedPassword.isEmpty)
-                                          ? null
-                                          : goToForm2,
-                                      icon: Icon(Icons.navigate_next),
                                     ),
                                   ),
+                                  TextFormField(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        email = value;
+                                      });
+                                    },
+                                    onEditingComplete: () =>
+                                        focusNode1.requestFocus(),
+                                    onSaved: (value) => email = value,
+                                    keyboardType: TextInputType.emailAddress,
+                                    key: ValueKey('email'),
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black54),
+                                    decoration: InputDecoration(
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      hintText: 'Ex. JohnMac@gmail.com',
+                                      hintStyle: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey,
+                                      ),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.all(8),
+                                      errorStyle: TextStyle(color: Colors.red),
+                                    ),
+                                    validator: (email) {
+                                      if (email.isEmpty)
+                                        return 'enter your email address';
+                                      if (!email.contains('@'))
+                                        return 'enter a valid email address';
+                                      return null;
+                                    },
+                                    controller: emailController,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      'User name',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromRGBO(53, 77, 175, 1),
+                                      ),
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        userName = value;
+                                      });
+                                    },
+                                    focusNode: focusNode1,
+                                    onEditingComplete: () =>
+                                        focusNode2.requestFocus(),
+                                    controller: userNameController,
+                                    onSaved: (value) => userName = value,
+                                    keyboardType: TextInputType.emailAddress,
+                                    key: ValueKey('User Name'),
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black54),
+                                    decoration: InputDecoration(
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      hintText: 'John M',
+                                      hintStyle: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey,
+                                      ),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.all(8),
+                                      errorStyle: TextStyle(color: Colors.red),
+                                    ),
+                                    validator: (userName) {
+                                      if (userName.isEmpty)
+                                        return 'enter your user name';
+                                      return null;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      'Password',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromRGBO(53, 77, 175, 1),
+                                      ),
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        password = value;
+                                      });
+                                    },
+                                    focusNode: focusNode2,
+                                    onEditingComplete: () =>
+                                        focusNode3.requestFocus(),
+                                    controller: passwordController,
+                                    onSaved: (value) => password = value,
+                                    key: ValueKey('password'),
+                                    validator: (value) {
+                                      if (value.isEmpty)
+                                        return 'enter your password';
+                                      if (value.length < 6)
+                                        return 'Password must be at least 6 characters long';
+                                      return null;
+                                    },
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black54),
+                                    decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      hintText: '* * * * * * * * * * *',
+                                      hintStyle: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey,
+                                      ),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.all(8),
+                                      errorStyle: TextStyle(color: Colors.red),
+                                    ),
+                                    obscureText: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      'Confirm Password',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromRGBO(53, 77, 175, 1),
+                                      ),
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        confirmedPassword = value;
+                                      });
+                                    },
+                                    focusNode: focusNode3,
+                                    controller: confirmedPasswordController,
+                                    onSaved: (value) => password = value,
+                                    key: ValueKey('confirm password'),
+                                    validator: (value) {
+                                      if (confirmedPassword != password ||
+                                          value.isEmpty)
+                                        return 'password dosen\'t match';
+                                      return null;
+                                    },
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black54),
+                                    decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      hintText: '* * * * * * * * * * *',
+                                      hintStyle: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey,
+                                      ),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.all(8),
+                                      errorStyle: TextStyle(color: Colors.red),
+                                    ),
+                                    obscureText: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            InkWell(
+                              onTap: goToForm2,
+                              child: Container(
+                                height: 50,
+                                width: 2 * width / 3,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(53, 77, 175, 1),
+                                  borderRadius: const BorderRadius.all(
+                                    const Radius.circular(28.0),
+                                  ),
                                 ),
-                              ],
-                            )
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      'Sign up',
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.white),
+                                    ),
+                                    FlatButton(
+                                      child: Container(
+                                        child: Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                          size: 22,
+                                        ),
+                                        padding: EdgeInsets.all(3),
+//
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
                           ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: widget.toggleAuthMode,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(53, 77, 175, 1),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  width: width,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  alignment: Alignment.center,
+                  child: Row(
+                    children: <Widget>[
+                      SizedBox(
+                        width: 30,
+                      ),
+                      Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 100,
+                      ),
+                      Text(
+                        'back to login',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -365,113 +498,145 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final height = MediaQuery.of(context).size.height;
     return SingleChildScrollView(
       child: Container(
-        height: height,
-        width: width,
+        height: height - 100,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(3, 155, 229, 1),
-              Colors.black87,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: [0, 1],
-          ),
+          color: Color.fromRGBO(244, 240, 247, 1),
         ),
         child: Column(
           children: <Widget>[
-            SizedBox(
-              height: 70,
-            ),
-            Text(
-              'Sign up',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontFamily: 'Signatra', fontSize: 80, color: Colors.white),
-            ),
-            SizedBox(
-              height: 70,
-            ),
-            CircleAvatar(
-              backgroundColor: Colors.white70,
-              radius: 80,
-              backgroundImage:
-                  pickedImage == null ? null : FileImage(pickedImage),
-            ),
-            SizedBox(
-              height: 35,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white24,
-                border: Border.all(color: Colors.white),
-              ),
-              height: 35,
-              child: FlatButton.icon(
-                onPressed: pickImage,
-                icon: Icon(Icons.camera_enhance),
-                label: Text('Add image',
-                    style: TextStyle(fontSize: 14, color: Colors.black)),
-              ),
-            ),
-            SizedBox(height: 70),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Container(
-                  alignment: Alignment.bottomLeft,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    border: Border.all(color: Colors.white),
+            Expanded(
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 20,
                   ),
-                  child: FlatButton.icon(
-                    label: Text('back'),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
+                  Text(
+                    'Avatar',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 50,
+                        color: Color.fromRGBO(53, 77, 175, 1),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Choose an',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 40, color: Colors.black),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 80,
+                    backgroundImage: pickedImage == null
+                        ? AssetImage('assets/images/avatar.jpg')
+                        : FileImage(pickedImage),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(249, 249, 249, 1),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        height: 40,
+                        child: FlatButton.icon(
+                          onPressed: () => pickImage(ImageSource.camera),
+                          icon: Icon(
+                            Icons.camera_enhance,
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                          ),
+                          label: Text('Open camera',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey)),
+                        ),
+                      ),
+                      Container(
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(249, 249, 249, 1),
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: FlatButton.icon(
+                            onPressed: () => pickImage(ImageSource.gallery),
+                            icon: Icon(
+                              Icons.camera_enhance,
+                              color: Color.fromRGBO(53, 77, 175, 1),
+                            ),
+                            label: Text('From gallery',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.grey))),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 0),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  FlatButton.icon(
+                    label: Text(
+                      (pickedImage == null ? 'Skip for Now' : 'Let\'s Go'),
+                      style: TextStyle(
+                          color: Color.fromRGBO(53, 77, 175, 1),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
+                    icon: Icon(Icons.navigate_next,
+                        color: Color.fromRGBO(53, 77, 175, 1)),
+                    color: Color.fromRGBO(244, 240, 247, 1),
                     onPressed: () {
                       setState(() {
-                        step--;
+                        step++;
                       });
                     },
-                    icon: Icon(Icons.navigate_before),
+                  ),
+                ],
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  step--;
+                });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(53, 77, 175, 1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Opacity(
-                  opacity: (password.isEmpty ||
-                          email.isEmpty ||
-                          userName.isEmpty ||
-                          confirmedPassword.isEmpty)
-                      ? 0.5
-                      : 1.0,
-                  child: Container(
-                    alignment: Alignment.bottomRight,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      border: Border.all(color: Colors.white),
+                width: width,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: Row(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 30,
                     ),
-                    child: FlatButton.icon(
-                      label: Text('Next'),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
+                    Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 100,
+                    ),
+                    Text(
+                      'back to Sign Up',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
                       ),
-                      onPressed: (pickedImage == null)
-                          ? null
-                          : () {
-                              setState(() {
-                                step++;
-                              });
-                            },
-                      icon: Icon(Icons.navigate_next),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),
@@ -500,38 +665,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
       width: double.infinity,
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color.fromRGBO(3, 155, 229, 1),
-            Colors.black87,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          stops: [0, 1],
-        ),
+        color: Color.fromRGBO(244, 240, 247, 1),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(
-            'Sign up',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontFamily: 'Signatra', fontSize: 80, color: Colors.white),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            'What kind of movies do you like ?',
-            style: TextStyle(fontSize: 20, color: Colors.white),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Kind Of Movies',
+                style: TextStyle(
+                    fontSize: 35,
+                    color: Color.fromRGBO(53, 77, 175, 1),
+                    fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'do you prefer ?                        ',
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontSize: 17,
+                  color: Color.fromRGBO(92, 92, 92, 1),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           SizedBox(
             height: 10,
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(6.0),
+              padding: const EdgeInsets.all(25.0),
               child: Consumer<Categories>(
                 builder: (_, categories, ch) => categories.categories == null
                     ? Center(
@@ -541,41 +706,65 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         itemCount: categories.categories.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 1,
-                          crossAxisSpacing: 20,
+                          childAspectRatio: 0.9,
+                          crossAxisSpacing: 40,
                           mainAxisSpacing: 20,
                         ),
                         itemBuilder: (ctx, idx) {
-                          return GridTile(
-                            key: ValueKey(categories.categories[idx]['name']),
-                            footer: GridTileBar(
-                              backgroundColor: Colors.black54,
-                              title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    categories.categories[idx]['name'],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: GridTile(
+                              key: ValueKey(categories.categories[idx]['name']),
+                              footer: GridTileBar(
+//                                backgroundColor: Colors.black54,
+                                title: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      categories.categories[idx]['name'],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
                                     ),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          categories.toggleFavorite(idx),
+                                      child: Icon(categories.categories[idx]
+                                                  ['isFav'] ==
+                                              'true'
+                                          ? Icons.star
+                                          : Icons.star_border),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: <Widget>[
+                                  Image.network(
+                                    categories.categories[idx]['imageUrl'],
+                                    fit: BoxFit.fill,
                                   ),
-                                  GestureDetector(
-                                    onTap: () => categories.toggleFavorite(idx),
-                                    child: Icon(categories.categories[idx]
-                                                ['isFav'] ==
-                                            'true'
-                                        ? Icons.star
-                                        : Icons.star_border),
-                                  ),
+                                  if (categories.categories[idx]['isFav'] ==
+                                      'true')
+                                    Opacity(
+                                      child: Container(
+                                        color: Colors.blueAccent,
+                                      ),
+                                      opacity: 0.6,
+                                    ),
+                                  if (categories.categories[idx]['isFav'] ==
+                                      'true')
+                                    Icon(
+                                      Icons.favorite_border,
+                                      size: 70,
+                                      color: Colors.white,
+                                    )
                                 ],
                               ),
-                            ),
-                            child: Image.network(
-                              categories.categories[idx]['imageUrl'],
-                              fit: BoxFit.fill,
                             ),
                           );
                         },
@@ -583,59 +772,106 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(
-                  alignment: Alignment.bottomLeft,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    border: Border.all(color: Colors.white),
+//          Padding(
+//            padding: const EdgeInsets.all(8.0),
+//            child: Row(
+//              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//              children: <Widget>[
+//                Container(
+//                  alignment: Alignment.bottomLeft,
+//                  height: 35,
+//                  decoration: BoxDecoration(
+//                    color: Colors.white24,
+//                    border: Border.all(color: Colors.white),
+//                  ),
+//                  child: FlatButton.icon(
+//                    label: Text('back'),
+//                    shape: RoundedRectangleBorder(
+//                      borderRadius: BorderRadius.circular(25.0),
+//                    ),
+//                    onPressed: () {
+//                      setState(() {
+//                        step--;
+//                      });
+//                    },
+//                    icon: Icon(Icons.navigate_before),
+//                  ),
+//                ),
+//                Container(
+//                  alignment: Alignment.bottomRight,
+//                  height: 35,
+//                  decoration: BoxDecoration(
+//                    color: Colors.white24,
+//                    border: Border.all(color: Colors.white),
+//                  ),
+//                  child: _loading
+//                      ? FlatButton(
+//                          child: CircularProgressIndicator(),
+//                          shape: RoundedRectangleBorder(
+//                            borderRadius: BorderRadius.circular(25.0),
+//                          ),
+//                          onPressed: null,
+//                        )
+//                      : FlatButton.icon(
+//                          onPressed: createUser,
+//                          shape: RoundedRectangleBorder(
+//                            borderRadius: BorderRadius.circular(25.0),
+//                          ),
+//                          icon: Icon(Icons.done),
+//                          label: Text(
+//                            'Finish',
+//                            style: TextStyle(fontSize: 16),
+//                          ),
+//                        ),
+//                ),
+//              ],
+//            ),
+//          ),
+          InkWell(
+            onTap: createUser,
+            child: Container(
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(53, 77, 175, 1),
+                borderRadius: BorderRadius.all(Radius.circular(40)),
+              ),
+              width: MediaQuery.of(context).size.width - 150,
+              height: 70,
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  SizedBox(
+                    width: 50,
                   ),
-                  child: FlatButton.icon(
-                    label: Text('back'),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
+                  Text(
+                    'Finish',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        step--;
-                      });
-                    },
-                    icon: Icon(Icons.navigate_before),
                   ),
-                ),
-                Container(
-                  alignment: Alignment.bottomRight,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    border: Border.all(color: Colors.white),
+                  SizedBox(
+                    width: 30,
                   ),
-                  child: _loading
-                      ? FlatButton(
-                          child: CircularProgressIndicator(),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          onPressed: null,
-                        )
-                      : FlatButton.icon(
-                          onPressed: createUser,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          icon: Icon(Icons.done),
-                          label: Text(
-                            'Finish',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                ),
-              ],
+                  FlatButton(
+                    child: Container(
+                      child: Icon(
+                        Icons.check,
+                        color: Colors.green,
+                        size: 25,
+                      ),
+                      padding: EdgeInsets.all(3),
+//                    height: 70,
+//                    width: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

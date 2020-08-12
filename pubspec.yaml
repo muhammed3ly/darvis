@@ -29,8 +29,10 @@ flutter:
   uses-material-design: true
   assets:
    - assets/images/default-user-placeholder.png
+   - assets/images/avatar.jpg
    - assets/images/chatbot.png
-   - assets/images/logo.png
+   - assets/images/logo.jpg
+   - assets/images/Bar01.png
    - assets/images/movie_placeholder.png
    - assets/images/Asset 01.png
    - assets/soundEffects/typing.mp3

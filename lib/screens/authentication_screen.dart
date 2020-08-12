@@ -32,7 +32,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+//      backgroundColor: Colors.white,
       body: authMode == AuthMode.SignIn
           ? SignInScreen(toggleAuthMode)
           : SignUpScreen(toggleAuthMode),
