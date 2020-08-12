@@ -13,6 +13,8 @@ class SignInScreen extends StatefulWidget {
   _SignInScreenState createState() => _SignInScreenState();
 }
 
+
+
 class _SignInScreenState extends State<SignInScreen> {
   String email = '', password = '';
   bool _isSigning;
@@ -28,6 +30,13 @@ class _SignInScreenState extends State<SignInScreen> {
 //    emailController.value.text = "emailController"
     super.initState();
     _isSigning = false;
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    _isSigning = false;
+    super.didChangeDependencies();
   }
 
   @override
@@ -50,33 +59,22 @@ class _SignInScreenState extends State<SignInScreen> {
       email = email.trim();
       password = password.trim();
       Provider.of<User>(context).isSigning = false;
-      await auth.signInWithEmailAndPassword(email: email, password: password);
-      Navigator.of(context).pushReplacementNamed(MyFavoritesScreen.routeName);
+      await auth.signInWithEmailAndPassword(
+          email: email, password: password);
     } catch (error) {
-      if (mounted) {
-        setState(() {
-          _isSigning = false;
-        });
-        var message = 'An error occurred';
-        if (error.message != null) message = error.message;
-        if (error.code == 'ERROR_USER_NOT_FOUND') message = "user not found";
-        if (error.code == 'ERROR_WRONG_PASSWORD')
-          message = "wrong password! please try again";
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-            backgroundColor: Color.fromRGBO(53, 77, 175, 1),
-          ),
-        );
-      }
+      setState(() {
+        _isSigning = false;
+      });
+      var message = 'An error occurred';
+      if (error.message != null) message = error.message;
+      if (error.code == 'ERROR_USER_NOT_FOUND') message = "user not found";
+      if (error.code == 'ERROR_WRONG_PASSWORD')
+        message = "wrong password! please try again";
+      print(message);
     }
+    setState(() {
+      _isSigning = false;
+    });
   }
 
   @override
@@ -153,7 +151,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                         key: ValueKey('email'),
                                         style: TextStyle(
                                           fontSize: 17,
-                                          color: Colors.black54,
                                         ),
                                         decoration: InputDecoration(
                                           focusedBorder: OutlineInputBorder(
@@ -227,8 +224,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                           return null;
                                         },
                                         style: TextStyle(
-                                            fontSize: 17,
-                                            color: Colors.black54),
+                                          fontSize: 17,
+                                        ),
                                         decoration: InputDecoration(
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: const BorderSide(
