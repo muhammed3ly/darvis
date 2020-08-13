@@ -5,6 +5,7 @@ import 'package:chat_bot/screens/sign_in_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -540,12 +541,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           color: Colors.white,
                         ),
                       ),
-                      Text(
-                        'back to login',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'back to ',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            'Login',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -570,102 +585,125 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Avatar',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 50,
-                        color: Color.fromRGBO(53, 77, 175, 1),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'Choose an',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 40, color: Colors.black),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 80,
-                    backgroundImage: pickedImage == null
-                        ? AssetImage('assets/images/Author__Placeholder.png')
-                        : FileImage(pickedImage),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(249, 249, 249, 1),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        height: 40,
-                        child: FlatButton.icon(
-                          onPressed: () => pickImage(ImageSource.camera),
-                          icon: Icon(
-                            Icons.camera_enhance,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    FittedBox(
+                      child: Text(
+                        'Avatar',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 50,
                             color: Color.fromRGBO(53, 77, 175, 1),
-                          ),
-                          label: Text('Open camera',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey)),
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    FittedBox(
+                      child: Text(
+                        'Choose an',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 40, color: Colors.black),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 80,
+                      backgroundImage: pickedImage == null
+                          ? AssetImage('assets/images/Author__Placeholder.png')
+                          : FileImage(pickedImage),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    FittedBox(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: width * 0.09,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(249, 249, 249, 1),
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              height: 40,
+                              child: FlatButton.icon(
+                                onPressed: () => pickImage(ImageSource.camera),
+                                icon: Icon(
+                                  Icons.camera_enhance,
+                                  color: Color.fromRGBO(53, 77, 175, 1),
+                                ),
+                                label: Text('Open camera',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.grey)),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(249, 249, 249, 1),
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: FlatButton.icon(
+                                onPressed: () => pickImage(ImageSource.gallery),
+                                icon: Icon(
+                                  FontAwesomeIcons.images,
+                                  color: Color.fromRGBO(53, 77, 175, 1),
+                                ),
+                                label: Text(
+                                  'From gallery',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       ),
-                      Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(249, 249, 249, 1),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: FlatButton.icon(
-                          onPressed: () => pickImage(ImageSource.gallery),
-                          icon: Icon(
-                            Icons.camera_enhance,
-                            color: Color.fromRGBO(53, 77, 175, 1),
-                          ),
-                          label: Text(
-                            'From gallery',
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    FlatButton(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            (pickedImage == null
+                                ? 'Skip for Now'
+                                : 'Let\'s Go'),
                             style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
+                              color: Color.fromRGBO(53, 77, 175, 1),
+                              fontSize: 18,
+                              decoration: TextDecoration.underline,
                             ),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 0),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  FlatButton.icon(
-                    label: Text(
-                      (pickedImage == null ? 'Skip for Now' : 'Let\'s Go'),
-                      style: TextStyle(
-                          color: Color.fromRGBO(53, 77, 175, 1),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
+                          Icon(
+                            Icons.navigate_next,
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                          )
+                        ],
+                      ),
+                      color: Color.fromRGBO(244, 240, 247, 1),
+                      onPressed: () {
+                        setState(() {
+                          step++;
+                        });
+                      },
                     ),
-                    icon: Icon(Icons.navigate_next,
-                        color: Color.fromRGBO(53, 77, 175, 1)),
-                    color: Color.fromRGBO(244, 240, 247, 1),
-                    onPressed: () {
-                      setState(() {
-                        step++;
-                      });
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             InkWell(
@@ -682,32 +720,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     topRight: Radius.circular(20),
                   ),
                 ),
-                width: width,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                alignment: Alignment.center,
-                child: Row(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 25,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
                   children: <Widget>[
-                    SizedBox(
-                      width: 30,
-                    ),
-                    Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 100,
-                    ),
-                    Text(
-                      'back to Sign Up',
-                      style: TextStyle(
-                        fontSize: 18,
+                    Positioned(
+                      left: 0,
+                      child: Icon(
+                        Icons.arrow_back,
                         color: Colors.white,
                       ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'back to ',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -722,9 +774,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         color: Color.fromRGBO(244, 240, 247, 1),
       ),
       child: Container(
-//        height: MediaQuery.of(context).size.height -
-//            100 -
-//            MediaQuery.of(context).padding.top,
         child: Stack(
           children: <Widget>[
             Consumer<Categories>(
@@ -839,37 +888,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         InkWell(
                           onTap: createUser,
                           child: Container(
-                            margin: EdgeInsets.only(bottom: 15).add(
-                              EdgeInsets.symmetric(
-                                horizontal:
-                                    MediaQuery.of(context).size.width * 0.05,
+                            margin: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.05,
+                            ).add(
+                              EdgeInsets.only(
+                                bottom: 10,
                               ),
                             ),
                             decoration: BoxDecoration(
                               color: Color.fromRGBO(53, 77, 175, 1),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(40)),
+                              borderRadius: const BorderRadius.all(
+                                const Radius.circular(28.0),
+                              ),
                             ),
-                            height: 60,
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 15,
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
                               children: <Widget>[
-                                SizedBox(
-                                  width: 50,
-                                ),
                                 Text(
                                   'Finish',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 20,
                                     color: Colors.white,
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 30,
-                                ),
-                                AnimatedSwitcher(
-                                  duration: Duration(milliseconds: 200),
+                                Positioned(
+                                  right: 0,
                                   child: signingUp
                                       ? CircularProgressIndicator()
                                       : FlatButton(
@@ -878,13 +926,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             child: Icon(
                                               Icons.check,
                                               color: Colors.green,
-                                              size: 25,
+                                              size: 18,
                                             ),
                                             padding: EdgeInsets.all(3),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
+                                                Radius.circular(10),
+                                              ),
                                             ),
                                           ),
                                         ),
