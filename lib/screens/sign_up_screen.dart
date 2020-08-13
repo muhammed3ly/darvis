@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../widgets/appbar_without_Drawer.dart';
 import '../providers/categories.dart';
 import '../providers/users.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';
@@ -38,9 +39,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int step = 0;
   bool signingUp;
   File pickedImage;
+
   @override
   void initState() {
     super.initState();
+    Provider.of<Categories>(context, listen: false).categories = null;
     signingUp = false;
   }
 
@@ -118,7 +121,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } on PlatformException catch (error) {
       if (mounted) {
-        signingUp = false;
+        setState(() {
+          signingUp = false;
+        });
       }
       Get.rawSnackbar(
         messageText: Text(
@@ -129,7 +134,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
     } catch (error) {
       if (mounted) {
-        signingUp = false;
+        setState(() {
+          signingUp = false;
+        });
       }
       debugPrint(error);
     }
@@ -715,9 +722,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         color: Color.fromRGBO(244, 240, 247, 1),
       ),
       child: Container(
-        height: MediaQuery.of(context).size.height -
-            100 -
-            MediaQuery.of(context).padding.top,
+//        height: MediaQuery.of(context).size.height -
+//            100 -
+//            MediaQuery.of(context).padding.top,
         child: Stack(
           children: <Widget>[
             Consumer<Categories>(
@@ -744,70 +751,85 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.7,
+                            childAspectRatio: 0.6,
                             crossAxisSpacing: 40,
                           ),
                           itemBuilder: (ctx, idx) {
                             return Column(
                               children: [
-                                Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.25,
-                                  key: ValueKey(
-                                      categories.categories[idx]['name']),
-                                  child: GestureDetector(
-                                    onTap: () => categories.toggleFavorite(idx),
-                                    child: Stack(
-                                      fit: StackFit.expand,
-                                      children: <Widget>[
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                          child: Image.network(
-                                            categories.categories[idx]
-                                                ['imageUrl'],
-                                            fit: BoxFit.fill,
-                                          ),
-                                        ),
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                          child: AnimatedOpacity(
-                                            duration:
-                                                Duration(milliseconds: 200),
-                                            child: Container(
-                                              color: Colors.blueAccent,
+                                Flexible(
+                                  flex: 13,
+                                  child: Container(
+                                    key: ValueKey(
+                                        categories.categories[idx]['name']),
+                                    child: GestureDetector(
+                                      onTap: () =>
+                                          categories.toggleFavorite(idx),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: <Widget>[
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Image.network(
+                                              categories.categories[idx]
+                                                  ['imageUrl'],
+                                              fit: BoxFit.fill,
                                             ),
-                                            opacity: categories.categories[idx]
+                                          ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: AnimatedOpacity(
+                                              duration:
+                                                  Duration(milliseconds: 200),
+                                              child: Container(
+                                                color: Colors.blueAccent,
+                                              ),
+                                              opacity:
+                                                  categories.categories[idx]
+                                                              ['isFav'] ==
+                                                          'true'
+                                                      ? 0.6
+                                                      : 0,
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.favorite_border,
+                                            size: categories.categories[idx]
                                                         ['isFav'] ==
                                                     'true'
-                                                ? 0.6
+                                                ? 70
                                                 : 0,
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.favorite_border,
-                                          size: categories.categories[idx]
-                                                      ['isFav'] ==
-                                                  'true'
-                                              ? 70
-                                              : 0,
-                                          color: Colors.white,
-                                        )
-                                      ],
+                                            color: Colors.white,
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 5,
+                                Flexible(
+                                  flex: 1,
+                                  child: SizedBox(
+                                    height: 5,
+                                  ),
                                 ),
-                                Text(
-                                  categories.categories[idx]['name'],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color.fromRGBO(77, 75, 78, 1),
-                                    fontSize: 20,
+                                Flexible(
+                                  flex: 3,
+                                  child: Text(
+                                    categories.categories[idx]['name'],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromRGBO(77, 75, 78, 1),
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: SizedBox(
+                                    height: 50,
                                   ),
                                 ),
                               ],

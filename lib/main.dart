@@ -5,6 +5,7 @@ import 'package:chat_bot/screens/sign_in_screen.dart';
 import 'package:chat_bot/screens/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -24,12 +25,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     return MultiProvider(
+
       providers: [
         ChangeNotifierProvider(create: (_) => Categories()),
         ChangeNotifierProvider(create: (_) => User())
       ],
+
       child: GetMaterialApp(
+
         debugShowCheckedModeBanner: false,
         title: 'Darvis',
         theme: ThemeData(
