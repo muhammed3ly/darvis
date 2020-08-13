@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_bot/screens/chat_screen.dart';
 import 'package:chat_bot/screens/my_favorites.dart';
 import 'package:chat_bot/screens/sign_in_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -118,7 +119,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await Provider.of<User>(context, listen: false)
           .signUp(email, userName, password, pickedImage, categories);
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed(MyFavoritesScreen.routeName);
+        Navigator.of(context).pushReplacementNamed(ChatScreen.routeName);
       }
     } on PlatformException catch (error) {
       if (mounted) {
