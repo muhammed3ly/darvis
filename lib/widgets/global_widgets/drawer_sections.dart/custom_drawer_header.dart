@@ -31,7 +31,7 @@ class CustomDrawerHeader extends StatelessWidget {
                   letterSpacing: 2,
                   color: Color.fromRGBO(53, 77, 176, 1),
                   fontWeight: FontWeight.w800,
-                  fontSize: 20 * MediaQuery.of(context).textScaleFactor,
+                  fontSize: 20,
                 ),
               ),
               Text(
@@ -40,7 +40,7 @@ class CustomDrawerHeader extends StatelessWidget {
                   letterSpacing: 6,
                   color: Color.fromRGBO(81, 81, 81, 1),
                   fontWeight: FontWeight.bold,
-                  fontSize: 10 * MediaQuery.of(context).textScaleFactor,
+                  fontSize: 10,
                 ),
               ),
             ],
@@ -49,7 +49,7 @@ class CustomDrawerHeader extends StatelessWidget {
             icon: Icon(
               Icons.arrow_back_ios,
               color: Color.fromRGBO(53, 77, 176, 1),
-              size: 26 * MediaQuery.of(context).textScaleFactor,
+              size: 26,
             ),
             onPressed: () {
               Navigator.of(context).pop();

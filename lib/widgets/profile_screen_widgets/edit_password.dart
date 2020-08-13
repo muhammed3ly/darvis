@@ -120,6 +120,9 @@ class _EditPasswordState extends State<EditPassword>
     return WillPopScope(
       onWillPop: () async {
         _scaffold.currentState.removeCurrentSnackBar();
+        setState(() {
+          _close = true;
+        });
         await Future.wait(
           [
             newController.reverse(),
@@ -146,75 +149,94 @@ class _EditPasswordState extends State<EditPassword>
                     width: MediaQuery.of(context).size.width,
                   ),
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Hero(
-                      tag: 'Password',
-                      child: Material(
-                        color: Colors.transparent,
+                Positioned(
+                  left: 15,
+                  top: 15,
+                  child: AnimatedOpacity(
+                    duration: Duration(milliseconds: 500),
+                    opacity: _close ? 0.0 : 1.0,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                      onPressed: closeScreen,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Hero(
+                        tag: 'Password',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: EditPasswordTFs(
+                            title: 'Current Password',
+                            controller: _oldTEC,
+                            onSubmitted: (_) {
+                              _newPassword.requestFocus();
+                            },
+                          ),
+                        ),
+                      ),
+                      SizeTransition(
+                        sizeFactor: CurvedAnimation(
+                          curve: Curves.fastOutSlowIn,
+                          parent: newController,
+                        ),
                         child: EditPasswordTFs(
-                          title: 'Current Password',
-                          controller: _oldTEC,
+                          title: 'New Password',
+                          myFocusNode: _newPassword,
+                          controller: _newTEC,
                           onSubmitted: (_) {
-                            _newPassword.requestFocus();
+                            _confirmPasswod.requestFocus();
                           },
                         ),
                       ),
-                    ),
-                    SizeTransition(
-                      sizeFactor: CurvedAnimation(
-                        curve: Curves.fastOutSlowIn,
-                        parent: newController,
+                      AnimatedOpacity(
+                        opacity: _close ? 0 : 1,
+                        duration: Duration(milliseconds: 290),
+                        child: SizeTransition(
+                          sizeFactor: CurvedAnimation(
+                            curve: Curves.fastOutSlowIn,
+                            parent: confirmController,
+                          ),
+                          child: EditPasswordTFs(
+                            title: 'Confirm Password',
+                            controller: _confirmTEC,
+                            myFocusNode: _confirmPasswod,
+                            onSubmitted: (_) => validateThenEdit(),
+                          ),
+                        ),
                       ),
-                      child: EditPasswordTFs(
-                        title: 'New Password',
-                        myFocusNode: _newPassword,
-                        controller: _newTEC,
-                        onSubmitted: (_) {
-                          _confirmPasswod.requestFocus();
-                        },
-                      ),
-                    ),
-                    AnimatedOpacity(
-                      opacity: _close ? 0 : 1,
-                      duration: Duration(milliseconds: 290),
-                      child: SizeTransition(
+                      SizeTransition(
                         sizeFactor: CurvedAnimation(
                           curve: Curves.fastOutSlowIn,
-                          parent: confirmController,
+                          parent: buttonController,
                         ),
-                        child: EditPasswordTFs(
-                          title: 'Confirm Password',
-                          controller: _confirmTEC,
-                          myFocusNode: _confirmPasswod,
-                          onSubmitted: (_) => validateThenEdit(),
-                        ),
-                      ),
-                    ),
-                    SizeTransition(
-                      sizeFactor: CurvedAnimation(
-                        curve: Curves.fastOutSlowIn,
-                        parent: buttonController,
-                      ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: FlatButton(
-                          shape: StadiumBorder(),
-                          color: Color.fromRGBO(53, 77, 175, 1),
-                          child: Text(
-                            'Edit Password',
-                            style: TextStyle(
-                              color: Colors.white,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: FlatButton(
+                            shape: StadiumBorder(),
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                            child: Text(
+                              'Edit Password',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
+                            onPressed: validateThenEdit,
                           ),
-                          onPressed: validateThenEdit,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),

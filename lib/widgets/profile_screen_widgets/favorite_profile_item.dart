@@ -26,7 +26,7 @@ class FavoriteProfileItem extends StatelessWidget {
             this.title,
             style: TextStyle(
               color: Color.fromRGBO(53, 77, 175, 1),
-              fontSize: 12 * MediaQuery.of(context).textScaleFactor,
+              fontSize: 12,
             ),
           ),
           SizedBox(
@@ -42,7 +42,7 @@ class FavoriteProfileItem extends StatelessWidget {
             },
             child: Icon(
               Icons.close,
-              size: 20 * MediaQuery.of(context).textScaleFactor,
+              size: 20,
               color: Colors.red[800],
             ),
           ),

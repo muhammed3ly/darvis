@@ -64,39 +64,46 @@ class _SettingsScreenState extends State<ProfileScreen> {
             SizedBox(
               height: 20,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                FlatButton.icon(
-                  color: Colors.white,
-                  shape: StadiumBorder(),
-                  icon: Icon(
-                    Icons.camera_alt,
-                    color: Color.fromRGBO(53, 77, 175, 1),
-                  ),
-                  label: Text(
-                    'Open Camera',
-                    style: TextStyle(color: Colors.grey[400]),
-                  ),
-                  onPressed: () => _changeProfilePhoto(1),
+            FittedBox(
+              child: Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.09,
                 ),
-                SizedBox(
-                  width: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    FlatButton.icon(
+                      color: Colors.white,
+                      shape: StadiumBorder(),
+                      icon: Icon(
+                        Icons.camera_alt,
+                        color: Color.fromRGBO(53, 77, 175, 1),
+                      ),
+                      label: Text(
+                        'Open Camera',
+                        style: TextStyle(color: Colors.grey[400]),
+                      ),
+                      onPressed: () => _changeProfilePhoto(1),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    FlatButton.icon(
+                      color: Colors.white,
+                      shape: StadiumBorder(),
+                      icon: Icon(
+                        FontAwesomeIcons.images,
+                        color: Color.fromRGBO(53, 77, 175, 1),
+                      ),
+                      label: Text(
+                        'From Gallery',
+                        style: TextStyle(color: Colors.grey[400]),
+                      ),
+                      onPressed: () => _changeProfilePhoto(0),
+                    ),
+                  ],
                 ),
-                FlatButton.icon(
-                  color: Colors.white,
-                  shape: StadiumBorder(),
-                  icon: Icon(
-                    FontAwesomeIcons.images,
-                    color: Color.fromRGBO(53, 77, 175, 1),
-                  ),
-                  label: Text(
-                    'From Gallery',
-                    style: TextStyle(color: Colors.grey[400]),
-                  ),
-                  onPressed: () => _changeProfilePhoto(0),
-                ),
-              ],
+              ),
             ),
             SizedBox(
               height: 15,
@@ -162,7 +169,7 @@ class _SettingsScreenState extends State<ProfileScreen> {
                   Text(
                     'Favorites',
                     style: TextStyle(
-                      fontSize: 20 * MediaQuery.of(context).textScaleFactor,
+                      fontSize: 20,
                       color: Color.fromRGBO(53, 77, 175, 1),
                       decoration: TextDecoration.underline,
                     ),
