@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:chat_bot/providers/categories.dart';
 import 'package:chat_bot/providers/users.dart';
+import 'package:chat_bot/screens/chat_screen.dart';
 import 'package:chat_bot/screens/my_favorites.dart';
 import 'package:chat_bot/screens/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -56,7 +57,7 @@ class _SignInScreenState extends State<SignInScreen> {
       await auth.signInWithEmailAndPassword(email: email, password: password);
       final cats = await Provider.of<User>(context, listen: false).loadData();
       Provider.of<Categories>(context, listen: false).setCategories(cats);
-      Navigator.of(context).pushReplacementNamed(MyFavoritesScreen.routeName);
+      Navigator.of(context).pushReplacementNamed(ChatScreen.routeName);
     } on PlatformException catch (error) {
       if (mounted) {
         setState(() {
