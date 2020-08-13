@@ -11,7 +11,7 @@ class IntroScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 10),
               child: Image.asset(
-                'assets/images/logo.png',
+                'assets/images/logo.jpg',
                 fit: BoxFit.cover,
               ),
             ),
