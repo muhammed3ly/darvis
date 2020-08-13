@@ -46,7 +46,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     'Log Out',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18 * MediaQuery.of(context).textScaleFactor,
+                      fontSize: 18,
                     ),
                   ),
                   onPressed: () async {

@@ -29,14 +29,11 @@ class _MyAppState extends State<MyApp> {
       DeviceOrientation.portraitUp,
     ]);
     return MultiProvider(
-
       providers: [
         ChangeNotifierProvider(create: (_) => Categories()),
         ChangeNotifierProvider(create: (_) => User())
       ],
-
       child: GetMaterialApp(
-
         debugShowCheckedModeBanner: false,
         title: 'Darvis',
         theme: ThemeData(
@@ -68,7 +65,7 @@ class _MyAppState extends State<MyApp> {
                         }
                         Provider.of<Categories>(context, listen: false)
                             .setCategories(snapshot.data);
-                        return MyFavoritesScreen();
+                        return ChatScreen();
                       });
                 });
           },

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:chat_bot/providers/categories.dart';
 import 'package:chat_bot/providers/users.dart';
 import 'package:chat_bot/screens/my_favorites.dart';
@@ -87,9 +89,10 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    final height =
+        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
     return Scaffold(
-      body: Center(
+      body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
             height: height,
@@ -99,217 +102,202 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(
-                  height: 50,
-                ),
                 Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 50),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            height: 160,
-                            child: Image.asset('assets/images/logo.jpg'),
-                          ),
-                          SizedBox(
-                            height: 50,
-                          ),
-                          Form(
-                            key: formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(bottom: 25),
+                        height: height * 0.25,
+                        child: Image.asset('assets/images/logo.jpg'),
+                      ),
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              margin: EdgeInsets.symmetric(
+                                horizontal: width * 0.09,
+                              ),
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      'Email Address',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromRGBO(53, 77, 175, 1),
+                                      ),
+                                    ),
                                   ),
-                                  padding: EdgeInsets.only(
-                                      left: 10, top: 10, right: 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
+                                  TextFormField(
+                                    onSaved: (value) => email = value,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        email = value;
+                                      });
+                                    },
+                                    onEditingComplete: () =>
+                                        passwordFocus.requestFocus(),
+                                    keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
+                                    key: ValueKey('email'),
+                                    style: TextStyle(fontSize: 13),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                      hintText: 'Ex. JohnMac@gmail.com',
+                                      hintStyle: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                      isDense: true,
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 8),
+                                      errorStyle: TextStyle(
+                                          color: Colors.red, height: 0.5),
+                                    ),
+                                    validator: (email) {
+                                      if (email.isEmpty)
+                                        return 'enter your email address';
+                                      if (!email.contains('@'))
+                                        return 'enter a valid email address';
+                                      return null;
+                                    },
+                                  ),
+                                  SizedBox(
+                                    height: 8,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              margin: EdgeInsets.symmetric(
+                                horizontal: width * 0.09,
+                              ),
+                              padding:
+                                  EdgeInsets.only(left: 10, top: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      'Password',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromRGBO(53, 77, 175, 1),
+                                      ),
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    focusNode: passwordFocus,
+                                    onSaved: (value) => password = value,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        password = value;
+                                      });
+                                    },
+                                    onFieldSubmitted: (_) => login(),
+                                    key: ValueKey('password'),
+                                    validator: (value) {
+                                      if (value.isEmpty)
+                                        return 'enter your password';
+                                      return null;
+                                    },
+                                    style: TextStyle(fontSize: 13),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                      hintText: '* * * * * * * * * * *',
+                                      hintStyle: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                      isDense: true,
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 8),
+                                      errorStyle: TextStyle(
+                                          color: Colors.red, height: 0.5),
+                                    ),
+                                    obscureText: true,
+                                  ),
+                                  SizedBox(
+                                    height: 8,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            _isSigning
+                                ? CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Theme.of(context).primaryColor,
+                                    ),
+                                  )
+                                : Opacity(
+                                    opacity: (email.isEmpty || password.isEmpty)
+                                        ? 0.6
+                                        : 1.0,
+                                    child: Container(
+                                      height: min(60, height * 0.09),
+                                      decoration: BoxDecoration(
+                                        color: Color.fromRGBO(53, 77, 175, 1),
+                                        borderRadius: const BorderRadius.all(
+                                          const Radius.circular(28.0),
+                                        ),
+                                      ),
+                                      width: double.infinity,
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: width * 0.09,
+                                      ),
+                                      child: FlatButton(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 60),
                                         child: Text(
-                                          'Email Address',
+                                          'Login',
                                           style: TextStyle(
-                                            fontSize: 14,
-                                            color:
-                                                Color.fromRGBO(53, 77, 175, 1),
-                                          ),
+                                              fontSize: 20,
+                                              color: Colors.white),
                                         ),
-                                      ),
-                                      TextFormField(
-                                        onSaved: (value) => email = value,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            email = value;
-                                          });
-                                        },
-                                        onEditingComplete: () =>
-                                            passwordFocus.requestFocus(),
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        textInputAction: TextInputAction.next,
-                                        key: ValueKey('email'),
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                        ),
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          errorBorder: InputBorder.none,
-                                          disabledBorder: InputBorder.none,
-                                          hintText: 'Ex. JohnMac@gmail.com',
-                                          hintStyle: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.grey,
-                                          ),
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          errorStyle: TextStyle(
-                                              color: Colors.red, height: 0.5),
-                                        ),
-                                        validator: (email) {
-                                          if (email.isEmpty)
-                                            return 'enter your email address';
-                                          if (!email.contains('@'))
-                                            return 'enter a valid email address';
-                                          return null;
-                                        },
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  padding: EdgeInsets.only(
-                                      left: 10, top: 10, right: 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          'Password',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color:
-                                                Color.fromRGBO(53, 77, 175, 1),
-                                          ),
-                                        ),
-                                      ),
-                                      TextFormField(
-                                        focusNode: passwordFocus,
-                                        onSaved: (value) => password = value,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            password = value;
-                                          });
-                                        },
-                                        onFieldSubmitted: (_) => login(),
-                                        key: ValueKey('password'),
-                                        validator: (value) {
-                                          if (value.isEmpty)
-                                            return 'enter your password';
-                                          return null;
-                                        },
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                        ),
-                                        decoration: InputDecoration(
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          enabledBorder:
-                                              const OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          hintText: '* * * * * * * * * * *',
-                                          hintStyle: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.grey,
-                                          ),
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 8),
-                                          errorStyle: TextStyle(
-                                              color: Colors.red, height: 0.5),
-                                        ),
-                                        obscureText: true,
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                _isSigning
-                                    ? CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          Theme.of(context).primaryColor,
-                                        ),
-                                      )
-                                    : Opacity(
-                                        opacity:
+                                        onPressed:
                                             (email.isEmpty || password.isEmpty)
-                                                ? 0.6
-                                                : 1.0,
-                                        child: Container(
-                                          height: 60,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Color.fromRGBO(53, 77, 175, 1),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              const Radius.circular(28.0),
-                                            ),
-                                          ),
-                                          width: double.infinity,
-                                          child: FlatButton(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 60),
-                                            child: Text(
-                                              'Login',
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  color: Colors.white),
-                                            ),
-                                            onPressed: (email.isEmpty ||
-                                                    password.isEmpty)
                                                 ? null
                                                 : () => login(),
-                                          ),
-                                        ),
                                       ),
-                              ],
-                            ),
-                          ),
-                        ],
+                                    ),
+                                  ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
                 InkWell(
@@ -328,25 +316,27 @@ class _SignInScreenState extends State<SignInScreen> {
                     width: width,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          'Don\'t have an account?',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w300,
+                    child: FittedBox(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Don\'t have an account?',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
-                        ),
-                        Text(
-                          ' Sign up.',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
+                          Text(
+                            ' Sign up.',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

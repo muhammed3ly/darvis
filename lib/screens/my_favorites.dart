@@ -118,13 +118,15 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
                                 ),
                                 Flexible(
                                   flex: 3,
-                                  child: Text(
-                                    categories.categories[idx]['name'],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(77, 75, 78, 1),
-                                      fontSize: 20,
+                                  child: FittedBox(
+                                    child: Text(
+                                      categories.categories[idx]['name'],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Color.fromRGBO(77, 75, 78, 1),
+                                        fontSize: 20,
+                                      ),
                                     ),
                                   ),
                                 ),
