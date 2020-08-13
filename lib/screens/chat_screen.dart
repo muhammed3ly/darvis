@@ -24,62 +24,105 @@ class _ChatScreenState extends State<ChatScreen> {
       drawer: CustomDrawer(),
       appBar: CustomAppbar(title: 'Chat Room', openDrawer: drawer),
       body: SafeArea(
-        child: Container(
-          child: Column(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.09,
-                  vertical: 10,
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 20).add(
-                  const EdgeInsets.only(
-                    right: 25,
+        child: SingleChildScrollView(
+          physics: ScrollPhysics(),
+          child: Container(
+            height: MediaQuery.of(context).size.height - 85,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.09,
+                    vertical: 10,
                   ),
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/Asset 05.png',
-                      height: 35,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 20)
+                          .add(
+                    const EdgeInsets.only(
+                      right: 25,
                     ),
-                    Expanded(
-                      child: Text(
-                        'Darvis',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20 * MediaQuery.of(context).textScaleFactor,
-                          color: Color.fromRGBO(53, 77, 175, 1),
-                          letterSpacing: 2,
-                          fontWeight: FontWeight.w600,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/images/Asset 05.png',
+                        height: 35,
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Darvis',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.09,
-                ).add(
-                  const EdgeInsets.only(
-                    bottom: 10,
+                    ],
                   ),
                 ),
-                child: FittedBox(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      InkWell(
-                        onTap: _resetChat,
-                        borderRadius: BorderRadius.circular(50),
-                        child: Container(
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.09,
+                  ).add(
+                    const EdgeInsets.only(
+                      bottom: 10,
+                    ),
+                  ),
+                  child: FittedBox(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        InkWell(
+                          onTap: _resetChat,
+                          borderRadius: BorderRadius.circular(50),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 5,
+                              horizontal: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Row(
+                              children: <Widget>[
+                                Text(
+                                  'Reset Chat',
+                                  style: TextStyle(
+                                    letterSpacing: 1,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color.fromRGBO(53, 77, 175, 1),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.rotationY(pi),
+                                  child: Icon(
+                                    Icons.refresh,
+                                    size: 20 *
+                                        MediaQuery.of(context).textScaleFactor,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 5,
                             horizontal: 12,
@@ -91,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: Row(
                             children: <Widget>[
                               Text(
-                                'Reset Chat',
+                                'Save Conversation',
                                 style: TextStyle(
                                   letterSpacing: 1,
                                   fontWeight: FontWeight.w600,
@@ -101,145 +144,111 @@ class _ChatScreenState extends State<ChatScreen> {
                               SizedBox(
                                 width: 5,
                               ),
-                              Transform(
-                                alignment: Alignment.center,
-                                transform: Matrix4.rotationY(pi),
-                                child: Icon(
-                                  Icons.refresh,
-                                  size: 20 *
-                                      MediaQuery.of(context).textScaleFactor,
-                                  color: Colors.red,
-                                ),
+                              Icon(
+                                Icons.save,
+                                size:
+                                    20 * MediaQuery.of(context).textScaleFactor,
+                                color: Colors.red,
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            Text(
-                              'Save Conversation',
-                              style: TextStyle(
-                                letterSpacing: 1,
-                                fontWeight: FontWeight.w600,
-                                color: Color.fromRGBO(53, 77, 175, 1),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Icons.save,
-                              size: 20 * MediaQuery.of(context).textScaleFactor,
-                              color: Colors.red,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.07,
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: Provider.of<User>(context).messages.length,
-                          reverse: true,
-                          padding: const EdgeInsets.only(bottom: 15),
-                          itemBuilder: (_, i) {
-                            String turn = 'middle';
-                            if (i ==
-                                    Provider.of<User>(context).messages.length -
-                                        1 ||
-                                (i <
-                                        Provider.of<User>(context)
-                                                .messages
-                                                .length -
-                                            1 &&
-                                    Provider.of<User>(context)
-                                            .messages[i + 1]
-                                            .byMe !=
-                                        Provider.of<User>(context)
-                                            .messages[i]
-                                            .byMe)) {
-                              turn = 'start';
-                            }
-                            if (Provider.of<User>(context)
-                                    .messages[i]
-                                    .recommendations !=
-                                null) {
-                              return ChatBubble.chatbotRecommendation(
-                                ValueKey(Provider.of<User>(context)
-                                    .messages[i]
-                                    .time),
-                                {
-                                  'message': Provider.of<User>(context)
+                Expanded(
+                  child: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.07,
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            itemCount:
+                                Provider.of<User>(context).messages.length,
+                            reverse: true,
+                            padding: const EdgeInsets.only(bottom: 15),
+                            itemBuilder: (_, i) {
+                              String turn = 'middle';
+                              if (i ==
+                                      Provider.of<User>(context)
+                                              .messages
+                                              .length -
+                                          1 ||
+                                  (i <
+                                          Provider.of<User>(context)
+                                                  .messages
+                                                  .length -
+                                              1 &&
+                                      Provider.of<User>(context)
+                                              .messages[i + 1]
+                                              .byMe !=
+                                          Provider.of<User>(context)
+                                              .messages[i]
+                                              .byMe)) {
+                                turn = 'start';
+                              }
+                              if (Provider.of<User>(context)
                                       .messages[i]
-                                      .text,
-                                  'list': Provider.of<User>(context)
+                                      .recommendations !=
+                                  null) {
+                                return ChatBubble.chatbotRecommendation(
+                                  ValueKey(Provider.of<User>(context)
                                       .messages[i]
-                                      .recommendations
-                                },
-                                newMessage: turn == 'start',
-                              );
-                            } else if (Provider.of<User>(context)
-                                .messages[i]
-                                .byMe) {
-                              return ChatBubble.user(
-                                ValueKey(Provider.of<User>(context)
-                                    .messages[i]
-                                    .time),
-                                Provider.of<User>(context).messages[i].text,
-                                newMessage: turn == 'start',
-                              );
-                            } else if (Provider.of<User>(context)
-                                    .messages[i]
-                                    .text ==
-                                '..sudo..replying..') {
-                              return ChatBubble.typing(
-                                ValueKey('typing'),
-                                newMessage: Provider.of<User>(context)
-                                    .messages[i + 1]
-                                    .byMe,
-                              );
-                            } else {
-                              return ChatBubble.chatbot(
-                                ValueKey(Provider.of<User>(context)
-                                    .messages[i]
-                                    .time),
-                                Provider.of<User>(context).messages[i].text,
-                                newMessage: turn == 'start',
-                              );
-                            }
-                          },
+                                      .time),
+                                  {
+                                    'message': Provider.of<User>(context)
+                                        .messages[i]
+                                        .text,
+                                    'list': Provider.of<User>(context)
+                                        .messages[i]
+                                        .recommendations
+                                  },
+                                  newMessage: turn == 'start',
+                                );
+                              } else if (Provider.of<User>(context)
+                                  .messages[i]
+                                  .byMe) {
+                                return ChatBubble.user(
+                                  ValueKey(Provider.of<User>(context)
+                                      .messages[i]
+                                      .time),
+                                  Provider.of<User>(context).messages[i].text,
+                                  newMessage: turn == 'start',
+                                );
+                              } else if (Provider.of<User>(context)
+                                      .messages[i]
+                                      .text ==
+                                  '..sudo..replying..') {
+                                return ChatBubble.typing(
+                                  ValueKey('typing'),
+                                  newMessage: Provider.of<User>(context)
+                                      .messages[i + 1]
+                                      .byMe,
+                                );
+                              } else {
+                                return ChatBubble.chatbot(
+                                  ValueKey(Provider.of<User>(context)
+                                      .messages[i]
+                                      .time),
+                                  Provider.of<User>(context).messages[i].text,
+                                  newMessage: turn == 'start',
+                                );
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                      TypingBar(_sendMessage),
-                    ],
+                        TypingBar(_sendMessage),
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

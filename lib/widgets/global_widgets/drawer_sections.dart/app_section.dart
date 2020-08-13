@@ -1,14 +1,11 @@
+import 'package:chat_bot/providers/users.dart';
 import 'package:chat_bot/widgets/global_widgets/drawer_sections.dart/send_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
-class AppSection extends StatefulWidget {
-  @override
-  _AppSectionState createState() => _AppSectionState();
-}
-
-class _AppSectionState extends State<AppSection> {
+class AppSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +22,7 @@ class _AppSectionState extends State<AppSection> {
             'Theme Design',
             style: TextStyle(
               color: Color.fromRGBO(53, 77, 175, 1),
-              fontSize: 18 * MediaQuery.of(context).textScaleFactor,
+              fontSize: 18,
             ),
           ),
           SizedBox(
@@ -45,7 +42,7 @@ class _AppSectionState extends State<AppSection> {
                   ),
                   child: Icon(
                     Icons.wb_sunny,
-                    size: 28 * MediaQuery.of(context).textScaleFactor,
+                    size: 28,
                     color: Colors.white,
                   ),
                 ),
@@ -64,7 +61,7 @@ class _AppSectionState extends State<AppSection> {
                   ),
                   child: Icon(
                     FontAwesomeIcons.solidMoon,
-                    size: 24 * MediaQuery.of(context).textScaleFactor,
+                    size: 24,
                     color: Color.fromRGBO(146, 151, 185, 1),
                   ),
                 ),
@@ -78,7 +75,7 @@ class _AppSectionState extends State<AppSection> {
             'Ratings/Feedback',
             style: TextStyle(
               color: Color.fromRGBO(53, 77, 175, 1),
-              fontSize: 18 * MediaQuery.of(context).textScaleFactor,
+              fontSize: 18,
             ),
           ),
           SizedBox(
@@ -95,14 +92,14 @@ class _AppSectionState extends State<AppSection> {
             child: Hero(
               tag: 'rating',
               child: RatingBar(
-                initialRating: 0,
+                initialRating: Provider.of<User>(context).rating,
                 tapOnlyMode: true,
                 direction: Axis.horizontal,
                 allowHalfRating: true,
                 itemCount: 5,
                 itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                 unratedColor: Colors.white,
-                itemSize: 30 * MediaQuery.of(context).textScaleFactor,
+                itemSize: 30,
                 itemBuilder: (context, _) => Icon(
                   Icons.star,
                   color: Colors.amber,
@@ -124,7 +121,7 @@ class _AppSectionState extends State<AppSection> {
               Icon(
                 FontAwesomeIcons.facebook,
                 color: Color.fromRGBO(66, 103, 178, 1),
-                size: 30 * MediaQuery.of(context).textScaleFactor,
+                size: 30,
               ),
               SizedBox(
                 width: 15,
@@ -132,7 +129,7 @@ class _AppSectionState extends State<AppSection> {
               Icon(
                 FontAwesomeIcons.instagram,
                 color: Color.fromRGBO(193, 53, 132, 1),
-                size: 30 * MediaQuery.of(context).textScaleFactor,
+                size: 30,
               ),
               SizedBox(
                 width: 15,
@@ -140,7 +137,7 @@ class _AppSectionState extends State<AppSection> {
               Icon(
                 FontAwesomeIcons.twitter,
                 color: Color.fromRGBO(29, 161, 242, 1),
-                size: 30 * MediaQuery.of(context).textScaleFactor,
+                size: 30,
               ),
             ],
           ),

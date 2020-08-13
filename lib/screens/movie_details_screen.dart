@@ -31,30 +31,27 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
           Container(
             width: MediaQuery.of(context).size.width,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                SizedBox(
-                  width: 20,
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios,
-                    size: 30 * MediaQuery.of(context).textScaleFactor,
-                    color: Color.fromRGBO(53, 77, 175, 1),
+                Expanded(
+                  flex: 1,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      size: 30,
+                      color: Color.fromRGBO(53, 77, 175, 1),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                SizedBox(
-                  width: 10,
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: Text(
                     widget.movie['Title'],
-                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 25 * MediaQuery.of(context).textScaleFactor,
+                      fontSize: 25,
                       color: Color.fromRGBO(77, 77, 77, 1),
                     ),
                   ),
@@ -69,7 +66,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         widget.movie['imdbRating'],
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 25 * MediaQuery.of(context).textScaleFactor,
+                          fontSize: 25,
                           color: Color.fromRGBO(53, 77, 175, 1),
                         ),
                       ),

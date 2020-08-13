@@ -136,13 +136,35 @@ class _SendFeedbackState extends State<SendFeedback>
                         curve: Curves.fastOutSlowIn,
                         parent: titleController,
                       ),
-                      child: Text(
-                        'Send Feedback',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 60 * MediaQuery.of(context).textScaleFactor,
-                          fontWeight: FontWeight.bold,
+                      child: Center(
+                        child: FittedBox(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 18.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Send',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 60,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Feedback',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 60,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -164,7 +186,7 @@ class _SendFeedbackState extends State<SendFeedback>
                           itemCount: 5,
                           itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                           unratedColor: Colors.white,
-                          itemSize: 30 * MediaQuery.of(context).textScaleFactor,
+                          itemSize: 30,
                           itemBuilder: (context, _) => Icon(
                             Icons.star,
                             color: Colors.amber,
@@ -249,6 +271,7 @@ class _SendFeedbackState extends State<SendFeedback>
                           child: Text(
                             'Send Feedback',
                             style: TextStyle(
+                              fontSize: 18,
                               color: Colors.white,
                             ),
                           ),

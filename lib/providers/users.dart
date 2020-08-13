@@ -26,6 +26,7 @@ class Message {
 
 class User with ChangeNotifier {
   String email, userName, imageUrl, userId;
+  double _rating;
   File pickedImage;
   List<Message> _chatMessages = [];
   List<Map<String, String>> categories = [];
@@ -40,6 +41,7 @@ class User with ChangeNotifier {
     String userId,
     File pickedImage,
     List<Map<String, String>> categories,
+    double rating,
   }) {
     this.email = email;
     this.userName = userName;
@@ -47,6 +49,7 @@ class User with ChangeNotifier {
     this.userId = userId;
     this.pickedImage = pickedImage;
     this.categories = categories;
+    this._rating = rating;
   }
 
   Future<List<Map<String, String>>> loadData() async {
@@ -67,12 +70,14 @@ class User with ChangeNotifier {
       }).toList();
     }
     final user = await FirebaseAuth.instance.currentUser();
-    final userData = await Firestore.instance.collection('users').document(user.uid).get();
+    final userData =
+        await Firestore.instance.collection('users').document(user.uid).get();
     setData(
       userName: userData['userName'],
       email: user.email,
       userId: user.uid,
       imageUrl: userData['imageUrl'],
+      rating: userData.data.containsKey('rating') ? userData['rating'] : 0.0,
     );
     await loadMessage();
     final allDocuments = await Firestore.instance
@@ -119,6 +124,7 @@ class User with ChangeNotifier {
       'userName': userName,
       'email': email,
       'imageUrl': url,
+      'rating': 0.0,
     });
     setData(
       email: email,
@@ -126,6 +132,7 @@ class User with ChangeNotifier {
       imageUrl: url,
       userId: user.uid,
       categories: categories,
+      rating: 0.0,
     );
     isLoaded = true;
     notifyListeners();
@@ -133,6 +140,10 @@ class User with ChangeNotifier {
 
   List<Message> get messages {
     return [..._chatMessages];
+  }
+
+  double get rating {
+    return _rating;
   }
 
   Map<String, dynamic> toMap(rec) {
@@ -435,19 +446,34 @@ class User with ChangeNotifier {
   }
 
   Future<void> sendFeedback(String text, double rating) async {
+    double prevRating = _rating;
     try {
-      await Firestore.instance.collection('feedback').add({
-        'userId': userId,
-        'rating': rating,
-        'feedback': text.trim(),
-        'date': DateTime.now().toIso8601String(),
-      });
+      _rating = rating;
+      notifyListeners();
+      await Future.wait(
+        [
+          Firestore.instance.collection('feedback').add({
+            'userId': userId,
+            'rating': rating,
+            'feedback': text.trim(),
+            'date': DateTime.now().toIso8601String(),
+          }),
+          Firestore.instance.collection('users').document(userId).setData(
+            {'rating': rating},
+            merge: true,
+          ),
+        ],
+      );
     } on PlatformException {
+      _rating = prevRating;
+      notifyListeners();
       showError(
         'Couldn\'t send your feedback',
         'Please check your internet connection.',
       );
     } catch (error) {
+      _rating = prevRating;
+      notifyListeners();
       showError(
         'Couldn\'t send your feedback',
         'Please check your internet connection.',
