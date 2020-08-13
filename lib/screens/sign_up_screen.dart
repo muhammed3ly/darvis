@@ -49,12 +49,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void pickImage(ImageSource source) async {
-    var pickedImageFile = await ImagePicker.pickImage(
-      source: source,
-      imageQuality: 50,
-      maxWidth: 150,
-    );
+//    var pickedImageFile = await ImagePicker.pickImage(
+//      source: source,
+//      imageQuality: 50,
+//      maxWidth: 150,
+//    );
 
+    var pickedImageFile;
+
+    final pickedFile = await ImagePicker()
+        .getImage(source: source, imageQuality: 50, maxWidth: 150);
+    pickedImageFile = File(pickedFile.path);
     if (pickedImageFile == null) return;
     setState(() {
       pickedImage = pickedImageFile;
@@ -865,13 +870,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                                 Flexible(
                                   flex: 3,
-                                  child: Text(
-                                    categories.categories[idx]['name'],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(77, 75, 78, 1),
-                                      fontSize: 20,
+                                  child: FittedBox(
+                                    child: Text(
+                                      categories.categories[idx]['name'],
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Color.fromRGBO(77, 75, 78, 1),
+                                        fontSize: 20,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -984,26 +991,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       size: 40,
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        'Kind Of Movies',
-                        style: TextStyle(
-                            fontSize: 35,
-                            color: Color.fromRGBO(53, 77, 175, 1),
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'do you prefer ?',
-                        style: TextStyle(
-                          fontSize: 19,
-                          color: Color.fromRGBO(92, 92, 92, 1),
-                          fontWeight: FontWeight.w800,
+                  FittedBox(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Kind Of Movies',
+                          style: TextStyle(
+                              fontSize: 35,
+                              color: Color.fromRGBO(53, 77, 175, 1),
+                              fontWeight: FontWeight.bold),
                         ),
-                      ),
-                    ],
+                        Text(
+                          'do you prefer ?',
+                          style: TextStyle(
+                            fontSize: 19,
+                            color: Color.fromRGBO(92, 92, 92, 1),
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
