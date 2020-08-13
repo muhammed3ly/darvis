@@ -575,97 +575,99 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Avatar',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 50,
-                        color: Color.fromRGBO(53, 77, 175, 1),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'Choose an',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 40, color: Colors.black),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 80,
-                    backgroundImage: pickedImage == null
-                        ? AssetImage('assets/images/Author__Placeholder.png')
-                        : FileImage(pickedImage),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(249, 249, 249, 1),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        height: 40,
-                        child: FlatButton.icon(
-                          onPressed: () => pickImage(ImageSource.camera),
-                          icon: Icon(
-                            Icons.camera_enhance,
-                            color: Color.fromRGBO(53, 77, 175, 1),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Avatar',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 50,
+                          color: Color.fromRGBO(53, 77, 175, 1),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Choose an',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 40, color: Colors.black),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 80,
+                      backgroundImage: pickedImage == null
+                          ? AssetImage('assets/images/Author__Placeholder.png')
+                          : FileImage(pickedImage),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(249, 249, 249, 1),
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                          label: Text('Open camera',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey)),
-                        ),
-                      ),
-                      Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(249, 249, 249, 1),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: FlatButton.icon(
-                            onPressed: () => pickImage(ImageSource.gallery),
+                          height: 40,
+                          child: FlatButton.icon(
+                            onPressed: () => pickImage(ImageSource.camera),
                             icon: Icon(
                               Icons.camera_enhance,
                               color: Color.fromRGBO(53, 77, 175, 1),
                             ),
-                            label: Text('From gallery',
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.grey))),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 0),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  FlatButton.icon(
-                    label: Text(
-                      (pickedImage == null ? 'Skip for Now' : 'Let\'s Go'),
-                      style: TextStyle(
-                          color: Color.fromRGBO(53, 77, 175, 1),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
+                            label: Text('Open camera',
+                                style:
+                                    TextStyle(fontSize: 16, color: Colors.grey)),
+                          ),
+                        ),
+                        Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(249, 249, 249, 1),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: FlatButton.icon(
+                              onPressed: () => pickImage(ImageSource.gallery),
+                              icon: Icon(
+                                Icons.camera_enhance,
+                                color: Color.fromRGBO(53, 77, 175, 1),
+                              ),
+                              label: Text('From gallery',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.grey))),
+                        )
+                      ],
                     ),
-                    icon: Icon(Icons.navigate_next,
-                        color: Color.fromRGBO(53, 77, 175, 1)),
-                    color: Color.fromRGBO(244, 240, 247, 1),
-                    onPressed: () {
-                      setState(() {
-                        step++;
-                      });
-                    },
-                  ),
-                ],
+                    SizedBox(height: 0),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    FlatButton.icon(
+                      label: Text(
+                        (pickedImage == null ? 'Skip for Now' : 'Let\'s Go'),
+                        style: TextStyle(
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      icon: Icon(Icons.navigate_next,
+                          color: Color.fromRGBO(53, 77, 175, 1)),
+                      color: Color.fromRGBO(244, 240, 247, 1),
+                      onPressed: () {
+                        setState(() {
+                          step++;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             InkWell(
