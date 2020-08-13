@@ -15,7 +15,7 @@ class _SendFeedbackState extends State<SendFeedback>
   AnimationController titleController, buttonController, feedbackController;
   TextEditingController _feedbackTEC;
   double _rating;
-  bool _firstRun;
+  bool _firstRun, closing;
   GlobalKey<ScaffoldState> _scaffold;
   @override
   void initState() {
@@ -36,6 +36,7 @@ class _SendFeedbackState extends State<SendFeedback>
       vsync: this,
       duration: Duration(milliseconds: 300),
     );
+    closing = false;
   }
 
   @override
@@ -75,6 +76,9 @@ class _SendFeedbackState extends State<SendFeedback>
 
   void closeScreen() async {
     _scaffold.currentState.removeCurrentSnackBar();
+    setState(() {
+      closing = true;
+    });
     await Future.wait(
       [
         titleController.reverse(),
@@ -100,6 +104,9 @@ class _SendFeedbackState extends State<SendFeedback>
     return WillPopScope(
       onWillPop: () async {
         _scaffold.currentState.removeCurrentSnackBar();
+        setState(() {
+          closing = true;
+        });
         await Future.wait(
           [
             titleController.reverse(),
@@ -126,160 +133,180 @@ class _SendFeedbackState extends State<SendFeedback>
                     width: MediaQuery.of(context).size.width,
                   ),
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    SizeTransition(
-                      sizeFactor: CurvedAnimation(
-                        curve: Curves.fastOutSlowIn,
-                        parent: titleController,
+                Positioned(
+                  left: 15,
+                  top: 15,
+                  child: AnimatedOpacity(
+                    duration: Duration(milliseconds: 500),
+                    opacity: closing ? 0.0 : 1.0,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 28,
                       ),
-                      child: Center(
-                        child: FittedBox(
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 18.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Send',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 60,
-                                    fontWeight: FontWeight.bold,
+                      onPressed: closeScreen,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizeTransition(
+                        sizeFactor: CurvedAnimation(
+                          curve: Curves.fastOutSlowIn,
+                          parent: titleController,
+                        ),
+                        child: Center(
+                          child: FittedBox(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 18.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Send',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 60,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  'Feedback',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 60,
-                                    fontWeight: FontWeight.bold,
+                                  Text(
+                                    'Feedback',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 60,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 50,
-                      margin: const EdgeInsets.symmetric(horizontal: 30),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Hero(
-                        tag: 'rating',
-                        child: RatingBar(
-                          initialRating: widget.initialRating,
-                          tapOnlyMode: true,
-                          direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 5,
-                          itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                          unratedColor: Colors.white,
-                          itemSize: 30,
-                          itemBuilder: (context, _) => Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                          ),
-                          onRatingUpdate: (rating) {
-                            setState(() {
-                              _rating = rating;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    SizeTransition(
-                      sizeFactor: CurvedAnimation(
-                        curve: Curves.fastOutSlowIn,
-                        parent: feedbackController,
-                      ),
-                      child: Container(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.09,
-                          vertical: 15,
-                        ),
-                        child: TextField(
-                          controller: _feedbackTEC,
-                          textInputAction: TextInputAction.newline,
-                          maxLines: 6,
-                          decoration: InputDecoration(
-                            hintText: 'Your reasons for this rating.',
-                            isDense: true,
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.all(5),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
-                              ),
-                            ),
-                            disabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                width: 0,
-                                style: BorderStyle.none,
+                                ],
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizeTransition(
-                      sizeFactor: CurvedAnimation(
-                        curve: Curves.fastOutSlowIn,
-                        parent: buttonController,
-                      ),
-                      child: Align(
+                      Container(
+                        height: 50,
+                        margin: const EdgeInsets.symmetric(horizontal: 30),
                         alignment: Alignment.center,
-                        child: FlatButton(
-                          shape: StadiumBorder(),
-                          color: Color.fromRGBO(53, 77, 175, 1),
-                          child: Text(
-                            'Send Feedback',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Hero(
+                          tag: 'rating',
+                          child: RatingBar(
+                            initialRating: widget.initialRating,
+                            tapOnlyMode: true,
+                            direction: Axis.horizontal,
+                            allowHalfRating: true,
+                            itemCount: 5,
+                            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                            unratedColor: Colors.white,
+                            itemSize: 30,
+                            itemBuilder: (context, _) => Icon(
+                              Icons.star,
+                              color: Colors.amber,
                             ),
+                            onRatingUpdate: (rating) {
+                              setState(() {
+                                _rating = rating;
+                              });
+                            },
                           ),
-                          onPressed: validateThenEdit,
                         ),
                       ),
-                    ),
-                  ],
+                      SizeTransition(
+                        sizeFactor: CurvedAnimation(
+                          curve: Curves.fastOutSlowIn,
+                          parent: feedbackController,
+                        ),
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.09,
+                            vertical: 15,
+                          ),
+                          child: TextField(
+                            controller: _feedbackTEC,
+                            textInputAction: TextInputAction.newline,
+                            maxLines: 6,
+                            decoration: InputDecoration(
+                              hintText: 'Your reasons for this rating.',
+                              isDense: true,
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.all(5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                              disabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizeTransition(
+                        sizeFactor: CurvedAnimation(
+                          curve: Curves.fastOutSlowIn,
+                          parent: buttonController,
+                        ),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: FlatButton(
+                            shape: StadiumBorder(),
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                            child: Text(
+                              'Send Feedback',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            onPressed: validateThenEdit,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

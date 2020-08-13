@@ -11,12 +11,13 @@ class EditEmail extends StatefulWidget {
 class _EditEmailState extends State<EditEmail> with TickerProviderStateMixin {
   AnimationController passwordController, buttonController;
   TextEditingController _emailTEC, _passwordTEC;
-  bool _firstRun;
+  bool _firstRun, closing;
   GlobalKey<ScaffoldState> _scaffold;
   FocusNode _password;
   @override
   void initState() {
     super.initState();
+    closing = false;
     _firstRun = true;
     _scaffold = GlobalKey<ScaffoldState>();
     _emailTEC = TextEditingController();
@@ -72,6 +73,9 @@ class _EditEmailState extends State<EditEmail> with TickerProviderStateMixin {
 
   void closeScreen() async {
     _scaffold.currentState.removeCurrentSnackBar();
+    setState(() {
+      closing = true;
+    });
     await Future.wait(
       [
         buttonController.reverse(),
@@ -98,6 +102,9 @@ class _EditEmailState extends State<EditEmail> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async {
         _scaffold.currentState.removeCurrentSnackBar();
+        setState(() {
+          closing = true;
+        });
         await Future.wait(
           [
             buttonController.reverse(),
@@ -123,58 +130,77 @@ class _EditEmailState extends State<EditEmail> with TickerProviderStateMixin {
                     width: MediaQuery.of(context).size.width,
                   ),
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Hero(
-                      tag: 'Email',
-                      child: Material(
-                        color: Colors.transparent,
-                        child: EditPasswordTFs(
-                          title: 'Email Address',
-                          controller: _emailTEC,
-                          pass: false,
-                          onSubmitted: (_) {
-                            _password.requestFocus();
-                          },
-                        ),
+                Positioned(
+                  left: 15,
+                  top: 15,
+                  child: AnimatedOpacity(
+                    duration: Duration(milliseconds: 500),
+                    opacity: closing ? 0.0 : 1.0,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 28,
                       ),
+                      onPressed: closeScreen,
                     ),
-                    SizeTransition(
-                      sizeFactor: CurvedAnimation(
-                        curve: Curves.fastOutSlowIn,
-                        parent: passwordController,
-                      ),
-                      child: EditPasswordTFs(
-                        title: 'Password',
-                        myFocusNode: _password,
-                        controller: _passwordTEC,
-                        onSubmitted: (_) => validateThenEdit(),
-                      ),
-                    ),
-                    SizeTransition(
-                      sizeFactor: CurvedAnimation(
-                        curve: Curves.fastOutSlowIn,
-                        parent: buttonController,
-                      ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: FlatButton(
-                          shape: StadiumBorder(),
-                          color: Color.fromRGBO(53, 77, 175, 1),
-                          child: Text(
-                            'Edit Email',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Hero(
+                        tag: 'Email',
+                        child: Material(
+                          color: Colors.transparent,
+                          child: EditPasswordTFs(
+                            title: 'Email Address',
+                            controller: _emailTEC,
+                            pass: false,
+                            onSubmitted: (_) {
+                              _password.requestFocus();
+                            },
                           ),
-                          onPressed: validateThenEdit,
                         ),
                       ),
-                    ),
-                  ],
+                      SizeTransition(
+                        sizeFactor: CurvedAnimation(
+                          curve: Curves.fastOutSlowIn,
+                          parent: passwordController,
+                        ),
+                        child: EditPasswordTFs(
+                          title: 'Password',
+                          myFocusNode: _password,
+                          controller: _passwordTEC,
+                          onSubmitted: (_) => validateThenEdit(),
+                        ),
+                      ),
+                      SizeTransition(
+                        sizeFactor: CurvedAnimation(
+                          curve: Curves.fastOutSlowIn,
+                          parent: buttonController,
+                        ),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: FlatButton(
+                            shape: StadiumBorder(),
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                            child: Text(
+                              'Edit Email',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            onPressed: validateThenEdit,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

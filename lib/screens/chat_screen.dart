@@ -110,8 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   transform: Matrix4.rotationY(pi),
                                   child: Icon(
                                     Icons.refresh,
-                                    size: 20 *
-                                        MediaQuery.of(context).textScaleFactor,
+                                    size: 20,
                                     color: Colors.red,
                                   ),
                                 ),
@@ -146,8 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                               Icon(
                                 Icons.save,
-                                size:
-                                    20 * MediaQuery.of(context).textScaleFactor,
+                                size: 20,
                                 color: Colors.red,
                               ),
                             ],
