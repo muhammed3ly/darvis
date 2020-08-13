@@ -1,3 +1,4 @@
+import 'package:chat_bot/providers/users.dart';
 import 'package:chat_bot/widgets/global_widgets/custom_appbar.dart';
 import 'package:chat_bot/widgets/global_widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,11 @@ class _MyFavoritesScreenState extends State<MyFavoritesScreen> {
                                   key: ValueKey(
                                       categories.categories[idx]['name']),
                                   child: GestureDetector(
-                                    onTap: () => categories.toggleFavorite(idx),
+                                    onTap: () => categories.toggleFavorite(
+                                      idx,
+                                      true,
+                                      Provider.of<User>(context).userId,
+                                    ),
                                     child: Stack(
                                       fit: StackFit.expand,
                                       children: <Widget>[

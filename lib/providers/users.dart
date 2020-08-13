@@ -67,15 +67,14 @@ class User with ChangeNotifier {
       }).toList();
     }
     final user = await FirebaseAuth.instance.currentUser();
-    final loadUserDataCalls =
-        await Future.wait([_loadUserData(user.uid), loadMessage()]);
-    final userData = loadUserDataCalls[0];
+    final userData = await Firestore.instance.collection('users').document(user.uid).get();
     setData(
       userName: userData['userName'],
       email: user.email,
       userId: user.uid,
       imageUrl: userData['imageUrl'],
     );
+    await loadMessage();
     final allDocuments = await Firestore.instance
         .collection('users')
         .document(user.uid)
@@ -88,12 +87,6 @@ class User with ChangeNotifier {
         'isFav': document.data['isFav'] as String,
       };
     }).toList();
-  }
-
-  Future<dynamic> _loadUserData(String uid) async {
-    final data =
-        await Firestore.instance.collection('users').document(uid).get();
-    return data.data;
   }
 
   Future<void> signUp(String email, String userName, String password,

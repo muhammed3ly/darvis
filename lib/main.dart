@@ -43,8 +43,8 @@ class _MyAppState extends State<MyApp> {
             },
           ),
         ),
-        home: Consumer2<User, Categories>(
-          builder: (_, user, categories, __) {
+        home: Builder(
+          builder: (context) {
             return FutureBuilder(
                 future: FirebaseAuth.instance.currentUser(),
                 builder: (ctx, userSnapShort) {
@@ -52,13 +52,15 @@ class _MyAppState extends State<MyApp> {
                     return SignInScreen();
                   }
                   return FutureBuilder(
-                      future: user.loadData(),
+                      future:
+                          Provider.of<User>(context, listen: false).loadData(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return SplashScreen();
                         }
-                        categories.setCategories(snapshot.data);
+                        Provider.of<Categories>(context, listen: false)
+                            .setCategories(snapshot.data);
                         return MyFavoritesScreen();
                       });
                 });
