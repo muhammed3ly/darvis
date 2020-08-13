@@ -167,335 +167,330 @@ class _SignUpScreenState extends State<SignUpScreen> {
             color: Color.fromRGBO(244, 240, 247, 1),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              FittedBox(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 10,
-                  ),
-                  height: 160,
-                  child: Image.asset('assets/images/logo.jpg'),
-                ),
-              ),
               Expanded(
-                child: Container(
-                  padding: EdgeInsets.only(left: 40, right: 40),
-                  child: ListView(
-                    children: <Widget>[
-                      Form(
-                        key: formKey,
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              padding:
-                                  EdgeInsets.only(left: 10, top: 10, right: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: Text(
-                                      'Email Address',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromRGBO(53, 77, 175, 1),
-                                      ),
-                                    ),
-                                  ),
-                                  TextFormField(
-                                    onChanged: (value) {
-                                      setState(() {
-                                        email = value;
-                                      });
-                                    },
-                                    onEditingComplete: () =>
-                                        focusNode1.requestFocus(),
-                                    onSaved: (value) => email = value,
-                                    keyboardType: TextInputType.emailAddress,
-                                    key: ValueKey('email'),
+                child: Form(
+                  key: formKey,
+                  child: SingleChildScrollView(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: width * 0.09,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(bottom: 25),
+                            height: height * 0.25,
+                            child: Image.asset('assets/images/logo.jpg'),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            padding:
+                                EdgeInsets.only(left: 10, top: 10, right: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'Email Address',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      color: Color.fromRGBO(53, 77, 175, 1),
                                     ),
-                                    textInputAction: TextInputAction.next,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      hintText: 'Ex. JohnMac@gmail.com',
-                                      hintStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                      ),
-                                      isDense: true,
-                                      contentPadding:
-                                          EdgeInsets.symmetric(horizontal: 8),
-                                      errorStyle: TextStyle(
-                                        color: Colors.red,
-                                        height: 0.5,
-                                      ),
-                                    ),
-                                    validator: (email) {
-                                      if (email.isEmpty)
-                                        return 'enter your email address';
-                                      if (!email.contains('@'))
-                                        return 'enter a valid email address';
-                                      return null;
-                                    },
-                                    controller: emailController,
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              padding:
-                                  EdgeInsets.only(left: 10, top: 10, right: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: Text(
-                                      'User name',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromRGBO(53, 77, 175, 1),
-                                      ),
-                                    ),
-                                  ),
-                                  TextFormField(
-                                    onChanged: (value) {
-                                      setState(() {
-                                        userName = value;
-                                      });
-                                    },
-                                    focusNode: focusNode1,
-                                    onEditingComplete: () =>
-                                        focusNode2.requestFocus(),
-                                    controller: userNameController,
-                                    onSaved: (value) => userName = value,
-                                    keyboardType: TextInputType.emailAddress,
-                                    key: ValueKey('User Name'),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                    textInputAction: TextInputAction.next,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      hintText: 'John M',
-                                      hintStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                      ),
-                                      isDense: true,
-                                      contentPadding:
-                                          EdgeInsets.symmetric(horizontal: 8),
-                                      errorStyle: TextStyle(
-                                        color: Colors.red,
-                                        height: 0.5,
-                                      ),
-                                    ),
-                                    validator: (userName) {
-                                      if (userName.isEmpty)
-                                        return 'enter your user name';
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              padding:
-                                  EdgeInsets.only(left: 10, top: 10, right: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: Text(
-                                      'Password',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromRGBO(53, 77, 175, 1),
-                                      ),
-                                    ),
-                                  ),
-                                  TextFormField(
-                                    onChanged: (value) {
-                                      setState(() {
-                                        password = value;
-                                      });
-                                    },
-                                    focusNode: focusNode2,
-                                    onEditingComplete: () =>
-                                        focusNode3.requestFocus(),
-                                    controller: passwordController,
-                                    onSaved: (value) => password = value,
-                                    key: ValueKey('password'),
-                                    validator: (value) {
-                                      if (value.isEmpty)
-                                        return 'enter your password';
-                                      if (value.length < 6)
-                                        return 'Password must be at least 6 characters long';
-                                      return null;
-                                    },
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                    textInputAction: TextInputAction.next,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      hintText: '* * * * * * * * * * *',
-                                      hintStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                      ),
-                                      isDense: true,
-                                      errorStyle: TextStyle(
-                                        color: Colors.red,
-                                        height: 0.5,
-                                      ),
-                                      contentPadding:
-                                          EdgeInsets.symmetric(horizontal: 8),
-                                    ),
-                                    obscureText: true,
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              padding:
-                                  EdgeInsets.only(left: 10, top: 10, right: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: Text(
-                                      'Confirm Password',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color.fromRGBO(53, 77, 175, 1),
-                                      ),
-                                    ),
-                                  ),
-                                  TextFormField(
-                                    onChanged: (value) {
-                                      setState(() {
-                                        confirmedPassword = value;
-                                      });
-                                    },
-                                    focusNode: focusNode3,
-                                    controller: confirmedPasswordController,
-                                    onSaved: (value) => password = value,
-                                    key: ValueKey('confirm password'),
-                                    validator: (value) {
-                                      if (confirmedPassword != password ||
-                                          value.isEmpty)
-                                        return 'password dosen\'t match';
-                                      return null;
-                                    },
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                    textInputAction: TextInputAction.done,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      hintText: '* * * * * * * * * * *',
-                                      hintStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                      ),
-                                      isDense: true,
-                                      errorStyle: TextStyle(
-                                        color: Colors.red,
-                                        height: 0.5,
-                                      ),
-                                      contentPadding:
-                                          EdgeInsets.symmetric(horizontal: 8),
-                                    ),
-                                    obscureText: true,
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            InkWell(
-                              onTap: goToForm2,
-                              child: Container(
-                                height: 50,
-                                width: 2 * width / 3,
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(53, 77, 175, 1),
-                                  borderRadius: const BorderRadius.all(
-                                    const Radius.circular(28.0),
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    SizedBox(
-                                      width: 5,
+                                TextFormField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      email = value;
+                                    });
+                                  },
+                                  onEditingComplete: () =>
+                                      focusNode1.requestFocus(),
+                                  onSaved: (value) => email = value,
+                                  keyboardType: TextInputType.emailAddress,
+                                  key: ValueKey('email'),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    hintText: 'Ex. JohnMac@gmail.com',
+                                    hintStyle: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
                                     ),
-                                    Text(
-                                      'Sign up',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.white),
+                                    isDense: true,
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 8),
+                                    errorStyle: TextStyle(
+                                      color: Colors.red,
+                                      height: 0.5,
                                     ),
-                                    FlatButton(
+                                  ),
+                                  validator: (email) {
+                                    if (email.isEmpty)
+                                      return 'enter your email address';
+                                    if (!email.contains('@'))
+                                      return 'enter a valid email address';
+                                    return null;
+                                  },
+                                  controller: emailController,
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            padding:
+                                EdgeInsets.only(left: 10, top: 10, right: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'User name',
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(53, 77, 175, 1),
+                                    ),
+                                  ),
+                                ),
+                                TextFormField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      userName = value;
+                                    });
+                                  },
+                                  focusNode: focusNode1,
+                                  onEditingComplete: () =>
+                                      focusNode2.requestFocus(),
+                                  controller: userNameController,
+                                  onSaved: (value) => userName = value,
+                                  keyboardType: TextInputType.emailAddress,
+                                  key: ValueKey('User Name'),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    hintText: 'John M',
+                                    hintStyle: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                    ),
+                                    isDense: true,
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 8),
+                                    errorStyle: TextStyle(
+                                      color: Colors.red,
+                                      height: 0.5,
+                                    ),
+                                  ),
+                                  validator: (userName) {
+                                    if (userName.isEmpty)
+                                      return 'enter your user name';
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            padding:
+                                EdgeInsets.only(left: 10, top: 10, right: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'Password',
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(53, 77, 175, 1),
+                                    ),
+                                  ),
+                                ),
+                                TextFormField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      password = value;
+                                    });
+                                  },
+                                  focusNode: focusNode2,
+                                  onEditingComplete: () =>
+                                      focusNode3.requestFocus(),
+                                  controller: passwordController,
+                                  onSaved: (value) => password = value,
+                                  key: ValueKey('password'),
+                                  validator: (value) {
+                                    if (value.isEmpty)
+                                      return 'enter your password';
+                                    if (value.length < 6)
+                                      return 'Password must be at least 6 characters long';
+                                    return null;
+                                  },
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    hintText: '* * * * * * * * * * *',
+                                    hintStyle: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                    ),
+                                    isDense: true,
+                                    errorStyle: TextStyle(
+                                      color: Colors.red,
+                                      height: 0.5,
+                                    ),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 8),
+                                  ),
+                                  obscureText: true,
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            padding:
+                                EdgeInsets.only(left: 10, top: 10, right: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    'Confirm Password',
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(53, 77, 175, 1),
+                                    ),
+                                  ),
+                                ),
+                                TextFormField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      confirmedPassword = value;
+                                    });
+                                  },
+                                  focusNode: focusNode3,
+                                  controller: confirmedPasswordController,
+                                  onSaved: (value) => password = value,
+                                  key: ValueKey('confirm password'),
+                                  validator: (value) {
+                                    if (confirmedPassword != password ||
+                                        value.isEmpty)
+                                      return 'password dosen\'t match';
+                                    return null;
+                                  },
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                  ),
+                                  textInputAction: TextInputAction.done,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    hintText: '* * * * * * * * * * *',
+                                    hintStyle: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                    ),
+                                    isDense: true,
+                                    errorStyle: TextStyle(
+                                      color: Colors.red,
+                                      height: 0.5,
+                                    ),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 8),
+                                  ),
+                                  obscureText: true,
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          InkWell(
+                            onTap: goToForm2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(53, 77, 175, 1),
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(28.0),
+                                ),
+                              ),
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 15,
+                              ),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    'Sign up',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.white),
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    child: FlatButton(
                                       onPressed: null,
                                       child: Container(
                                         child: Icon(
                                           Icons.check,
                                           color: Colors.green,
-                                          size: 22,
+                                          size: 20,
                                         ),
                                         padding: EdgeInsets.all(3),
                                         decoration: BoxDecoration(
@@ -505,17 +500,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -530,20 +525,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       topRight: Radius.circular(20),
                     ),
                   ),
-                  width: width,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  alignment: Alignment.center,
-                  child: Row(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 25,
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: <Widget>[
-                      SizedBox(
-                        width: 30,
-                      ),
-                      Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                      ),
-                      SizedBox(
-                        width: 100,
+                      Positioned(
+                        left: 0,
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
                       ),
                       Text(
                         'back to login',
@@ -633,14 +628,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                         child: FlatButton.icon(
-                            onPressed: () => pickImage(ImageSource.gallery),
-                            icon: Icon(
-                              Icons.camera_enhance,
-                              color: Color.fromRGBO(53, 77, 175, 1),
+                          onPressed: () => pickImage(ImageSource.gallery),
+                          icon: Icon(
+                            Icons.camera_enhance,
+                            color: Color.fromRGBO(53, 77, 175, 1),
+                          ),
+                          label: Text(
+                            'From gallery',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
                             ),
-                            label: Text('From gallery',
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.grey))),
+                          ),
+                        ),
                       )
                     ],
                   ),
