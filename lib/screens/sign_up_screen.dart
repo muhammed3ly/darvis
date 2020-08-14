@@ -975,47 +975,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   end: Alignment.bottomCenter,
                 ),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: signingUp
-                        ? null
-                        : () {
-                            setState(() {
-                              step--;
-                            });
-                          },
-                    child: Icon(
-                      Icons.arrow_back_ios,
-                      color: Theme.of(context).primaryColor,
-                      size: 40,
+              child: FittedBox(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: signingUp
+                          ? null
+                          : () {
+                              setState(() {
+                                step--;
+                              });
+                            },
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: Theme.of(context).primaryColor,
+                        size: 40,
+                      ),
                     ),
-                  ),
-                  FittedBox(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          'Kind Of Movies',
-                          style: TextStyle(
-                              fontSize: 35,
-                              color: Color.fromRGBO(53, 77, 175, 1),
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'do you prefer ?',
-                          style: TextStyle(
-                            fontSize: 19,
-                            color: Color.fromRGBO(92, 92, 92, 1),
-                            fontWeight: FontWeight.w800,
+                    
+                    FittedBox(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Kind Of Movies',
+                            style: TextStyle(
+                                fontSize: 35,
+                                color: Color.fromRGBO(53, 77, 175, 1),
+                                fontWeight: FontWeight.bold),
+                            softWrap: true,
                           ),
-                        ),
-                      ],
+                          Text(
+                            'do you prefer ?',
+                            style: TextStyle(
+                              fontSize: 19,
+                              color: Color.fromRGBO(92, 92, 92, 1),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
