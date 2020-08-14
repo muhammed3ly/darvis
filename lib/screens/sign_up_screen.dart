@@ -965,6 +965,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               padding: EdgeInsets.only(
                 left: MediaQuery.of(context).size.width * 0.05,
                 top: 15,
+                right: 12,
               ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
