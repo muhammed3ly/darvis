@@ -927,7 +927,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 Positioned(
                                   right: 0,
                                   child: signingUp
-                                      ? CircularProgressIndicator()
+                                      ? Container(
+                                          margin:
+                                              const EdgeInsets.only(right: 15),
+                                          height: 30,
+                                          width: 30,
+                                          child: CircularProgressIndicator(),
+                                        )
                                       : FlatButton(
                                           onPressed: null,
                                           child: Container(
