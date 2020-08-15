@@ -121,12 +121,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
       password = password.trim();
       var categories =
           Provider.of<Categories>(context, listen: false).categories;
-      await Provider.of<User>(context, listen: false)
+      bool timedOut = await Provider.of<User>(context, listen: false)
           .signUp(email, userName, password, pickedImage, categories);
+      if (timedOut) {
+        throw Exception('Check your internet connection');
+      }
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(ChatScreen.routeName);
       }
     } on PlatformException catch (error) {
+      var message = error.message;
+      if (message == 'An internal error has occurred. [ 7: ]')
+        message =
+            'an error occurred, please check your internet connection and try again';
       if (mounted) {
         setState(() {
           signingUp = false;
@@ -134,18 +141,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
       Get.rawSnackbar(
         messageText: Text(
-          error.message,
+          message,
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red[700],
       );
     } catch (error) {
+      var message = error.message;
+      if (message == 'An internal error has occurred. [ 7: ]')
+        message =
+            'an error occurred, please check your internet connection and try again';
       if (mounted) {
         setState(() {
           signingUp = false;
         });
       }
-      debugPrint(error);
+      Get.rawSnackbar(
+        messageText: Text(
+          message,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red[700],
+      );
     }
   }
 
@@ -1000,7 +1017,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         size: 40,
                       ),
                     ),
-                    
                     FittedBox(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -17,26 +17,30 @@ class NavigationSection extends StatelessWidget {
           ),
         ),
       ),
-      child: Column(
-        children: <Widget>[
-          NavigationSectionItem(
-            icon: Icons.person,
-            title: 'Profile',
-            onTap: () {
-              Navigator.of(context)
-                  .pushReplacementNamed(ProfileScreen.routeName);
-            },
-          ),
-          NavigationSectionItem(
-            icon: FontAwesomeIcons.film,
-            title: 'Movies Genres',
-            onTap: () {
-              Navigator.of(context)
-                  .pushReplacementNamed(MyFavoritesScreen.routeName);
-            },
-          ),
-          ChatNavigationSectionItem(),
-        ],
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        child: Column(
+          children: <Widget>[
+            NavigationSectionItem(
+              icon: Icons.person,
+              title: 'Profile',
+              onTap: () {
+                Navigator.of(context)
+                    .pushReplacementNamed(ProfileScreen.routeName);
+              },
+            ),
+            NavigationSectionItem(
+              icon: FontAwesomeIcons.film,
+
+              title: 'Movies Genres',
+              onTap: () {
+                Navigator.of(context)
+                    .pushReplacementNamed(MyFavoritesScreen.routeName);
+              },
+            ),
+            ChatNavigationSectionItem(),
+          ],
+        ),
       ),
     );
   }

@@ -16,6 +16,7 @@ class Message {
   final bool byMe;
   final String time;
   final recommendations;
+
   Message({
     @required this.text,
     @required this.byMe,
@@ -94,10 +95,16 @@ class User with ChangeNotifier {
     }).toList();
   }
 
-  Future<void> signUp(String email, String userName, String password,
+  Future<bool> signUp(String email, String userName, String password,
       File pickedImage, List<Map<String, String>> categories) async {
+    bool timedOut = false;
     await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .timeout(Duration(seconds: 10), onTimeout: () {
+      timedOut = true;
+      return;
+    });
+    if (timedOut) return true;
     final user = await FirebaseAuth.instance.currentUser();
     userId = user.uid;
     categories.forEach((type) async {
@@ -136,6 +143,7 @@ class User with ChangeNotifier {
     );
     isLoaded = true;
     notifyListeners();
+    return false;
   }
 
   List<Message> get messages {

@@ -54,11 +54,18 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       email = email.trim();
       password = password.trim();
-      await auth.signInWithEmailAndPassword(email: email, password: password);
+      await auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .timeout(Duration(seconds: 10), onTimeout: () {
+        throw Exception('Check your internet connection');
+      });
       final cats = await Provider.of<User>(context, listen: false).loadData();
       Provider.of<Categories>(context, listen: false).setCategories(cats);
       Navigator.of(context).pushReplacementNamed(ChatScreen.routeName);
     } on PlatformException catch (error) {
+      var message = error.message;
+      if (message == 'An internal error has occurred. [ 7: ]')
+        message = 'an error occurred, please try again';
       if (mounted) {
         setState(() {
           _isSigning = false;
@@ -66,12 +73,16 @@ class _SignInScreenState extends State<SignInScreen> {
       }
       Get.rawSnackbar(
         messageText: Text(
-          error.message,
+          message,
           style: TextStyle(color: Colors.white),
+          textAlign: TextAlign.center,
         ),
         backgroundColor: Colors.red[700],
       );
     } catch (error) {
+      var message = error.message;
+      if (message == 'An internal error has occurred. [ 7: ]')
+        message = 'an error occurred, please check your internet connection and try again';
       if (mounted) {
         setState(() {
           _isSigning = false;
@@ -79,8 +90,9 @@ class _SignInScreenState extends State<SignInScreen> {
       }
       Get.rawSnackbar(
         messageText: Text(
-          error,
+          message,
           style: TextStyle(color: Colors.white),
+          textAlign: TextAlign.center,
         ),
         backgroundColor: Colors.red[700],
       );
@@ -315,7 +327,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ),
                     width: width,
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     alignment: Alignment.center,
                     child: FittedBox(
                       child: Row(
