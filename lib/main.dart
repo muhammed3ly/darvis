@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => Categories()),
-        ChangeNotifierProvider(create: (_) => User())
+        ChangeNotifierProvider(create: (_) => User()),
       ],
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,

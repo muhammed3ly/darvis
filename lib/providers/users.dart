@@ -1,6 +1,6 @@
 import 'dart:convert' as convert;
-import 'dart:ffi';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +8,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/dialogflow/v2.dart';
+import 'package:googleapis_auth/auth.dart';
+import 'package:googleapis_auth/auth_io.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -34,6 +37,7 @@ class User with ChangeNotifier {
   bool isSigning = false;
   bool isLoaded = false;
   int _replying = 0;
+  DialogflowApi _dialog;
 
   void setData({
     String email,
@@ -169,6 +173,39 @@ class User with ChangeNotifier {
     };
   }
 
+  Future<String> _requestChatBot(String text) async {
+    var dialogSessionId = "projects/newagent-xkyv/agent/sessions/1234";
+
+    Map data = {
+      "queryInput": {
+        "text": {
+          "text": text,
+          "languageCode": "en",
+        }
+      }
+    };
+
+    var request = GoogleCloudDialogflowV2DetectIntentRequest.fromJson(data);
+
+    var resp = await _dialog.projects.agent.sessions
+        .detectIntent(request, dialogSessionId);
+    var result = resp.queryResult;
+    return result.intent.displayName;
+  }
+
+  Future<void> _initChatbot() async {
+    String configString =
+        await rootBundle.loadString('assets/newagent-xkyv-abe80b73a056.json');
+    String _dialogFlowConfig = configString;
+
+    var credentials = new ServiceAccountCredentials.fromJson(_dialogFlowConfig);
+
+    const _SCOPES = const [DialogflowApi.CloudPlatformScope];
+
+    var httpClient = await clientViaServiceAccount(credentials, _SCOPES);
+    _dialog = new DialogflowApi(httpClient);
+  }
+
   Future<void> addMessage(Message message) async {
     if (_replying > 0) {
       _chatMessages.insert(1, message);
@@ -179,6 +216,9 @@ class User with ChangeNotifier {
     try {
       if (message.byMe) {
         _replying++;
+        if (_dialog == null) {
+          await _initChatbot();
+        }
         await Future.wait([
           Firestore.instance
               .collection('users')
@@ -209,6 +249,23 @@ class User with ChangeNotifier {
               : message.recommendations.map((i) => toMap(i)).toList()
         });
       }
+    } on PlatformException {
+      if (_replying > 0) {
+        _chatMessages.removeAt(0);
+        _replying = 0;
+      }
+      _chatMessages.removeAt(0);
+      notifyListeners();
+      addMessage(
+        Message(
+          text:
+              'I can\'t talk now check the internet connection or try again later.',
+          byMe: false,
+          time: DateTime.now().toIso8601String(),
+        ),
+      );
+    } on NoSuchMethodError catch (error) {
+      print(error.toString());
     } catch (error) {
       if (_replying > 0) {
         _chatMessages.removeAt(0);
@@ -241,13 +298,14 @@ class User with ChangeNotifier {
       }
       String url = 'http://3.230.233.147/darvis';
 
+      final intent = await _requestChatBot(text);
+      debugPrint(intent);
       final response = await http.post(url,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
           body: convert.jsonEncode({
             'Message': text,
-            'NewMessage': 1,
-            'Reply': "all",
-            'NumberFilms': 10
+            'Intent': intent == 'request' ? 'C' : 'N',
+            'NumberFilms': 50
           }));
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseData = convert.jsonDecode(response.body);
@@ -261,7 +319,8 @@ class User with ChangeNotifier {
           );
         } else if (responseData['Activated Model'] == 'R') {
           final recs = [];
-          for (int i = 0; i < responseData['FilmsIDs'].length; i++) {
+          responseData['FilmsIDs'].shuffle();
+          for (int i = 0; i < min(responseData['FilmsIDs'].length, 5); i++) {
             recs.add(await getFilmByID(responseData['FilmsIDs'][i]));
           }
           addMessage(
@@ -289,6 +348,15 @@ class User with ChangeNotifier {
           ),
         );
       }
+    } on PlatformException {
+      addMessage(
+        Message(
+          text:
+              'I can\'t talk now check the internet connection or try again later.',
+          byMe: false,
+          time: DateTime.now().toIso8601String(),
+        ),
+      );
     } catch (error) {
       addMessage(
         Message(

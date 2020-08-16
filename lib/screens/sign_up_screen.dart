@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:chat_bot/screens/chat_screen.dart';
-import 'package:chat_bot/screens/my_favorites.dart';
 import 'package:chat_bot/screens/sign_in_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'package:provider/provider.dart';
 import '../widgets/appbar_without_Drawer.dart';
 import '../providers/categories.dart';
 import '../providers/users.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/sign-up';

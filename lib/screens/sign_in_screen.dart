@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:chat_bot/providers/categories.dart';
 import 'package:chat_bot/providers/users.dart';
 import 'package:chat_bot/screens/chat_screen.dart';
-import 'package:chat_bot/screens/my_favorites.dart';
 import 'package:chat_bot/screens/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -82,7 +81,8 @@ class _SignInScreenState extends State<SignInScreen> {
     } catch (error) {
       var message = error.message;
       if (message == 'An internal error has occurred. [ 7: ]')
-        message = 'an error occurred, please check your internet connection and try again';
+        message =
+            'an error occurred, please check your internet connection and try again';
       if (mounted) {
         setState(() {
           _isSigning = false;

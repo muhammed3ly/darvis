@@ -22,7 +22,7 @@ class _TypingBarState extends State<TypingBar> {
           bottom: 15,
         ),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
@@ -61,7 +61,8 @@ class _TypingBarState extends State<TypingBar> {
                 isDense: true,
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.all(0),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 12),
                 border: InputBorder.none,
                 focusedBorder: InputBorder.none,
                 enabledBorder: InputBorder.none,
@@ -75,16 +76,19 @@ class _TypingBarState extends State<TypingBar> {
           SizedBox(
             width: 10,
           ),
-          InkWell(
-            onTap: _canSend ? _trySendingMessage : null,
-            child: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationZ(-0.25 * pi),
-              child: Icon(
-                Icons.send,
-                color: _canSend
-                    ? Color.fromRGBO(53, 77, 175, 1)
-                    : Color.fromRGBO(53, 77, 175, 1).withOpacity(0.6),
+          Padding(
+            padding: const EdgeInsets.only(right: 5.0),
+            child: InkWell(
+              onTap: _canSend ? _trySendingMessage : null,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationZ(-0.25 * pi),
+                child: Icon(
+                  Icons.send,
+                  color: _canSend
+                      ? Color.fromRGBO(53, 77, 175, 1)
+                      : Color.fromRGBO(53, 77, 175, 1).withOpacity(0.6),
+                ),
               ),
             ),
           ),
