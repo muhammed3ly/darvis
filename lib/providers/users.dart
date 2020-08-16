@@ -173,7 +173,8 @@ class User with ChangeNotifier {
     };
   }
 
-  Future<String> _requestChatBot(String text) async {
+  Future<GoogleCloudDialogflowV2QueryResult> _requestChatBot(
+      String text) async {
     var dialogSessionId = "projects/newagent-xkyv/agent/sessions/1234";
 
     Map data = {
@@ -190,7 +191,7 @@ class User with ChangeNotifier {
     var resp = await _dialog.projects.agent.sessions
         .detectIntent(request, dialogSessionId);
     var result = resp.queryResult;
-    return result.intent.displayName;
+    return result;
   }
 
   Future<void> _initChatbot() async {
@@ -297,9 +298,25 @@ class User with ChangeNotifier {
         notifyListeners();
       }
       String url = 'http://3.230.233.147/darvis';
-
-      final intent = await _requestChatBot(text);
+      final dialogFlowResult = await _requestChatBot(text);
+      final intent = dialogFlowResult.intent.displayName;
       debugPrint(intent);
+      if (intent == 'Default Welcome Intent') {
+        final message = dialogFlowResult.fulfillmentMessages[0].text.text[0];
+        addMessage(
+          Message(
+            text: message,
+            byMe: false,
+            time: DateTime.now().toIso8601String(),
+          ),
+        );
+
+        if (_replying == 0) {
+          _chatMessages.removeAt(0);
+          notifyListeners();
+        }
+        return;
+      }
       final response = await http.post(url,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
           body: convert.jsonEncode({
