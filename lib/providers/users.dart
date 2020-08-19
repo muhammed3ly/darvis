@@ -146,6 +146,8 @@ class User with ChangeNotifier {
       rating: 0.0,
     );
     isLoaded = true;
+    _chatMessages.clear();
+    _chatMessages = [];
     notifyListeners();
     return false;
   }
@@ -300,23 +302,6 @@ class User with ChangeNotifier {
       String url = 'http://3.230.233.147/darvis';
       final dialogFlowResult = await _requestChatBot(text);
       final intent = dialogFlowResult.intent.displayName;
-      debugPrint(intent);
-      if (intent == 'Default Welcome Intent') {
-        final message = dialogFlowResult.fulfillmentMessages[0].text.text[0];
-        addMessage(
-          Message(
-            text: message,
-            byMe: false,
-            time: DateTime.now().toIso8601String(),
-          ),
-        );
-
-        if (_replying == 0) {
-          _chatMessages.removeAt(0);
-          notifyListeners();
-        }
-        return;
-      }
       final response = await http.post(url,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
           body: convert.jsonEncode({
