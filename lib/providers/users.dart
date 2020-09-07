@@ -299,7 +299,7 @@ class User with ChangeNotifier {
         );
         notifyListeners();
       }
-      String url = 'http://3.230.233.147/darvis';
+      String url = 'http://54.160.9.125/darvis';
       final dialogFlowResult = await _requestChatBot(text);
       final intent = dialogFlowResult.intent.displayName;
       final response = await http.post(url,
